@@ -3,8 +3,8 @@ import { View, StyleSheet, Modal, Animated } from 'react-native';
 import { Text, ActivityIndicator } from 'react-native-paper';
 import { useLoading } from '@/contexts/LoadingContext';
 
-// Unused export removed - not imported anywhere in active codebase  
-function GlobalLoading() {
+// Actually used in app/_layout.tsx - restoring export
+export function GlobalLoading() {
   const { isLoading, loadingMessage } = useLoading();
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.8)).current;

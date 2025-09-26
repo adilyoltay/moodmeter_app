@@ -12,8 +12,8 @@ type ConflictLog = {
   resolved_at?: string;
 };
 
-// Unused export removed - not imported anywhere in active codebase
-function ConflictNotificationBanner() {
+// Actually used in app/_layout.tsx - restoring export  
+export default function ConflictNotificationBanner() {
   const [visible, setVisible] = React.useState(false);
   const [latest, setLatest] = React.useState<ConflictLog | null>(null);
 
