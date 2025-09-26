@@ -162,7 +162,8 @@ const styles = StyleSheet.create({
 });
 
 // Header component for screens
-export function ScreenHeader({
+// Unused export removed  
+function ScreenHeader({
   title,
   subtitle,
   rightComponent,

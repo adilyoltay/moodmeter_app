@@ -9,7 +9,8 @@ interface Props {
   mode?: 'signin' | 'signup';
 }
 
-export function GoogleSignInButton({ onPress, disabled = false, loading = false, mode = 'signin' }: Props) {
+// Unused export removed - only used in archived AI code
+function GoogleSignInButton({ onPress, disabled = false, loading = false, mode = 'signin' }: Props) {
   const { language } = useLanguage();
   
   const buttonText = language === 'tr' 

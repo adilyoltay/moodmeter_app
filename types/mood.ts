@@ -10,7 +10,8 @@ export interface TriggerFrequency {
   count: number;
 }
 
-export interface MoodEntryLite {
+// Unused export removed
+interface MoodEntryLite {
   id: string;
   user_id: string;
   mood_score: number; // 0..100

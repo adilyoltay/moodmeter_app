@@ -171,6 +171,7 @@ interface GamificationState {
   saveProfile: () => Promise<void>;
 }
 
+// Unused export removed
 export const useGamificationStore = create<GamificationState>((set, get) => ({
   profile: {
     streakCurrent: 0,

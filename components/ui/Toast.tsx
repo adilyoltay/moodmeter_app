@@ -18,7 +18,8 @@ interface ToastProps {
   duration?: number;
 }
 
-export function Toast({ message, type, visible, onHide, duration = 3000 }: ToastProps) {
+// Unused export removed - not imported anywhere in active codebase
+function Toast({ message, type, visible, onHide, duration = 3000 }: ToastProps) {
   const translateY = useRef(new Animated.Value(-100)).current;
 
   useEffect(() => {

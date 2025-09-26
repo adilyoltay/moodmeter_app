@@ -11,7 +11,8 @@ interface BadgeProps {
   textStyle?: StyleProp<TextStyle>;
 }
 
-export function Badge({
+// Unused export removed
+function Badge({
   text,
   variant = 'default',
   size = 'medium',

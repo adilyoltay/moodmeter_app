@@ -12,7 +12,8 @@ type ConflictLog = {
   resolved_at?: string;
 };
 
-export default function ConflictNotificationBanner() {
+// Unused export removed - not imported anywhere in active codebase
+function ConflictNotificationBanner() {
   const [visible, setVisible] = React.useState(false);
   const [latest, setLatest] = React.useState<ConflictLog | null>(null);
 

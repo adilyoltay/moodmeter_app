@@ -8,7 +8,8 @@ interface MicroRewardAnimationProps {
   onComplete?: () => void;
 }
 
-export function MicroRewardAnimation({ reward, onComplete }: MicroRewardAnimationProps) {
+// Unused export removed  
+function MicroRewardAnimation({ reward, onComplete }: MicroRewardAnimationProps) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;

@@ -66,7 +66,8 @@ export type MicroRewardTrigger =
   | 'multi_module_day_3'
   | 'weekly_consistency_5';
 
-export interface MicroReward {
+// Unused export removed
+interface MicroReward {
   points: number;
   message: string;
   trigger: MicroRewardTrigger;

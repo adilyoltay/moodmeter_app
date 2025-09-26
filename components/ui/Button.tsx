@@ -31,7 +31,8 @@ interface ButtonProps {
   testID?: string;
 }
 
-export function Button({
+// Unused export removed
+function Button({
   children,
   title,
   onPress,
