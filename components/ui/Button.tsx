@@ -31,8 +31,8 @@ interface ButtonProps {
   testID?: string;
 }
 
-// Unused export removed
-function Button({
+// Actually used in BottomCheckinCTA - restoring export
+export function Button({
   children,
   title,
   onPress,

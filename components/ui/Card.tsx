@@ -12,8 +12,8 @@ interface CardProps {
   borderRadius?: number;
 }
 
-// Unused export removed
-function Card({
+// Actually used in debug-console.tsx - restoring export
+export function Card({
   children,
   style,
   variant = 'default',

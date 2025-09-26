@@ -11,8 +11,8 @@ interface AchievementBadgeProps {
   onPress?: () => void;
 }
 
-// Unused export removed
-function AchievementBadge({ achievement, isUnlocked, onPress }: AchievementBadgeProps) {
+// Actually used in achievements.tsx - restoring export
+export function AchievementBadge({ achievement, isUnlocked, onPress }: AchievementBadgeProps) {
   const handlePress = async () => {
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
     onPress?.();

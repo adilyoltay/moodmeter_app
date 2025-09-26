@@ -11,8 +11,8 @@ interface BadgeProps {
   textStyle?: StyleProp<TextStyle>;
 }
 
-// Unused export removed
-function Badge({
+// Actually used in debug-console.tsx - restoring export
+export function Badge({
   text,
   variant = 'default',
   size = 'medium',
