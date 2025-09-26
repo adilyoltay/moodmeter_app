@@ -171,7 +171,7 @@ interface GamificationState {
   saveProfile: () => Promise<void>;
 }
 
-// Unused export removed
+// Actually used in app/(tabs)/index.tsx - export is correct
 export const useGamificationStore = create<GamificationState>((set, get) => ({
   profile: {
     streakCurrent: 0,
