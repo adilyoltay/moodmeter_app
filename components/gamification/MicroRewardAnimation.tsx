@@ -8,8 +8,8 @@ interface MicroRewardAnimationProps {
   onComplete?: () => void;
 }
 
-// Unused export removed  
-function MicroRewardAnimation({ reward, onComplete }: MicroRewardAnimationProps) {
+// Actually used in app/(tabs)/index.tsx line 972 - restoring export
+export function MicroRewardAnimation({ reward, onComplete }: MicroRewardAnimationProps) {
   const fadeAnim = useRef(new Animated.Value(0)).current;
   const translateY = useRef(new Animated.Value(0)).current;
   const scale = useRef(new Animated.Value(0.8)).current;
