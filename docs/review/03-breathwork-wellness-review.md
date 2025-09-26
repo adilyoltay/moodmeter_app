@@ -354,6 +354,238 @@ interface HealthIntegration {
 **Version:** 1.0.0  
 **Status:** [ ] In Progress [ ] Complete [ ] Blocked
 
+---
+
+## 🤖 AI Agent PR Plan & Prompts
+
+### PR Implementation Plan
+
+#### Phase 1: Core Breathwork Engine
+```yaml
+PR-1: Implement Breathwork Engine & Patterns
+Branch: feat/breathwork-engine
+Files:
+  - services/breathwork/BreathworkEngine.ts
+  - utils/breathPatterns.ts
+  - types/breathwork.ts
+  - constants/breathworkPresets.ts
+Size: ~600 lines
+Priority: P0 - Critical
+```
+
+#### Phase 2: Visual Breathwork Component
+```yaml
+PR-2: Create Animated Breathing Circle
+Branch: feat/breathing-circle
+Files:
+  - components/breathwork/BreathingCircle.tsx
+  - components/breathwork/SessionControls.tsx
+  - hooks/useBreathworkAnimation.ts
+  - utils/breathworkAnimations.ts
+Size: ~500 lines
+Priority: P0 - Critical
+```
+
+#### Phase 3: HRV Integration
+```yaml
+PR-3: Integrate HRV Measurement with Breathwork
+Branch: feat/hrv-integration
+Files:
+  - services/heartpy/HRVService.ts
+  - components/breathwork/HRVMonitor.tsx
+  - hooks/useHRVTracking.ts
+  - utils/hrvCalculations.ts
+Size: ~700 lines
+Priority: P1 - High
+```
+
+### AI Agent Prompts
+
+#### 🤖 Prompt 1: Breathwork Engine Implementation
+```markdown
+You are implementing a breathing exercise engine for a wellness app.
+
+CONTEXT:
+- App: MoodMeter - Mental health & wellness
+- Feature: Guided breathing exercises
+- Patterns: Box, 4-7-8, Coherent, Custom
+- Integration: HRV tracking, haptic feedback
+
+TASK: Create breathwork engine with pattern management
+
+REQUIREMENTS:
+1. Pattern Definition:
+   ```typescript
+   interface BreathPattern {
+     name: string;
+     inhale: number;     // seconds
+     hold1?: number;     // optional hold after inhale
+     exhale: number;     // seconds
+     hold2?: number;     // optional hold after exhale
+     cycles: number;     // repetitions
+     hapticPattern: HapticSequence;
+   }
+   ```
+
+2. Session Management:
+   - Start/pause/resume/stop
+   - Progress tracking
+   - Time remaining
+   - Cycle counter
+   - Phase transitions
+
+3. Haptic Feedback:
+   - Inhale: light continuous
+   - Hold: medium pulse
+   - Exhale: light continuous
+   - Transition: sharp tick
+
+4. Audio Cues (optional):
+   - Voice guidance
+   - Ambient sounds
+   - Bell on completion
+   - Volume control
+
+5. State Machine:
+   ```typescript
+   enum BreathPhase {
+     IDLE, PREPARE, INHALE, HOLD_IN,
+     EXHALE, HOLD_OUT, COMPLETE
+   }
+   ```
+
+DELIVERABLES:
+- BreathworkEngine class
+- Pattern presets
+- Session state management
+- Event emitters for UI sync
+```
+
+#### 🤖 Prompt 2: Breathing Circle Animation
+```markdown
+You are creating an animated breathing guide visualization.
+
+CONTEXT:
+- Visual guide for breathing exercises
+- Smooth, calming animations
+- Responsive to breath phases
+- Accessibility friendly
+
+TASK: Implement BreathingCircle component with animations
+
+REQUIREMENTS:
+1. Visual Design:
+   - Expanding/contracting circle
+   - Gradient colors (phase-based)
+   - Progress ring around circle
+   - Phase text overlay
+   - Timer display
+
+2. Animations:
+   ```typescript
+   // Use react-native-reanimated
+   const scale = useSharedValue(1);
+   const opacity = useSharedValue(1);
+   const rotation = useSharedValue(0);
+   ```
+
+3. Color Transitions:
+   - Inhale: Blue gradient
+   - Hold: Purple gradient
+   - Exhale: Green gradient
+   - Smooth transitions
+
+4. Performance:
+   - 60 FPS animations
+   - GPU accelerated
+   - No layout thrashing
+   - Minimal re-renders
+
+IMPLEMENTATION:
+- Use Reanimated 3
+- Spring animations for smoothness
+- Worklets for performance
+- Gesture handler for manual control
+```
+
+#### 🤖 Prompt 3: HRV Integration
+```markdown
+You are integrating heart rate variability tracking with breathwork.
+
+CONTEXT:
+- HRV indicates stress/relaxation
+- Camera-based measurement
+- Real-time feedback during breathing
+- Privacy-first approach
+
+TASK: Add HRV monitoring to breathwork sessions
+
+REQUIREMENTS:
+1. Camera PPG Detection:
+   ```typescript
+   interface HRVMeasurement {
+     rmssd: number;      // HRV metric
+     heartRate: number;  // BPM
+     quality: number;    // 0-1 signal quality
+     timestamp: Date;
+   }
+   ```
+
+2. Real-time Processing:
+   - 30 FPS camera feed
+   - Color channel analysis
+   - Peak detection
+   - Moving average
+
+3. Visual Feedback:
+   - Live heart rate display
+   - HRV trend graph
+   - Signal quality indicator
+   - Coherence score
+
+4. Privacy:
+   - Local processing only
+   - No image storage
+   - Clear permissions
+   - Opt-in feature
+
+TECHNICAL:
+- expo-camera for video
+- Frame processing in JS
+- FFT for frequency analysis
+- Butterworth filtering
+```
+
+### PR Review Checklist
+
+```markdown
+## Breathwork Specific Checks
+
+### Timing Accuracy
+- [ ] Phase durations exact
+- [ ] Transitions smooth
+- [ ] No timer drift
+- [ ] Pause/resume maintains state
+
+### Animation Quality
+- [ ] 60 FPS maintained
+- [ ] No jank or stutter
+- [ ] Smooth color transitions
+- [ ] Responsive to interaction
+
+### HRV Accuracy
+- [ ] Signal processing correct
+- [ ] Noise filtering effective
+- [ ] Measurements validated
+- [ ] Error handling robust
+
+### Accessibility
+- [ ] Works without visuals
+- [ ] Haptic alternatives
+- [ ] Screen reader friendly
+- [ ] Reduced motion support
+```
+
 ## 📝 Notes
 
 _Space for additional observations, bugs found, or improvement suggestions:_

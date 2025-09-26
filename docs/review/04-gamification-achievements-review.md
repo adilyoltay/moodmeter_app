@@ -380,6 +380,238 @@ Core Loops:
 **Version:** 1.0.0  
 **Status:** [ ] In Progress [ ] Complete [ ] Blocked
 
+---
+
+## 🤖 AI Agent PR Plan & Prompts
+
+### PR Implementation Plan
+
+#### Phase 1: Achievement System Core
+```yaml
+PR-1: Implement Achievement Engine
+Branch: feat/achievement-engine
+Files:
+  - services/achievementService.ts
+  - store/gamificationStore.ts
+  - types/achievements.ts
+  - utils/achievementCalculations.ts
+Size: ~800 lines
+Priority: P1 - High
+```
+
+#### Phase 2: Streak System
+```yaml
+PR-2: Add Streak Tracking System
+Branch: feat/streak-system
+Files:
+  - services/streakService.ts
+  - components/gamification/StreakCounter.tsx
+  - utils/streakCalculations.ts
+  - hooks/useStreak.ts
+Size: ~500 lines
+Priority: P1 - High
+```
+
+#### Phase 3: Visual Rewards
+```yaml
+PR-3: Create Reward Animations & UI
+Branch: feat/reward-visuals
+Files:
+  - components/gamification/AchievementModal.tsx
+  - components/gamification/MicroRewardAnimation.tsx
+  - utils/confettiEffects.ts
+  - hooks/useRewardAnimation.ts
+Size: ~600 lines
+Priority: P2 - Medium
+```
+
+### AI Agent Prompts
+
+#### 🤖 Prompt 1: Achievement System Implementation
+```markdown
+You are building a gamification system for a mental health app.
+
+CONTEXT:
+- App: MoodMeter - Mood tracking
+- Goal: Encourage consistent usage
+- Balance: Engaging but not addictive
+- Ethical: Mental health appropriate
+
+TASK: Implement achievement tracking system
+
+REQUIREMENTS:
+1. Achievement Types:
+   ```typescript
+   interface Achievement {
+     id: string;
+     category: 'streak' | 'milestone' | 'special' | 'social';
+     title: string;
+     description: string;
+     icon: string;
+     points: number;
+     tier: 'bronze' | 'silver' | 'gold' | 'platinum';
+     unlockedAt?: Date;
+     progress: number;  // 0-100
+     requirement: AchievementRequirement;
+   }
+   ```
+
+2. Progress Tracking:
+   - Real-time updates
+   - Offline capability
+   - Retroactive unlocks
+   - Progress persistence
+
+3. Unlock Conditions:
+   - Streak-based (7, 30, 100 days)
+   - Count-based (10, 50, 100 entries)
+   - Time-based (morning person)
+   - Pattern-based (consistency)
+
+4. Notifications:
+   - Achievement unlocked
+   - Near completion (90%)
+   - Milestone approaching
+   - Streak at risk
+
+5. Ethical Considerations:
+   - No pressure messaging
+   - Skip day allowance
+   - Focus on progress
+   - Celebrate small wins
+
+DELIVERABLES:
+- Achievement service
+- Progress calculator
+- Unlock checker
+- Notification triggers
+```
+
+#### 🤖 Prompt 2: Streak System
+```markdown
+You are implementing a streak tracking system for daily engagement.
+
+CONTEXT:
+- Track consecutive days of mood entries
+- Allow grace periods (skip 1 day)
+- Multiple streak types
+- Motivational but not stressful
+
+TASK: Build comprehensive streak tracking
+
+REQUIREMENTS:
+1. Streak Logic:
+   ```typescript
+   interface StreakData {
+     current: number;
+     longest: number;
+     startDate: Date;
+     lastEntryDate: Date;
+     freezesAvailable: number;
+     freezeUsedToday: boolean;
+     type: 'daily' | 'weekly' | 'check-in';
+   }
+   ```
+
+2. Grace Periods:
+   - 1 skip day per week
+   - Weekend flexibility
+   - Timezone handling
+   - Retroactive recovery
+
+3. Visual Indicators:
+   - Flame icon with number
+   - Color intensity (heat)
+   - Animation on increment
+   - Risk indicator
+
+4. Motivational Features:
+   - Milestone celebrations
+   - Encouraging messages
+   - Recovery prompts
+   - Personal records
+
+IMPLEMENTATION:
+- Calculate at app launch
+- Check on each entry
+- Store in Zustand
+- Sync with backend
+```
+
+#### 🤖 Prompt 3: Reward Animations
+```markdown
+You are creating delightful reward animations for achievements.
+
+CONTEXT:
+- Celebrate user progress
+- Non-intrusive animations
+- Performance conscious
+- Accessibility friendly
+
+TASK: Implement reward animation system
+
+REQUIREMENTS:
+1. Animation Types:
+   - Confetti burst
+   - Badge reveal
+   - Points counter
+   - Streak fire
+   - Star shower
+
+2. Lottie Animations:
+   ```typescript
+   interface RewardAnimation {
+     type: 'confetti' | 'badge' | 'stars';
+     duration: number;
+     intensity: 'subtle' | 'normal' | 'celebration';
+     colors: string[];
+     haptic: boolean;
+   }
+   ```
+
+3. Performance:
+   - Lazy load animations
+   - GPU accelerated
+   - Auto-cleanup
+   - FPS monitoring
+
+4. Accessibility:
+   - Reduced motion option
+   - Screen reader announce
+   - Skip animation button
+   - Success sound alternative
+
+FILES:
+- MicroRewardAnimation.tsx
+- AchievementModal.tsx
+- confettiEffects.ts
+- soundEffects.ts
+```
+
+### PR Review Checklist
+
+```markdown
+## Gamification Specific Checks
+
+### Engagement Balance
+- [ ] Not overly addictive
+- [ ] Mental health appropriate
+- [ ] Positive reinforcement only
+- [ ] No dark patterns
+
+### Data Integrity
+- [ ] Streak calculation accurate
+- [ ] Progress saved correctly
+- [ ] Achievements persistent
+- [ ] Sync conflicts handled
+
+### Performance
+- [ ] Animations smooth
+- [ ] No memory leaks
+- [ ] Lazy loading works
+- [ ] Background calculations
+```
+
 ## 📝 Balance Notes
 
 _Record any balance issues, exploit possibilities, or user feedback:_

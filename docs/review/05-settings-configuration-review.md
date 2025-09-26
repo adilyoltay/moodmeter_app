@@ -410,6 +410,266 @@ const migrateSettings = async () => {
 **Version:** 1.0.0  
 **Status:** [ ] In Progress [ ] Complete [ ] Blocked
 
+---
+
+## 🤖 AI Agent PR Plan & Prompts
+
+### PR Implementation Plan
+
+#### Phase 1: Settings Infrastructure
+```yaml
+PR-1: Create Settings Store & Persistence
+Branch: feat/settings-infrastructure
+Files:
+  - store/settingsStore.ts
+  - services/settingsPersistence.ts
+  - types/settings.ts
+  - hooks/useSettings.ts
+Size: ~600 lines
+Priority: P0 - Critical
+```
+
+#### Phase 2: Privacy & Security Settings
+```yaml
+PR-2: Implement Privacy Controls
+Branch: feat/privacy-settings
+Files:
+  - components/settings/PrivacySettings.tsx
+  - components/settings/DataManagement.tsx
+  - services/dataExportService.ts
+  - utils/dataSanitization.ts
+Size: ~700 lines
+Priority: P0 - Critical
+```
+
+#### Phase 3: Notification System
+```yaml
+PR-3: Add Smart Notification Settings
+Branch: feat/notification-settings
+Files:
+  - components/settings/NotificationSettings.tsx
+  - services/notificationScheduler.ts
+  - utils/notificationTemplates.ts
+  - hooks/useNotifications.ts
+Size: ~500 lines
+Priority: P1 - High
+```
+
+### AI Agent Prompts
+
+#### 🤖 Prompt 1: Settings Store Implementation
+```markdown
+You are building a comprehensive settings system for a mental health app.
+
+CONTEXT:
+- App: MoodMeter - Privacy-first wellness
+- Settings: User preferences, privacy, notifications
+- Storage: Encrypted local + cloud sync
+- Compliance: GDPR, CCPA ready
+
+TASK: Create settings management infrastructure
+
+REQUIREMENTS:
+1. Settings Structure:
+   ```typescript
+   interface AppSettings {
+     // General
+     theme: 'light' | 'dark' | 'system';
+     language: 'en' | 'tr';
+     hapticFeedback: boolean;
+     
+     // Privacy
+     analytics: boolean;
+     crashReports: boolean;
+     dataCollection: 'minimal' | 'full' | 'none';
+     biometricLock: boolean;
+     
+     // Notifications
+     enabled: boolean;
+     reminderTime: string;
+     smartScheduling: boolean;
+     streakReminders: boolean;
+     
+     // Data
+     autoBackup: boolean;
+     syncEnabled: boolean;
+     deleteAfterDays?: number;
+     
+     // Accessibility
+     fontSize: 'small' | 'medium' | 'large';
+     highContrast: boolean;
+     reduceMotion: boolean;
+   }
+   ```
+
+2. Persistence Layer:
+   - Encrypted storage
+   - Migration support
+   - Default values
+   - Validation
+
+3. State Management:
+   - Zustand store
+   - Optimistic updates
+   - Rollback capability
+   - Change listeners
+
+4. Sync Strategy:
+   - Local-first
+   - Conflict resolution
+   - Offline queue
+   - Batch updates
+
+DELIVERABLES:
+- Settings store with actions
+- Persistence service
+- Migration utilities
+- Type definitions
+```
+
+#### 🤖 Prompt 2: Privacy Controls
+```markdown
+You are implementing privacy settings for sensitive health data.
+
+CONTEXT:
+- Mental health data is sensitive
+- Users need full control
+- GDPR/CCPA compliance required
+- Trust is paramount
+
+TASK: Build privacy control interface
+
+REQUIREMENTS:
+1. Data Controls:
+   ```typescript
+   interface PrivacyControls {
+     // Visibility
+     profileVisibility: 'private' | 'friends' | 'public';
+     moodSharingEnabled: boolean;
+     anonymousMode: boolean;
+     
+     // Data Management
+     exportFormat: 'json' | 'csv' | 'pdf';
+     deleteAccount: () => Promise<void>;
+     clearLocalData: () => Promise<void>;
+     exportAllData: () => Promise<Blob>;
+     
+     // Consent
+     termsAccepted: Date;
+     privacyAccepted: Date;
+     marketingConsent: boolean;
+     researchConsent: boolean;
+   }
+   ```
+
+2. UI Components:
+   - Toggle switches with descriptions
+   - Data export button
+   - Delete account flow
+   - Download all data
+
+3. Security Features:
+   - Confirmation dialogs
+   - Password verification
+   - 24-hour deletion grace
+   - Audit log
+
+4. Export Capabilities:
+   - All mood entries
+   - Settings backup
+   - Media attachments
+   - Analytics data
+
+IMPLEMENTATION:
+- Clear explanations for each setting
+- Immediate effect indicators
+- Undo options where possible
+- Legal compliance badges
+```
+
+#### 🤖 Prompt 3: Smart Notifications
+```markdown
+You are creating an intelligent notification system for wellness reminders.
+
+CONTEXT:
+- Gentle reminders, not nagging
+- Smart timing based on habits
+- Respect user's schedule
+- Motivational messaging
+
+TASK: Implement adaptive notification settings
+
+REQUIREMENTS:
+1. Scheduling Options:
+   ```typescript
+   interface NotificationSchedule {
+     // Basic
+     enabled: boolean;
+     times: string[];  // ["09:00", "21:00"]
+     days: number[];   // [1,2,3,4,5] weekdays
+     
+     // Smart Features
+     adaptiveScheduling: boolean;
+     quietHours: { start: string; end: string; };
+     contextAware: boolean;  // Based on usage
+     
+     // Message Types
+     checkInReminders: boolean;
+     streakNotifications: boolean;
+     insightAlerts: boolean;
+     weeklyReports: boolean;
+   }
+   ```
+
+2. Message Customization:
+   - Tone selection (supportive, neutral, motivating)
+   - Language preference
+   - Emoji usage
+   - Custom messages
+
+3. Smart Features:
+   - Learn from dismissals
+   - Detect optimal times
+   - Respect busy calendar
+   - Weather-based suggestions
+
+4. Testing Tools:
+   - Send test notification
+   - Preview messages
+   - Schedule simulator
+   - Analytics view
+
+FILES:
+- NotificationSettings.tsx
+- NotificationPreview.tsx
+- smartScheduler.ts
+- messageTemplates.ts
+```
+
+### PR Review Checklist
+
+```markdown
+## Settings Specific Checks
+
+### Data Integrity
+- [ ] Settings persist correctly
+- [ ] Migration path tested
+- [ ] Defaults appropriate
+- [ ] Validation comprehensive
+
+### Privacy Compliance
+- [ ] GDPR requirements met
+- [ ] Data export complete
+- [ ] Deletion thorough
+- [ ] Consent tracking works
+
+### UX Considerations
+- [ ] Changes take effect immediately
+- [ ] Confirmations for destructive actions
+- [ ] Clear descriptions
+- [ ] Grouped logically
+```
+
 ## 📝 Configuration Notes
 
 _Document any platform-specific issues, edge cases, or configuration complexities:_

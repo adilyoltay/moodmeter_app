@@ -439,6 +439,292 @@ Requirements:
 **Version:** 1.0.0  
 **Status:** [ ] In Progress [ ] Complete [ ] Blocked
 
+---
+
+## 🤖 AI Agent PR Plan & Prompts
+
+### PR Implementation Plan
+
+#### Phase 1: Offline Storage Layer
+```yaml
+PR-1: Implement Offline-First Storage
+Branch: feat/offline-storage
+Files:
+  - services/offlineStorage.ts
+  - services/sync/queueManager.ts
+  - utils/storageEncryption.ts
+  - types/sync.ts
+Size: ~800 lines
+Priority: P0 - Critical
+```
+
+#### Phase 2: Sync Engine
+```yaml
+PR-2: Create Bidirectional Sync Engine
+Branch: feat/sync-engine
+Files:
+  - services/sync/syncEngine.ts
+  - services/sync/conflictResolver.ts
+  - services/sync/deltaSync.ts
+  - hooks/useSyncStatus.ts
+Size: ~1000 lines
+Priority: P0 - Critical
+```
+
+#### Phase 3: Conflict Resolution UI
+```yaml
+PR-3: Add Conflict Resolution Interface
+Branch: feat/conflict-ui
+Files:
+  - components/sync/ConflictModal.tsx
+  - components/sync/SyncStatusBar.tsx
+  - components/sync/ConflictResolver.tsx
+  - utils/conflictStrategies.ts
+Size: ~600 lines
+Priority: P1 - High
+```
+
+### AI Agent Prompts
+
+#### 🤖 Prompt 1: Offline Storage Implementation
+```markdown
+You are building an offline-first storage system for a mobile health app.
+
+CONTEXT:
+- App: MoodMeter - Works offline primarily
+- Data: Mood entries, settings, achievements
+- Sync: Eventual consistency with Supabase
+- Privacy: Encrypted local storage
+
+TASK: Implement robust offline storage layer
+
+REQUIREMENTS:
+1. Storage Architecture:
+   ```typescript
+   interface OfflineStorage {
+     // Data Types
+     moods: MoodEntry[];
+     pendingSync: SyncQueue[];
+     settings: AppSettings;
+     cache: CacheData;
+     
+     // Operations
+     save<T>(key: string, data: T): Promise<void>;
+     get<T>(key: string): Promise<T | null>;
+     delete(key: string): Promise<void>;
+     clear(): Promise<void>;
+     
+     // Sync Tracking
+     lastSyncTime: Date;
+     syncVersion: number;
+     pendingChanges: Change[];
+   }
+   ```
+
+2. Queue Management:
+   ```typescript
+   interface SyncQueue {
+     id: string;
+     operation: 'CREATE' | 'UPDATE' | 'DELETE';
+     entity: 'mood' | 'settings' | 'achievement';
+     data: any;
+     timestamp: Date;
+     retries: number;
+     status: 'pending' | 'syncing' | 'failed';
+   }
+   ```
+
+3. Encryption:
+   - AES-256 for sensitive data
+   - Key derivation from biometric
+   - Secure key storage
+   - Transparent enc/dec
+
+4. Performance:
+   - Batch operations
+   - Lazy loading
+   - Compression for large data
+   - Background processing
+
+5. Reliability:
+   - Atomic operations
+   - Transaction support
+   - Corruption detection
+   - Auto-recovery
+
+IMPLEMENTATION:
+- AsyncStorage for React Native
+- MMKV for performance critical
+- SQLite for complex queries
+- Encryption via expo-crypto
+```
+
+#### 🤖 Prompt 2: Sync Engine
+```markdown
+You are implementing a bidirectional sync engine for offline-first app.
+
+CONTEXT:
+- Multiple devices per user
+- Offline-first architecture
+- Conflict resolution needed
+- Real-time sync when online
+
+TASK: Build robust sync engine with conflict resolution
+
+REQUIREMENTS:
+1. Sync Protocol:
+   ```typescript
+   interface SyncProtocol {
+     // Sync Process
+     pullChanges(): Promise<Change[]>;
+     pushChanges(changes: Change[]): Promise<void>;
+     resolveConflicts(conflicts: Conflict[]): Promise<void>;
+     
+     // Delta Sync
+     getLocalVersion(): number;
+     getRemoteVersion(): Promise<number>;
+     applyDeltas(deltas: Delta[]): Promise<void>;
+     
+     // Real-time
+     subscribe(callback: (change: Change) => void): void;
+     unsubscribe(): void;
+   }
+   ```
+
+2. Conflict Detection:
+   ```typescript
+   interface Conflict {
+     type: 'update-update' | 'delete-update';
+     local: Change;
+     remote: Change;
+     baseVersion: any;
+     resolution?: 'local' | 'remote' | 'merge';
+   }
+   ```
+
+3. Resolution Strategies:
+   - Last-write-wins (timestamps)
+   - Client-wins (local priority)
+   - Server-wins (remote priority)
+   - Manual merge (user decides)
+   - Field-level merge
+
+4. Optimization:
+   - Delta compression
+   - Batch syncing
+   - Incremental sync
+   - Smart retry logic
+   - Connection awareness
+
+5. Monitoring:
+   - Sync status tracking
+   - Error reporting
+   - Performance metrics
+   - Conflict statistics
+
+DELIVERABLES:
+- SyncEngine class
+- Conflict resolver
+- Delta calculator
+- Retry mechanism
+```
+
+#### 🤖 Prompt 3: Conflict Resolution UI
+```markdown
+You are creating UI for handling sync conflicts in a wellness app.
+
+CONTEXT:
+- Users may not understand conflicts
+- Mental health context (gentle UX)
+- Quick resolution needed
+- Data integrity critical
+
+TASK: Build intuitive conflict resolution interface
+
+REQUIREMENTS:
+1. Conflict Presentation:
+   ```typescript
+   interface ConflictUI {
+     title: string;
+     description: string;
+     localData: {
+       preview: string;
+       timestamp: Date;
+       device: string;
+     };
+     remoteData: {
+       preview: string;
+       timestamp: Date;
+       device: string;
+     };
+     suggestedResolution: 'local' | 'remote';
+   }
+   ```
+
+2. Visual Design:
+   - Side-by-side comparison
+   - Highlighted differences
+   - Device indicators
+   - Timestamp display
+   - Preview of changes
+
+3. Resolution Options:
+   - Keep mine (local)
+   - Keep theirs (remote)
+   - Keep both (duplicate)
+   - Merge (if applicable)
+   - Skip (postpone)
+
+4. User Guidance:
+   - Simple explanations
+   - Visual cues
+   - Recommended action
+   - Undo capability
+   - Help tooltips
+
+5. Batch Handling:
+   - Apply to all similar
+   - Review queue
+   - Progress indicator
+   - Cancel capability
+
+FILES:
+- ConflictModal.tsx
+- ConflictCard.tsx
+- DiffViewer.tsx
+- ResolutionButtons.tsx
+```
+
+### PR Review Checklist
+
+```markdown
+## Sync Specific Checks
+
+### Data Integrity
+- [ ] No data loss scenarios
+- [ ] Conflicts detected correctly
+- [ ] Resolution preserves data
+- [ ] Rollback possible
+
+### Performance
+- [ ] Sync doesn't block UI
+- [ ] Battery efficient
+- [ ] Network optimized
+- [ ] Storage efficient
+
+### Reliability
+- [ ] Handles network failures
+- [ ] Retry logic works
+- [ ] Queue persistence
+- [ ] Corruption recovery
+
+### UX Quality
+- [ ] Status clearly shown
+- [ ] Conflicts explained
+- [ ] Progress visible
+- [ ] Errors actionable
+```
+
 ## 📝 Sync Architecture Notes
 
 _Document any architectural decisions, trade-offs, or known limitations:_
