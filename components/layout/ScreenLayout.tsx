@@ -20,7 +20,7 @@ interface ScreenLayoutProps {
   edges?: ('top' | 'bottom' | 'left' | 'right')[];
 }
 
-function ScreenLayout({ 
+export default function ScreenLayout({ 
   children, 
   scrollable = true, 
   showStatusBar = true,
@@ -225,4 +225,4 @@ const headerStyles = StyleSheet.create({
   },
 });
 
-export default ScreenLayout;
+// export default moved to function declaration above
