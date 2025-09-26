@@ -1,183 +1,217 @@
-# Supabase CLI
+# 🧠 MoodMeter - Mental Sağlık Takip Uygulaması
 
-[![Coverage Status](https://coveralls.io/repos/github/supabase/cli/badge.svg?branch=main)](https://coveralls.io/github/supabase/cli?branch=main) [![Bitbucket Pipelines](https://img.shields.io/bitbucket/pipelines/supabase-cli/setup-cli/master?style=flat-square&label=Bitbucket%20Canary)](https://bitbucket.org/supabase-cli/setup-cli/pipelines) [![Gitlab Pipeline Status](https://img.shields.io/gitlab/pipeline-status/sweatybridge%2Fsetup-cli?label=Gitlab%20Canary)
-](https://gitlab.com/sweatybridge/setup-cli/-/pipelines)
+> **ObsessLess** - OKB ile yaşayan bireyler için dijital sığınak ve mental sağlık destek platformu
 
-[Supabase](https://supabase.io) is an open source Firebase alternative. We're building the features of Firebase using enterprise-grade open source tools.
+[![React Native](https://img.shields.io/badge/React%20Native-0.79.5-blue.svg)](https://reactnative.dev/)
+[![Expo](https://img.shields.io/badge/Expo-53.0.0-black.svg)](https://expo.dev/)
+[![Supabase](https://img.shields.io/badge/Supabase-Backend-green.svg)](https://supabase.com/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.8.3-blue.svg)](https://www.typescriptlang.org/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 
-This repository contains all the functionality for Supabase CLI.
+## 📱 Proje Hakkında
 
-- [x] Running Supabase locally
-- [x] Managing database migrations
-- [x] Creating and deploying Supabase Functions
-- [x] Generating types directly from your database schema
-- [x] Making authenticated HTTP requests to [Management API](https://supabase.com/docs/reference/api/introduction)
+**MoodMeter**, Obsesif Kompulsif Bozukluk (OKB) ile yaşayan bireyler için özel olarak tasarlanmış, kapsamlı bir mental sağlık takip ve destek uygulamasıdır. Uygulama, kullanıcıların günlük ruh hallerini takip etmelerini, kompulsif davranışlarını yönetmelerini ve mental sağlıklarını iyileştirmelerine yardımcı olacak araçlar sunmaktadır.
 
-## Getting started
+### ✨ Ana Özellikler
 
-### Install the CLI
+- 📊 **Ruh Hali Takibi** - Günlük mood skorları ve analiz
+- 🎯 **Kompulsiyon Yönetimi** - Davranış kalıplarını takip etme
+- 🗣️ **Sesli Check-in** - AI destekli konuşma analizi
+- 🫁 **Nefes Egzersizleri** - Rehberli mindfulness teknikleri
+- 🧭 **CBT Araçları** - Bilişsel davranışçı terapi desteği
+- 🏆 **Gamifikasyon** - Motivasyonu artıran ödül sistemi
+- 🔒 **Gizlilik Odaklı** - End-to-end şifreleme ile veri güvenliği
+- 🌍 **Çoklu Dil** - Türkçe ve İngilizce dil desteği
 
-Available via [NPM](https://www.npmjs.com) as dev dependency. To install:
+### 🎯 Hedef Kitle
 
-```bash
-npm i supabase --save-dev
-```
+- OKB ile mücadele eden bireyler
+- Mental sağlık takibi yapmak isteyen kişiler
+- Terapi sürecini desteklemek isteyen hastalar
+- Mental sağlık profesyonelleri (veri analizi için)
 
-To install the beta release channel:
+## 🚀 Teknoloji Stack
 
-```bash
-npm i supabase@beta --save-dev
-```
+### Frontend
+- **React Native** `0.79.5` - Cross-platform mobile development
+- **Expo** `53.0.0` - Development platform ve build tools
+- **TypeScript** `5.8.3` - Type-safe JavaScript
+- **React Native Reanimated** - Performanslı animasyonlar
+- **Expo Router** - File-based navigation
 
-When installing with yarn 4, you need to disable experimental fetch with the following nodejs config.
+### Backend & Database
+- **Supabase** - PostgreSQL database + Auth + Real-time
+- **Row Level Security (RLS)** - Veri güvenliği
+- **Edge Functions** - Serverless API endpoints
 
-```
-NODE_OPTIONS=--no-experimental-fetch yarn add supabase
-```
+### AI & Analytics
+- **Google Gemini API** - Doğal dil işleme
+- **On-device Processing** - Gizlilik odaklı AI analiz
+- **TensorFlow Lite** - Mobil ML modelleri
 
-> **Note**
-For Bun versions below v1.0.17, you must add `supabase` as a [trusted dependency](https://bun.sh/guides/install/trusted) before running `bun add -D supabase`.
+### Kimlik Doğrulama
+- **Supabase Auth** - Email/password authentication
+- **Google OAuth** - Social login
+- **Expo Local Authentication** - Biometric security
 
-<details>
-  <summary><b>macOS</b></summary>
+## 🛠️ Kurulum ve Geliştirme
 
-  Available via [Homebrew](https://brew.sh). To install:
+### Gereksinimler
 
-  ```sh
-  brew install supabase/tap/supabase
-  ```
+- **Node.js** >= 18.14.0
+- **npm** veya **yarn**
+- **Expo CLI**
+- **iOS Simulator** (macOS) veya **Android Emulator**
+- **Supabase Account**
 
-  To install the beta release channel:
-  
-  ```sh
-  brew install supabase/tap/supabase-beta
-  brew link --overwrite supabase-beta
-  ```
-  
-  To upgrade:
-
-  ```sh
-  brew upgrade supabase
-  ```
-</details>
-
-<details>
-  <summary><b>Windows</b></summary>
-
-  Available via [Scoop](https://scoop.sh). To install:
-
-  ```powershell
-  scoop bucket add supabase https://github.com/supabase/scoop-bucket.git
-  scoop install supabase
-  ```
-
-  To upgrade:
-
-  ```powershell
-  scoop update supabase
-  ```
-</details>
-
-<details>
-  <summary><b>Linux</b></summary>
-
-  Available via [Homebrew](https://brew.sh) and Linux packages.
-
-  #### via Homebrew
-
-  To install:
-
-  ```sh
-  brew install supabase/tap/supabase
-  ```
-
-  To upgrade:
-
-  ```sh
-  brew upgrade supabase
-  ```
-
-  #### via Linux packages
-
-  Linux packages are provided in [Releases](https://github.com/supabase/cli/releases). To install, download the `.apk`/`.deb`/`.rpm`/`.pkg.tar.zst` file depending on your package manager and run the respective commands.
-
-  ```sh
-  sudo apk add --allow-untrusted <...>.apk
-  ```
-
-  ```sh
-  sudo dpkg -i <...>.deb
-  ```
-
-  ```sh
-  sudo rpm -i <...>.rpm
-  ```
-
-  ```sh
-  sudo pacman -U <...>.pkg.tar.zst
-  ```
-</details>
-
-<details>
-  <summary><b>Other Platforms</b></summary>
-
-  You can also install the CLI via [go modules](https://go.dev/ref/mod#go-install) without the help of package managers.
-
-  ```sh
-  go install github.com/supabase/cli@latest
-  ```
-
-  Add a symlink to the binary in `$PATH` for easier access:
-
-  ```sh
-  ln -s "$(go env GOPATH)/bin/cli" /usr/bin/supabase
-  ```
-
-  This works on other non-standard Linux distros.
-</details>
-
-<details>
-  <summary><b>Community Maintained Packages</b></summary>
-
-  Available via [pkgx](https://pkgx.sh/). Package script [here](https://github.com/pkgxdev/pantry/blob/main/projects/supabase.com/cli/package.yml).
-  To install in your working directory:
-
-  ```bash
-  pkgx install supabase
-  ```
-
-  Available via [Nixpkgs](https://nixos.org/). Package script [here](https://github.com/NixOS/nixpkgs/blob/master/pkgs/development/tools/supabase-cli/default.nix).
-</details>
-
-### Run the CLI
+### 1. Repository'yi Klonlayın
 
 ```bash
-supabase bootstrap
+git clone https://github.com/adilyoltay/moodmeter_app.git
+cd moodmeter_app
 ```
 
-Or using npx:
+### 2. Bağımlılıkları Yükleyin
 
 ```bash
-npx supabase bootstrap
+npm install
 ```
 
-The bootstrap command will guide you through the process of setting up a Supabase project using one of the [starter](https://github.com/supabase-community/supabase-samples/blob/main/samples.json) templates.
+### 3. Environment Variables
 
-## Docs
+`.env.local` dosyası oluşturun:
 
-Command & config reference can be found [here](https://supabase.com/docs/reference/cli/about).
+```bash
+# Supabase Configuration
+EXPO_PUBLIC_SUPABASE_URL=your_supabase_url
+EXPO_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
 
-## Breaking changes
+# Google OAuth
+EXPO_PUBLIC_GOOGLE_CLIENT_ID=your_google_client_id
 
-We follow semantic versioning for changes that directly impact CLI commands, flags, and configurations.
-
-However, due to dependencies on other service images, we cannot guarantee that schema migrations, seed.sql, and generated types will always work for the same CLI major version. If you need such guarantees, we encourage you to pin a specific version of CLI in package.json.
-
-## Developing
-
-To run from source:
-
-```sh
-# Go >= 1.22
-go run . help
+# Optional: AI Features
+OPENAI_API_KEY=your_openai_api_key
 ```
+
+### 4. Supabase Setup
+
+1. [Supabase Dashboard](https://supabase.com/dashboard)'da yeni proje oluşturun
+2. Database migrations'ları çalıştırın:
+```bash
+npx supabase db push
+```
+
+3. Google OAuth Provider'ı etkinleştirin
+4. RLS policies'leri aktif edin
+
+### 5. Uygulamayı Çalıştırın
+
+```bash
+# Development server'ı başlat
+npx expo start
+
+# iOS Simulator
+npx expo run:ios
+
+# Android Emulator
+npx expo run:android
+```
+
+## 📁 Proje Yapısı
+
+```
+moodmeter_app/
+├── app/                    # Expo Router screens
+│   ├── (auth)/            # Authentication screens
+│   ├── (tabs)/            # Main app tabs
+│   └── _layout.tsx        # Root layout
+├── components/            # React components
+│   ├── ui/               # UI components
+│   ├── mood/             # Mood tracking components
+│   └── breathwork/       # Breathwork components
+├── contexts/             # React contexts
+├── hooks/                # Custom hooks
+├── services/             # API services
+│   ├── supabase/         # Supabase services
+│   ├── ai/              # AI services
+│   └── sync/            # Data synchronization
+├── store/                # State management (Zustand)
+├── utils/                # Utility functions
+├── types/                # TypeScript definitions
+└── supabase/             # Database schema & functions
+    ├── migrations/       # SQL migrations
+    └── functions/        # Edge functions
+```
+
+## 🔧 Geliştirme Komutları
+
+```bash
+# Type checking
+npm run typecheck
+
+# Linting
+npm run lint
+
+# Testing
+npm run test
+
+# Build for production
+npx expo build
+
+# Database migrations
+npx supabase db push
+
+# Generate TypeScript types from database
+npx supabase gen types typescript
+```
+
+## 🏗️ Database Schema
+
+Ana veritabanı tabloları:
+
+- `users` - Kullanıcı profilleri
+- `mood_entries` - Günlük ruh hali kayıtları
+- `compulsion_records` - Kompulsif davranış kayıtları
+- `voice_sessions` - Sesli check-in oturumları
+- `breath_sessions` - Nefes egzersizi oturumları
+- `thought_records` - CBT düşünce kayıtları
+- `gamification_profiles` - Kullanıcı ödül/seviye bilgileri
+
+## 🔒 Güvenlik & Gizlilik
+
+- **End-to-End Şifreleme** - Hassas veriler şifrelenerek saklanır
+- **Row Level Security** - Kullanıcı verilerine yalnızca kendisi erişebilir
+- **On-Device Processing** - AI analizler mümkün olan durumlarda cihazda yapılır
+- **GDPR Compliant** - Avrupa veri koruma standartlarına uygun
+- **No Data Selling** - Kullanıcı verileri asla üçüncü taraflara satılmaz
+
+## 🤝 Katkıda Bulunma
+
+1. Fork edin
+2. Feature branch oluşturun (`git checkout -b feature/amazing-feature`)
+3. Değişikliklerinizi commit edin (`git commit -m 'feat: Add amazing feature'`)
+4. Branch'i push edin (`git push origin feature/amazing-feature`)
+5. Pull Request açın
+
+## 📄 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır. Detaylar için [LICENSE](LICENSE) dosyasına bakın.
+
+## 📞 İletişim & Destek
+
+- **Geliştirici:** Adil Yoltay
+- **GitHub:** [@adilyoltay](https://github.com/adilyoltay)
+- **Proje Repository:** [moodmeter_app](https://github.com/adilyoltay/moodmeter_app)
+
+## 🙏 Teşekkürler
+
+- [Supabase](https://supabase.com/) - Backend altyapısı
+- [Expo](https://expo.dev/) - Development platform
+- [React Native Community](https://reactnative.dev/) - Açık kaynak katkıları
+- Mental sağlık alanındaki tüm araştırmacılar ve terapistler
+
+---
+
+<p align="center">
+  <strong>Mental sağlık, bir yolculuktur. Bu yolculukta yalnız değilsiniz. 💚</strong>
+</p>
