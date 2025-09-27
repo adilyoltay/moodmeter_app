@@ -1,15 +1,16 @@
 import React, { useMemo, useState, useCallback, useRef, useEffect } from 'react';
-import { 
-  View, 
-  Text, 
-  StyleSheet, 
-  Dimensions, 
-  Pressable, 
+import {
+  View,
+  Text,
+  StyleSheet,
+  Dimensions,
+  Pressable,
   ActivityIndicator,
   Modal,
   SafeAreaView,
   ScrollView,
   Alert,
+  Platform,
 } from 'react-native';
 import Slider from '@react-native-community/slider';
 import Animated, { 
@@ -35,6 +36,7 @@ import { useAuth } from '@/contexts/SupabaseAuthContext';
 import { useRouter } from 'expo-router';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { moodDataLoader } from '@/services/moodDataLoader';
+import { mapTriggerIdsToLabels, mapTriggerTokensToIds } from '@/utils/moodTriggers';
 
 // 🎤 REAL STT - İOS crash riski var ama gerçek konuşma için aktif
 import speechToTextService from '@/services/speechToTextService';
@@ -125,6 +127,8 @@ interface VAMoodCheckinProps {
   disableVoice?: boolean;
   initialMEA?: { mood: number; energy: number; anxiety: number } | null;
   serviceMeta?: any | null;
+  autoVoiceStart?: boolean;
+  forceFullScreen?: boolean;
 }
 
 export default function VAMoodCheckin({
@@ -134,6 +138,8 @@ export default function VAMoodCheckin({
   disableVoice = false,
   initialMEA = null,
   serviceMeta = null,
+  autoVoiceStart = false,
+  forceFullScreen = false,
 }: VAMoodCheckinProps) {
   const router = useRouter();
   const { user } = useAuth();
@@ -155,7 +161,13 @@ export default function VAMoodCheckin({
   const [detectedTriggers, setDetectedTriggers] = useState<string[]>([]);
   const [detectedAnxiety, setDetectedAnxiety] = useState<number | null>(null);
   const [isNativeSTTAvailable, setIsNativeSTTAvailable] = useState(!disableVoice);
-  
+  const [detailsDraft, setDetailsDraft] = useState<{ notes: string; triggers: string[]; activities: string[] }>({
+    notes: '',
+    triggers: [],
+    activities: [],
+  });
+  const [isSavingEntry, setIsSavingEntry] = useState(false);
+
   // Realtime analysis state
   const realtimeStateRef = useRef<RealtimeState | null>(null);
   
@@ -189,6 +201,13 @@ export default function VAMoodCheckin({
   // VA Pad color matches selected palette across app
   const color = useMemo(() => getPaletteVAColor(palette as any, xy.x, xy.y), [xy, palette]);
 
+  const modalPresentation = useMemo(() => {
+    if (forceFullScreen) {
+      return 'fullScreen';
+    }
+    return Platform.OS === 'ios' ? 'pageSheet' : 'fullScreen';
+  }, [forceFullScreen]);
+
   const fmt = (v: any) => {
     const n = Number(v);
     if (!Number.isFinite(n)) return '—';
@@ -198,7 +217,11 @@ export default function VAMoodCheckin({
 
   // Keep global accent palette in sync with current valence (0-100)
   const accentDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoVoiceTriggeredRef = useRef(false);
   useEffect(() => {
+    if (!isVisible) {
+      autoVoiceTriggeredRef.current = false;
+    }
     if (accentDebounceRef.current) clearTimeout(accentDebounceRef.current);
     accentDebounceRef.current = setTimeout(() => {
       const mood01 = to01(xy.x);
@@ -310,8 +333,13 @@ export default function VAMoodCheckin({
           
           // Store detected triggers for Step 2
           if (analysis.triggers && analysis.triggers.length > 0) {
-            setDetectedTriggers(analysis.triggers);
-            console.log('🎯 Detected triggers from voice:', analysis.triggers);
+            const normalizedVoiceTriggers = mapTriggerTokensToIds(analysis.triggers);
+            const effectiveTriggers = normalizedVoiceTriggers.length ? normalizedVoiceTriggers : analysis.triggers;
+            setDetectedTriggers(effectiveTriggers);
+            console.log('🎯 Detected triggers from voice:', {
+              raw: analysis.triggers,
+              normalized: normalizedVoiceTriggers,
+            });
           }
           
           // Convert to VA coordinates (service-compatible 5.5 center)
@@ -423,6 +451,20 @@ export default function VAMoodCheckin({
     }
   };
 
+  useEffect(() => {
+    if (!isVisible || disableVoice || !autoVoiceStart || autoVoiceTriggeredRef.current) {
+      return;
+    }
+    autoVoiceTriggeredRef.current = true;
+    // Allow sheet animation to settle before starting voice record
+    const timer = setTimeout(() => {
+      handleVoiceToggle().catch(() => {
+        autoVoiceTriggeredRef.current = false;
+      });
+    }, 250);
+    return () => clearTimeout(timer);
+  }, [autoVoiceStart, disableVoice, isVisible]);
+
   const handleNext = () => {
     // Clean up realtime analysis before moving to step 2
     if (partialTimerRef.current) {
@@ -435,8 +477,6 @@ export default function VAMoodCheckin({
 
     // Ensure STT is stopped if user proceeds without explicitly stopping
     try { speechToTextService.stopRealtimeListening().catch(() => {}); } catch {}
-      
-      console.log('🎧 Realtime v3.5: disabled for step 2');
     
     // Move to step 2 (details)
     setCurrentStep(2);
@@ -449,7 +489,12 @@ export default function VAMoodCheckin({
     Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
   };
 
-  const handleSave = async (details: { notes: string; trigger?: string }) => {
+  const handleSave = async (details: { notes: string; triggers: string[]; activities: string[] }): Promise<boolean> => {
+    if (isSavingEntry) {
+      return false;
+    }
+    setIsSavingEntry(true);
+
     try {
       // Resolve user id robustly if AuthContext not yet ready
       let uid = user?.id;
@@ -462,7 +507,8 @@ export default function VAMoodCheckin({
       if (!uid) {
         console.error('❌ No user ID available');
         Alert.alert('Giriş Gerekli', 'Kaydetmek için lütfen yeniden giriş yapın.');
-        return;
+        setIsSavingEntry(false);
+        return false;
       }
 
       const mood01 = to01(xy.x);
@@ -502,29 +548,69 @@ export default function VAMoodCheckin({
         return Math.max(1, Math.min(10, Math.round(derivedAnxiety)));
       })();
 
+      const triggerLabels = mapTriggerIdsToLabels(details.triggers);
+      const activities = Array.isArray(details.activities) ? details.activities : [];
+
       const moodData = {
         mood_score: moodScore, // Already 0-100 scale
         energy_level: energyLevel, // Already 1-10 scale  
         anxiety_level: finalAnx10,
         notes: details.notes || `Duygu: ${valenceLabel(xy.x)}, Enerji: ${energyLabel(xy.y)}`,
-        triggers: details.trigger ? [details.trigger] : [],
-        activities: [],
+        triggers: triggerLabels,
+        activities,
         user_id: uid,
         source: 'va_pad_voice',
         method: 'va_pad+slider+voice',
         // Store raw VA coordinates for analytics
         metadata: {
           va_point: { x: xy.x, y: xy.y },
-          transcript: transcript
+          transcript,
+          triggers: triggerLabels,
+          activities,
         } as any
       };
 
       console.log('💾 Saving mood entry:', moodData);
       
       // Save mood entry
-      const savedEntry = await moodTracker.saveMoodEntry(moodData);
-      
-      if (savedEntry) {
+      const saveResult = await moodTracker.saveMoodEntry(moodData);
+
+      if (saveResult.status === 'QUEUED_OFFLINE') {
+        setCurrentStep(1);
+        setTranscript('');
+        setShowTranscript(false);
+        setDetectedTriggers([]);
+        setDetailsDraft({ notes: '', triggers: [], activities: [] });
+
+        if (partialTimerRef.current) {
+          clearTimeout(partialTimerRef.current);
+          partialTimerRef.current = null;
+        }
+        realtimeStateRef.current = null;
+        isRealtimeAnalyzingRef.current = false;
+        lastRealtimeTextRef.current = '';
+
+        x.value = 0;
+        y.value = 0;
+        setXY({ x: 0, y: 0 });
+
+        onClose();
+
+        onComplete?.({
+          type: 'MOOD',
+          confidence: 0.5,
+          data: moodData,
+          status: 'QUEUED_OFFLINE',
+          queueItemId: saveResult.itemId,
+          toastShown: false,
+        });
+
+        setIsSavingEntry(false);
+        return true;
+      }
+
+      if (saveResult.status === 'SUCCESS') {
+        const savedEntry = saveResult.entry;
         console.log('✅ Mood entry saved successfully');
         try {
           // Invalidate cached chart datasets so new entry reflects immediately
@@ -548,6 +634,7 @@ export default function VAMoodCheckin({
         setTranscript('');
         setShowTranscript(false);
         setDetectedTriggers([]);
+        setDetailsDraft({ notes: '', triggers: [], activities: [] });
         
         // Clean up realtime analysis
         if (partialTimerRef.current) {
@@ -566,15 +653,17 @@ export default function VAMoodCheckin({
         onClose();
         
         // Optional: Call onComplete callback
-        if (onComplete) {
-          onComplete({
-            type: 'MOOD',
-            confidence: 0.95,
-            data: moodData
-          });
-        }
+        onComplete?.({
+          type: 'MOOD',
+          confidence: 0.95,
+          data: moodData,
+          status: 'SUCCESS',
+          toastShown: false,
+        });
         
         // Stay on Today: do not navigate away after save
+        setIsSavingEntry(false);
+        return true;
       }
     } catch (error) {
       // Treat idempotent duplicate as success (user already saved)
@@ -583,13 +672,29 @@ export default function VAMoodCheckin({
         console.warn('🛡️ Duplicate mood save detected – treating as success');
         try { Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success); } catch {}
         onClose();
+        setDetailsDraft({ notes: '', triggers: [], activities: [] });
         // Stay on Today (no navigation)
-        return;
+        setIsSavingEntry(false);
+        return true;
       }
       console.error('❌ Failed to save mood entry:', error);
       Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+      setIsSavingEntry(false);
+      return false;
     }
+    setIsSavingEntry(false);
+    return false;
   };
+
+  const handleDetailsChange = useCallback((payload: { notes: string; triggers: string[]; activities: string[] }) => {
+    setDetailsDraft(payload);
+  }, []);
+
+  useEffect(() => {
+    if (!isVisible) {
+      setIsSavingEntry(false);
+    }
+  }, [isVisible]);
 
   const mood01 = to01(xy.x);
   const valenceText = valenceLabel(xy.x);
@@ -743,9 +848,11 @@ export default function VAMoodCheckin({
     <Modal
       visible={isVisible}
       animationType="slide"
-      presentationStyle="pageSheet"
+      presentationStyle={modalPresentation}
       onRequestClose={onClose}
       transparent={false}
+      statusBarTranslucent={forceFullScreen}
+      hardwareAccelerated={forceFullScreen}
     >
       {currentStep === 1 ? (
         <SafeAreaView style={styles.container}>
@@ -869,7 +976,15 @@ export default function VAMoodCheckin({
         <MoodDetailsStep
           transcript={transcript}
           detectedTriggers={detectedTriggers}
+          moodLabel={valenceText}
+          energyLabel={energyText}
+          userId={user?.id ?? null}
+          initialNotes={detailsDraft.notes}
+          initialTriggers={detailsDraft.triggers}
+          initialActivities={detailsDraft.activities}
+          isSaving={isSavingEntry}
           onBack={handleBack}
+          onChange={handleDetailsChange}
           onSave={handleSave}
           moodColor={accentColor}
         />

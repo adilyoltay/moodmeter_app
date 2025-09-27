@@ -1,10 +1,11 @@
-import React, { useMemo } from 'react';
-import { View, Text, StyleSheet, Pressable, Animated, Easing } from 'react-native';
+import React, { useMemo, useEffect, useRef, useState, useCallback } from 'react';
+import { View, Text, StyleSheet, Pressable, Animated, Easing, AccessibilityInfo } from 'react-native';
 import Svg, { Path, Circle, Rect, Defs, LinearGradient as SvgLinearGradient, Stop, Line, Text as SvgText, G } from 'react-native-svg';
 import MoodFace from './mood/MoodFace';
 import MoodEnergyGaugeArc from '@/components/mind/MoodEnergyGaugeArc';
 import { LinearGradient } from 'expo-linear-gradient';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { getVAColorFromScores, getGradientFromBase, mixHex, getBramanMoodColor, getAppleMoodColor } from '@/utils/colorUtils';
 import { to0100, weightedScore } from '@/utils/mindScore';
 import { useAccentColor } from '@/contexts/AccentColorContext';
@@ -209,10 +210,10 @@ const Chip = ({ label, accentColor, onGradient, icon, style, textStyle }: { labe
 
 export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkline = true, gradientColors = ['#34d399', '#059669'], loading, emptyHint, onQuickStart, sparkStyle = 'line', moodVariance, variant = 'hero', streakCurrent = 0, streakBest = 0, streakLevel = 'seedling', coloredBackground = false, colorized = false, selectedDayScoreOverride = null, dominantLabel = null, trendPctOverride = null, periodLabelOverride = null, meaMood = null, meaEnergy = null, meaAnxiety = null, heroGaugeHeight }: Props) {
   const { palette } = useAccentColor();
-  console.log('🚀 MindScoreCard props:', { streakCurrent, streakBest, streakLevel, variant, coloredBackground });
   // Normalize and sort by date ascending
   const days = useMemo(() => {
     const copy = [...(week || [])];
+    // Debug log removed to prevent flicker
     copy.sort((a, b) => String(a.date).localeCompare(String(b.date)));
     return copy;
   }, [week]);
@@ -252,13 +253,151 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
   }, [days]);
   const avgEnergyLabel = energyLabel(avgEnergy0100);
 
+  const [reduceMotionEnabled, setReduceMotionEnabled] = useState(false);
+  const animatedScore = useRef(new Animated.Value(typeof scoreNow === 'number' ? scoreNow : 0)).current;
+  const [animatedScoreValue, setAnimatedScoreValue] = useState<number>(typeof scoreNow === 'number' ? scoreNow : 0);
+
+  useEffect(() => {
+    let mounted = true;
+    const updateReduceMotion = (value: boolean) => {
+      if (mounted) setReduceMotionEnabled(value);
+    };
+
+    AccessibilityInfo.isReduceMotionEnabled()
+      .then(updateReduceMotion)
+      .catch(() => {});
+
+    const subscription = (AccessibilityInfo.addEventListener as any)?.('reduceMotionChanged', updateReduceMotion);
+
+    return () => {
+      mounted = false;
+      if (subscription && typeof subscription.remove === 'function') {
+        subscription.remove();
+      } else if (typeof subscription === 'function') {
+        subscription();
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    const id = animatedScore.addListener(({ value }) => {
+      setAnimatedScoreValue(value);
+    });
+    return () => {
+      animatedScore.removeListener(id);
+    };
+  }, [animatedScore]);
+
+  useEffect(() => {
+    if (typeof scoreNow === 'number') {
+      if (reduceMotionEnabled) {
+        animatedScore.setValue(scoreNow);
+        return;
+      }
+      Animated.timing(animatedScore, {
+        toValue: scoreNow,
+        duration: 320,
+        easing: Easing.out(Easing.quad),
+        useNativeDriver: false,
+      }).start();
+    } else {
+      animatedScore.setValue(0);
+    }
+  }, [scoreNow, reduceMotionEnabled, animatedScore]);
+
+  const prevScoreRef = useRef<number | null>(null);
+  useEffect(() => {
+    if (typeof scoreNow === 'number' && prevScoreRef.current != null && !reduceMotionEnabled) {
+      const diff = scoreNow - prevScoreRef.current;
+      if (Math.abs(diff) >= 5) {
+        Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light).catch(() => {});
+      }
+    }
+    if (typeof scoreNow === 'number') {
+      prevScoreRef.current = scoreNow;
+    }
+  }, [scoreNow, reduceMotionEnabled]);
+
+  const displayScore = typeof scoreNow === 'number' ? Math.round(animatedScoreValue) : null;
+  const displayScoreText = displayScore != null ? `${displayScore}` : (loading ? '…' : '—');
+  const deltaA11y = useMemo(() => {
+    const abs = Math.abs(Math.round(delta));
+    if (abs === 0) return 'değişim yok';
+    return delta > 0 ? `${abs} artış` : `${abs} düşüş`;
+  }, [delta]);
+  const energyA11y = avgEnergyLabel.label !== '—' ? avgEnergyLabel.label : 'enerji verisi yok';
+  const stabilityA11y = stab.label;
+  const streakA11y = streakCurrent > 0 ? `${streakCurrent} günlük seri` : 'aktif seri yok';
+  const accessibilitySummary = useMemo(() => {
+    const scorePart = displayScore != null ? `${displayScore} puan` : 'veri yok';
+    const emotionPart = dominantLabel ? `Baskın duygu ${dominantLabel}.` : '';
+    return `${title}. Zihin skoru ${scorePart}. Değişim ${deltaA11y}. Stabilite ${stabilityA11y}. Enerji ${energyA11y}. ${emotionPart} ${streakA11y}.`;
+  }, [title, displayScore, deltaA11y, stabilityA11y, energyA11y, dominantLabel, streakA11y]);
+
+  const skeletonAV = useRef(new Animated.Value(0)).current;
+  useEffect(() => {
+    if (!loading) {
+      skeletonAV.stopAnimation();
+      skeletonAV.setValue(0);
+      return;
+    }
+    const animation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(skeletonAV, { toValue: 1, duration: 900, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+        Animated.timing(skeletonAV, { toValue: 0, duration: 900, easing: Easing.inOut(Easing.quad), useNativeDriver: true }),
+      ])
+    );
+    animation.start();
+    return () => {
+      animation.stop();
+    };
+  }, [loading, skeletonAV]);
+
+  const skeletonStyle = useMemo(() => ({
+    opacity: skeletonAV.interpolate({ inputRange: [0, 1], outputRange: [0.35, 0.75] }),
+  }), [skeletonAV]);
+
+  const renderSkeleton = useCallback(() => {
+    if (variant === 'white') {
+      return (
+        <Animated.View
+          style={[styles.whiteCard, styles.skeletonCard, skeletonStyle]}
+          accessibilityRole="progressbar"
+          accessibilityLabel={`${title} yükleniyor`}
+        >
+          <View style={styles.skeletonRow}>
+            <View style={styles.skeletonCircle} />
+            <View style={styles.skeletonLines}>
+              <View style={styles.skeletonLine} />
+              <View style={[styles.skeletonLine, { width: '60%' }]} />
+            </View>
+          </View>
+        </Animated.View>
+      );
+    }
+
+    return (
+      <Animated.View
+        style={[styles.heroSkeletonCard, styles.skeletonCard, skeletonStyle]}
+        accessibilityRole="progressbar"
+        accessibilityLabel={`${title} yükleniyor`}
+      >
+        <View style={styles.skeletonCircleLarge} />
+        <View style={styles.skeletonLines}>
+          <View style={styles.skeletonLine} />
+          <View style={[styles.skeletonLine, { width: '55%' }]} />
+          <View style={[styles.skeletonLine, { width: '35%' }]} />
+        </View>
+      </Animated.View>
+    );
+  }, [skeletonStyle, title, variant]);
+
   // Confidence removed
 
   const baseColor = useMemo(() => {
     const moodRef = (avgMood != null ? avgMood : (typeof scoreNow === 'number' ? scoreNow : 50));
     const e10 = avgEnergy0100 != null ? avgEnergy0100 / 10 : 6;
     const color = getVAColorFromScores(moodRef, e10);
-    console.log('🎨 BaseColor calculation:', { moodRef, e10, resultColor: color, avgMood, avgEnergy0100, scoreNow });
     return color;
   }, [avgMood, avgEnergy0100, scoreNow]);
 
@@ -267,7 +406,6 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
   // Trend spark + progress colors harmonized with baseColor (even softer/pastel)
   const sparkStroke = useMemo(() => {
     const result = (palette === 'apple') ? '#007AFF' : mixHex(baseColor, '#FFFFFF', 0.3);
-    console.log('🎨 MindScoreCard: baseColor =', baseColor, ', palette =', palette, ', sparkStroke =', result);
     return result;
   }, [baseColor, palette]);
   const areaTopColor = useMemo(() => mixHex(baseColor, '#FFFFFF', 0.35), [baseColor]);
@@ -276,30 +414,12 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
   // ---- UI ----
   const isLoading = !!loading;
   const isEmpty = !isLoading && (!days.length || dailyScores.filter((v): v is number => typeof v === 'number').length === 0);
-  console.log('📊 MindScoreCard debug:', { 
-    isLoading, 
-    isEmpty, 
-    daysLength: days.length, 
-    validScores: dailyScores.filter((v): v is number => typeof v === 'number').length, 
-    variant, 
-    showSparkline,
-    scoreNow,
-    delta,
-    stabLabel: stab.label,
-    avgEnergyLabel: avgEnergyLabel.label,
-    streakCurrent,
-    coloredBackground,
-    baseColor,
-    sparkStroke
-  });
   const progress = typeof scoreNow === 'number' ? scoreNow / 100 : 0;
   const size = 64; // legacy ring size (kept for spacing)
   const r = 28;
   const cx = size / 2;
   const cy = size / 2;
   const C = 2 * Math.PI * r;
-  const [heroSparkWidth, setHeroSparkWidth] = React.useState(0);
-  const [whiteFooterW, setWhiteFooterW] = React.useState(0);
   const todayLabel = useMemo(() => {
     try {
       const d = new Date();
@@ -330,54 +450,247 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
     } as const;
   }, [palette]);
 
-  if (variant === 'white') {
-    // Dynamic status background derived from stability (stddev)
-    const statusBase = (() => {
-      if (palette === 'braman') {
-        return stab.label === 'Stabil' ? BramanColors.güvenli : (stab.label === 'Dalgalı' ? BramanColors.yellow : BramanColors.coral);
-      }
-      if (palette === 'apple') {
-        return stab.label === 'Stabil' ? '#34C759' : (stab.label === 'Dalgalı' ? '#FF9500' : '#FF3B30');
-      }
-      return stab.label === 'Stabil' ? '#10B981' : (stab.label === 'Dalgalı' ? '#F59E0B' : '#EF4444');
-    })();
+  // --- Variant-specific animated states kept at top-level to maintain hook order ---
+  const [whiteFooterW, setWhiteFooterW] = useState(0);
+  const [heroSparkWidth, setHeroSparkWidth] = useState(0);
+  const [gaugeWidth, setGaugeWidth] = useState(0);
+
+  const faceScore = useMemo(() => {
+    if (typeof selectedDayScoreOverride === 'number') return clamp(selectedDayScoreOverride, 0, 100);
+    if (typeof scoreNow === 'number') return clamp(scoreNow, 0, 100);
+    return 50;
+  }, [selectedDayScoreOverride, scoreNow]);
+
+  const pointerInitialAngle = useMemo(() => -180 + faceScore * 1.8, [faceScore]);
+  const pointerAV = useRef(new Animated.Value(pointerInitialAngle)).current;
+  const [pointerAngle, setPointerAngle] = useState(pointerInitialAngle);
+  const pointerAngleRef = useRef(pointerInitialAngle);
+
+  const activeFaceScale = useRef(new Animated.Value(1)).current;
+  const lastActiveIdxRef = useRef<number | null>(null);
+
+  const ringColors = useMemo(() => {
+    if (palette === 'apple') {
+      return ['#FF3B30', '#FF9F0A', '#FFD60A', '#30D158', '#1D7F34'] as string[];
+    }
+    if (palette === 'braman') {
+      const badDeep = mixHex(BramanColors.coral, '#000000', 0.18);
+      const bad = BramanColors.coral;
+      const mid = BramanColors.yellow;
+      const goodWarm = mixHex(BramanColors.güvenli, BramanColors.yellow, 0.22);
+      const vgoodCool = mixHex(BramanColors.teal, '#000000', 0.12);
+      return [badDeep, bad, mid, goodWarm, vgoodCool] as string[];
+    }
+    return ['#D32F2F', '#F57C00', '#FBC02D', '#009688', '#1B5E20'] as string[];
+  }, [palette]);
+
+  const heroSegIdx = useMemo(() => {
+    const s = faceScore;
+    if (s <= 20) return 0;
+    if (s <= 40) return 1;
+    if (s <= 60) return 2;
+    if (s <= 80) return 3;
+    return 4;
+  }, [faceScore]);
+
+  const heroSegColor = useMemo(() => {
+    const fallback = gradientColors?.[0] ?? '#34d399';
+    return ringColors[heroSegIdx] ?? fallback;
+  }, [ringColors, heroSegIdx, gradientColors]);
+
+  const makeHeroCardGrad = useCallback((base: string): [string, string] => {
+    const PASTEL_TOP = 0.40;
+    const PASTEL_BOTTOM = 0.24;
+    let top = PASTEL_TOP;
+    let bottom = PASTEL_BOTTOM;
+    if (palette === 'apple') {
+      top += 0.04;
+      bottom += 0.04;
+    } else if (palette === 'braman') {
+      top += 0.02;
+      bottom += 0.02;
+    }
+    return [mixHex(base, '#FFFFFF', top), mixHex(base, '#FFFFFF', bottom)];
+  }, [palette]);
+
+  const [heroCurrGrad, setHeroCurrGrad] = useState<[string, string]>(() => makeHeroCardGrad(heroSegColor));
+  const [heroPrevGrad, setHeroPrevGrad] = useState<[string, string] | null>(null);
+  const heroGradAV = useRef(new Animated.Value(1)).current;
+
+  const whiteStatusBase = useMemo(() => {
+    if (palette === 'braman') {
+      return stab.label === 'Stabil' ? BramanColors.güvenli : (stab.label === 'Dalgalı' ? BramanColors.yellow : BramanColors.coral);
+    }
+    if (palette === 'apple') {
+      return stab.label === 'Stabil' ? '#34C759' : (stab.label === 'Dalgalı' ? '#FF9500' : '#FF3B30');
+    }
+    return stab.label === 'Stabil' ? '#10B981' : (stab.label === 'Dalgalı' ? '#F59E0B' : '#EF4444');
+  }, [palette, stab.label]);
+
+  const whiteTintTarget = useMemo(() => {
     const norm = (x: number, a: number, b: number) => {
-      if (b <= a) return 0; return Math.max(0, Math.min(1, (x - a) / (b - a)));
+      if (b <= a) return 0;
+      return Math.max(0, Math.min(1, (x - a) / (b - a)));
     };
-    // Weight controls how strong the tint is against white (lower = daha pastel)
-    // Calmer palette: overall weights downscaled
-    let w = 0.12; // base tint (more pastel)
-    if (stab.label === 'Stabil') w = 0.10 + 0.05 * norm(sdCalc, 0, 6);
-    else if (stab.label === 'Dalgalı') w = 0.11 + 0.06 * norm(sdCalc, 6, 12);
-    else w = 0.12 + 0.08 * norm(sdCalc, 12, 24); // Çok Dalgalı
-    w = Math.max(0.08, Math.min(0.20, w));
-    const statusBg = mixHex('#FFFFFF', statusBase, w);
-    // Fade between background tints when status changes
-    const [currTint, setCurrTint] = React.useState<string>(statusBg);
-    const [prevTint, setPrevTint] = React.useState<string | null>(null);
-    const tintAV = React.useRef(new Animated.Value(1)).current;
-    React.useEffect(() => {
-      if (!coloredBackground) return;
-      if (currTint === statusBg) return;
-      setPrevTint(currTint);
-      setCurrTint(statusBg);
-      try {
-        tintAV.stopAnimation();
-        tintAV.setValue(0);
-        Animated.timing(tintAV, { toValue: 1, duration: 260, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-      } catch {}
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [statusBg, coloredBackground]);
+    let weight = 0.12;
+    if (stab.label === 'Stabil') weight = 0.10 + 0.05 * norm(sdCalc, 0, 6);
+    else if (stab.label === 'Dalgalı') weight = 0.11 + 0.06 * norm(sdCalc, 6, 12);
+    else weight = 0.12 + 0.08 * norm(sdCalc, 12, 24);
+    weight = Math.max(0.08, Math.min(0.20, weight));
+    return mixHex('#FFFFFF', whiteStatusBase, weight);
+  }, [whiteStatusBase, stab.label, sdCalc]);
+
+  const [whiteCurrTint, setWhiteCurrTint] = useState(whiteTintTarget);
+  const [whitePrevTint, setWhitePrevTint] = useState<string | null>(null);
+  const whiteTintAV = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const id = pointerAV.addListener(({ value }) => {
+      pointerAngleRef.current = value;
+      setPointerAngle(value);
+    });
+    return () => {
+      pointerAV.removeListener(id);
+    };
+  }, [pointerAV]);
+
+  useEffect(() => {
+    const target = -180 + faceScore * 1.8;
+    const shouldAnimate = variant === 'hero' && !reduceMotionEnabled;
+
+    pointerAV.stopAnimation?.();
+
+    if (!shouldAnimate) {
+      pointerAV.setValue(target);
+      setPointerAngle(target);
+      return;
+    }
+
+    const current = pointerAngleRef.current;
+    const delta = target - current;
+    const needsOvershoot = Math.abs(delta) >= 6;
+    const overshoot = needsOvershoot ? target + Math.sign(delta || 1) * Math.min(14, Math.abs(delta) * 0.25) : target;
+
+    try {
+      const animations: Animated.CompositeAnimation[] = [];
+      if (overshoot !== target) {
+        animations.push(
+          Animated.spring(pointerAV, {
+            toValue: overshoot,
+            tension: 55,
+            friction: 6,
+            useNativeDriver: false,
+          }),
+        );
+      }
+      animations.push(
+        Animated.spring(pointerAV, {
+          toValue: target,
+          tension: 50,
+          friction: 7,
+          useNativeDriver: false,
+        }),
+      );
+
+      Animated.sequence(animations).start();
+    } catch {
+      pointerAV.setValue(target);
+      setPointerAngle(target);
+    }
+  }, [variant, faceScore, pointerAV, reduceMotionEnabled]);
+
+  useEffect(() => {
+    const activeIdx = heroSegIdx;
+    if (variant !== 'hero') {
+      lastActiveIdxRef.current = activeIdx;
+      activeFaceScale.stopAnimation?.();
+      activeFaceScale.setValue(1);
+      return;
+    }
+    if (lastActiveIdxRef.current === activeIdx) return;
+    lastActiveIdxRef.current = activeIdx;
+    try {
+      activeFaceScale.stopAnimation();
+      activeFaceScale.setValue(0.94);
+      Animated.sequence([
+        Animated.timing(activeFaceScale, { toValue: 1.08, duration: 140, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+        Animated.timing(activeFaceScale, { toValue: 1.0, duration: 160, easing: Easing.out(Easing.quad), useNativeDriver: true }),
+      ]).start();
+    } catch {}
+  }, [variant, heroSegIdx, activeFaceScale]);
+
+  useEffect(() => {
+    const nextGrad = makeHeroCardGrad(heroSegColor);
+    const isSame = heroCurrGrad[0] === nextGrad[0] && heroCurrGrad[1] === nextGrad[1];
+    if (variant !== 'hero') {
+      if (!isSame) {
+        setHeroPrevGrad(null);
+        setHeroCurrGrad(nextGrad);
+      }
+      heroGradAV.stopAnimation?.();
+      heroGradAV.setValue(1);
+      return;
+    }
+    if (isSame) return;
+    setHeroPrevGrad(heroCurrGrad);
+    setHeroCurrGrad(nextGrad);
+    try {
+      heroGradAV.stopAnimation();
+      heroGradAV.setValue(0);
+      Animated.timing(heroGradAV, { toValue: 1, duration: 300, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+    } catch {}
+  }, [variant, heroSegColor, makeHeroCardGrad, heroCurrGrad, heroGradAV]);
+
+  useEffect(() => {
+    if (variant !== 'white') return;
+    if (!coloredBackground) {
+      if (whitePrevTint !== null) setWhitePrevTint(null);
+      if (whiteCurrTint !== whiteTintTarget) setWhiteCurrTint(whiteTintTarget);
+      whiteTintAV.stopAnimation?.();
+      whiteTintAV.setValue(1);
+      return;
+    }
+    if (whiteCurrTint === whiteTintTarget) return;
+    setWhitePrevTint(whiteCurrTint);
+    setWhiteCurrTint(whiteTintTarget);
+    try {
+      whiteTintAV.stopAnimation();
+      whiteTintAV.setValue(0);
+      Animated.timing(whiteTintAV, { toValue: 1, duration: 260, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
+    } catch {}
+  }, [variant, coloredBackground, whiteTintTarget, whiteCurrTint, whiteTintAV, whitePrevTint]);
+
+  useEffect(() => {
+    if (variant === 'white') return;
+    if (whitePrevTint !== null) setWhitePrevTint(null);
+    if (whiteCurrTint !== whiteTintTarget) setWhiteCurrTint(whiteTintTarget);
+    whiteTintAV.stopAnimation?.();
+    whiteTintAV.setValue(1);
+  }, [variant, whiteTintTarget, whiteCurrTint, whitePrevTint, whiteTintAV]);
+
+  if (variant === 'white') {
+    const statusBase = whiteStatusBase;
+    const statusBg = whiteTintTarget;
+
+    if (isLoading) {
+      return renderSkeleton();
+    }
     const wSize = 80;
     const wR = 36;
     const wC = 2 * Math.PI * wR;
     const wProgress = typeof scoreNow === 'number' ? scoreNow / 100 : 0;
     return (
-      <View style={[styles.whiteCard, { backgroundColor: '#FFFFFF' }]}> 
+      <View
+        style={[styles.whiteCard, { backgroundColor: '#FFFFFF' }]}
+        accessible
+        accessibilityRole="summary"
+        accessibilityLabel={accessibilitySummary}
+        accessibilityHint="Günlük ruh hali özetiniz"
+      > 
         {coloredBackground && (
           <>
-            <View style={[StyleSheet.absoluteFill as any, { backgroundColor: (prevTint || currTint), borderRadius: 24 }]} pointerEvents="none" />
-            <Animated.View style={[StyleSheet.absoluteFill as any, { opacity: tintAV, backgroundColor: currTint, borderRadius: 24 }]} pointerEvents="none" />
+            <View style={[StyleSheet.absoluteFill as any, { backgroundColor: (whitePrevTint || whiteCurrTint || statusBg), borderRadius: 24 }]} pointerEvents="none" />
+            <Animated.View style={[StyleSheet.absoluteFill as any, { opacity: whiteTintAV, backgroundColor: whiteCurrTint, borderRadius: 24 }]} pointerEvents="none" />
           </>
         )}
         <View style={styles.whiteRow}>
@@ -396,7 +709,7 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
             />
           </Svg>
           <View style={styles.whiteScoreCenter} pointerEvents="none">
-            <Text style={styles.whiteScoreText}>{scoreNow != null ? roundInt(scoreNow) : (isLoading ? '…' : '—')}</Text>
+            <Text style={styles.whiteScoreText}>{displayScoreText}</Text>
           </View>
           <View style={{ flex: 1, marginLeft: 6 }}>
           <View style={styles.whiteHeaderRow}>
@@ -599,81 +912,16 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
   // Minimal Face Gauge mode for hero variant (temporary):
   // Title, chips, extended details HIDDEN. Shows only segmented arc + pointer + ring faces + center score + bottom progress + streak + micro trend.
   if (variant === 'hero') {
-    const [gaugeW, setGaugeW] = React.useState(0);
-    // Animate active face when override changes
-    const activeFaceScale = React.useRef(new Animated.Value(1)).current;
-    const lastActiveIdxRef = React.useRef<number | null>(null);
-    // Score used for visual pointers/faces/gradient (selected day when present)
-    const faceScore = typeof selectedDayScoreOverride === 'number' ? selectedDayScoreOverride : (typeof scoreNow === 'number' ? scoreNow : 50);
-    // Smooth pointer angle animation (degrees)
-    const initialAng = -180 + faceScore * 1.8;
-    const pointerAV = React.useRef(new Animated.Value(initialAng)).current;
-    const [pointerAngle, setPointerAngle] = React.useState<number>(initialAng);
-    React.useEffect(() => {
-      const id = pointerAV.addListener(({ value }) => setPointerAngle(value));
-      return () => { try { pointerAV.removeListener(id); } catch {} };
-    }, [pointerAV]);
-    React.useEffect(() => {
-      const target = -180 + faceScore * 1.8;
-      try {
-        Animated.spring(pointerAV, { toValue: target, friction: 7, tension: 60, useNativeDriver: false }).start();
-      } catch {
-        setPointerAngle(target);
-      }
-    }, [faceScore, pointerAV]);
-    // Palette-based ring colors
-    const ringColors = useMemo(() => {
-      if (palette === 'apple') {
-        return ['#FF3B30', '#FF9F0A', '#FFD60A', '#30D158', '#1D7F34'] as string[];
-      }
-      if (palette === 'braman') {
-        const badDeep = mixHex(BramanColors.coral, '#000000', 0.18);
-        const bad = BramanColors.coral;
-        const mid = BramanColors.yellow;
-        // Warm sage: güvenli (sage) biraz daha sıcak için sarıyla karıştır
-        const goodWarm = mixHex(BramanColors.güvenli, BramanColors.yellow, 0.22);
-        // Very good: teal'i bir miktar koyulaştır
-        const vgoodCool = mixHex(BramanColors.teal, '#000000', 0.12);
-        return [badDeep, bad, mid, goodWarm, vgoodCool] as string[];
-      }
-      // VA/classic more saturated
-      return ['#D32F2F', '#F57C00', '#FBC02D', '#009688', '#1B5E20'] as string[];
-    }, [palette]);
-    // Align background with face/ring segment color derived from current score
-    const segIdx = (() => {
-      const s = faceScore;
-      return s <= 20 ? 0 : s <= 40 ? 1 : s <= 60 ? 2 : s <= 80 ? 3 : 4;
-    })();
-    const segColor = (ringColors && ringColors[segIdx]) || (gradientColors?.[0] || '#34d399');
-    // Softer gradient; add cross-fade between gradients when score changes
-    const PASTEL_TOP = 0.40; // base pastel
-    const PASTEL_BOTTOM = 0.24;
-    const GRAD_FADE_MS = 300;
-    const makeCardGrad = React.useCallback((base: string) => {
-      let top = PASTEL_TOP;
-      let bottom = PASTEL_BOTTOM;
-      if (palette === 'apple') { top += 0.04; bottom += 0.04; }
-      else if (palette === 'braman') { top += 0.02; bottom += 0.02; }
-      return [
-        mixHex(base, '#FFFFFF', top),
-        mixHex(base, '#FFFFFF', bottom),
-      ] as [string, string];
-    }, [palette]);
-    const [currGrad, setCurrGrad] = React.useState<[string, string]>(() => makeCardGrad(segColor));
-    const [prevGrad, setPrevGrad] = React.useState<[string, string] | null>(null);
-    const gradAV = React.useRef(new Animated.Value(1)).current;
-    React.useEffect(() => {
-      const ng = makeCardGrad(segColor);
-      setPrevGrad(currGrad);
-      setCurrGrad(ng);
-      try {
-        gradAV.stopAnimation();
-        gradAV.setValue(0);
-        Animated.timing(gradAV, { toValue: 1, duration: GRAD_FADE_MS, easing: Easing.out(Easing.quad), useNativeDriver: true }).start();
-      } catch {}
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [segIdx]);
-    
+    const segIdx = heroSegIdx;
+    const segColor = heroSegColor;
+    const gradAV = heroGradAV;
+    const currGrad = heroCurrGrad;
+    const prevGrad = heroPrevGrad;
+
+    if (isLoading) {
+      return renderSkeleton();
+    }
+
     // Inline MEA stats values/colors (from props), match original card visuals
     const mvVal = Number.isFinite(meaMood as any) ? Math.round(meaMood as any) : NaN;
     const evVal = Number.isFinite(meaEnergy as any) ? Math.round(meaEnergy as any) : NaN;
@@ -697,10 +945,46 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
       const h = typeof heroGaugeHeight === 'number' && isFinite(heroGaugeHeight) ? heroGaugeHeight : 224;
       return Math.max(168, Math.min(224, Math.round(h)));
     })();
+    const heroUsesGradient = colorized;
+    const heroPrimaryTextColor = heroUsesGradient ? '#FFFFFF' : '#111827';
+    const heroSecondaryTextColor = heroUsesGradient ? 'rgba(255,255,255,0.88)' : '#6B7280';
+    const heroStatusPrimaryColor = heroUsesGradient ? '#FFFFFF' : '#111827';
+    const heroStatusSecondaryColor = heroUsesGradient ? 'rgba(255,255,255,0.82)' : '#6B7280';
+    const heroChipBorderColor = heroUsesGradient ? 'rgba(255,255,255,0.35)' : '#E5E7EB';
+    const heroBatteryStrokeColor = heroUsesGradient ? '#FFFFFF' : '#111827';
+    const heroBatteryCapColor = heroUsesGradient ? '#FFFFFF' : '#111827';
+
+    const animatedOpacityPrev = gradAV.interpolate({ inputRange: [0, 1], outputRange: [1, 0] });
+    const gradientCurr = currGrad;
+    const gradientPrev = prevGrad;
+
     return (
-      <View style={styles.heroCard}>
-        {/* Background coloring disabled: keep neutral white background */}
-        <View style={styles.plainBg} />
+      <View
+        style={styles.heroCard}
+        accessible
+        accessibilityRole="summary"
+        accessibilityLabel={accessibilitySummary}
+        accessibilityHint="Günlük ruh hali özetiniz"
+      >
+        <View style={StyleSheet.absoluteFillObject as any} pointerEvents="none">
+          {heroUsesGradient ? (
+            <>
+              {gradientPrev && (
+                <Animated.View style={[styles.gradientBg, { opacity: animatedOpacityPrev }]}
+                >
+                  <LinearGradient colors={gradientPrev} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject as any} />
+                </Animated.View>
+              )}
+              <Animated.View style={[styles.gradientBg, { opacity: gradAV }]}
+              >
+                <LinearGradient colors={gradientCurr} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={StyleSheet.absoluteFillObject as any} />
+              </Animated.View>
+              <View style={styles.pastelVeil} />
+            </>
+          ) : (
+            <View style={styles.plainBg} />
+          )}
+        </View>
         {/* Dominant emotion top-left (label only, no bg/border, colored as active segment) */}
         {dominantLabel && (() => {
           const activeColor = (ringColors && typeof segIdx === 'number' && ringColors[segIdx]) ? ringColors[segIdx] : '#111827';
@@ -754,7 +1038,7 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
           );
         })()}
         <View style={[styles.faceGaugeWrap, styles.faceGaugeTight]}>
-          <View style={[styles.faceGaugeArea, { height: FACE_H }]} onLayout={(e) => setGaugeW(Math.round(e.nativeEvent.layout.width))}>
+          <View style={[styles.faceGaugeArea, { height: FACE_H }]} onLayout={(e) => setGaugeWidth(Math.round(e.nativeEvent.layout.width))}>
           <Svg width="100%" height={FACE_H} viewBox="0 0 300 224">
             {(() => {
               const cx = 150, cy = 184, r = 108, seg = 36; // more vertical space, slightly smaller ring
@@ -828,7 +1112,7 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
           {(() => {
             const faces = [10, 30, 50, 70, 90];
             const angles = [-162, -126, -90, -54, -18];
-            const W = Math.max(1, gaugeW || 300);
+            const W = Math.max(1, gaugeWidth || 300);
             const scale = W / 300;
             const cx = 150 * scale, cy = 184 * scale, r = 146 * scale; // faces radius adjusted per request
             const baseSize = 32 * scale; // make all faces a bit smaller
@@ -836,19 +1120,6 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
               const s = faceScore;
               if (s <= 20) return 0; if (s <= 40) return 1; if (s <= 60) return 2; if (s <= 80) return 3; return 4;
             })();
-            // Kick a subtle bounce when active face changes
-            React.useEffect(() => {
-              if (lastActiveIdxRef.current === activeIdx) return;
-              lastActiveIdxRef.current = activeIdx;
-              try {
-                activeFaceScale.stopAnimation();
-                activeFaceScale.setValue(0.94);
-                Animated.sequence([
-                  Animated.timing(activeFaceScale, { toValue: 1.08, duration: 140, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-                  Animated.timing(activeFaceScale, { toValue: 1.0, duration: 160, easing: Easing.out(Easing.quad), useNativeDriver: true }),
-                ]).start();
-              } catch {}
-            }, [activeIdx]);
             return (
               <View style={styles.faceRingOverlay} pointerEvents="none">
                 {faces.map((sc, i) => {
@@ -1006,25 +1277,27 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
           })()}
           {/* Center overlay for score text (over the gauge) */}
           <View style={[styles.centerOverlay, { top: -8 }]}>
-            <Text style={styles.scoreOnGrad}>{scoreNow != null ? roundInt(scoreNow) : (isLoading ? '…' : '—')}</Text>
-            <Text style={styles.ofOnGrad}>/100</Text>
+            <Text style={[styles.scoreOnGrad, { color: heroPrimaryTextColor }]}>{displayScoreText}</Text>
+            <Text style={[styles.ofOnGrad, { color: heroSecondaryTextColor }]}>/100</Text>
           </View>
         </View>
 
         <View style={styles.right}>
-          <Text style={styles.titleOnGrad} numberOfLines={1}>{title}</Text>
-          <Text style={styles.subtitleOnGrad} numberOfLines={1}>Son 7 gün • mikro trend <Text style={{ color: '#fff' }}><Arrow delta={delta} /></Text></Text>
+          <Text style={[styles.titleOnGrad, { color: heroPrimaryTextColor }]} numberOfLines={1}>{title}</Text>
+          <Text style={[styles.subtitleOnGrad, { color: heroSecondaryTextColor }]} numberOfLines={1}>
+            Son 7 gün • mikro trend <Text style={{ color: heroSecondaryTextColor }}><Arrow delta={delta} /></Text>
+          </Text>
 
           {/* Inline status: sadece değerler (Durum ve Enerji) */}
-          <Text style={styles.statusInlineOnGrad} numberOfLines={1}>
-            <Text style={styles.statusInlineValueOnGrad}>{stab.label}</Text>
-            <Text style={styles.statusInlineLabelOnGrad}> • </Text>
-            <Text style={styles.statusInlineValueOnGrad}>{avgEnergyLabel.label}</Text>
+          <Text style={[styles.statusInlineOnGrad, { color: heroStatusSecondaryColor }]} numberOfLines={1}>
+            <Text style={[styles.statusInlineValueOnGrad, { color: heroStatusPrimaryColor }]}>{stab.label}</Text>
+            <Text style={[styles.statusInlineLabelOnGrad, { color: heroSecondaryTextColor }]}> • </Text>
+            <Text style={[styles.statusInlineValueOnGrad, { color: heroStatusPrimaryColor }]}>{avgEnergyLabel.label}</Text>
           </Text>
             <View style={styles.chipsVertical}>
             <View style={{ alignSelf: 'stretch' }}>
               <Chip 
-                onGradient 
+                onGradient={heroUsesGradient}
                 label={`${stab.label}`} 
                 accentColor={baseColor} 
                 icon={
@@ -1066,9 +1339,9 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
             </View>
             <View style={{ alignSelf: 'stretch' }}>
               <Chip 
-                onGradient 
+                onGradient={heroUsesGradient}
                 label={`${avgEnergyLabel.label}`} 
-                style={{ backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.35)' }} 
+                style={heroUsesGradient ? { backgroundColor: 'transparent', borderColor: heroChipBorderColor } : undefined} 
                 icon={
                   <View style={{ marginRight: 6 }}>
                     <Svg width={16} height={16} viewBox="0 0 16 16">
@@ -1082,11 +1355,10 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
                       {(() => {
                         const avg = avgEnergy0100 || 50; // 0-100 skala
                         const ratio = Math.max(0, Math.min(1, avg / 100));
-                        const levelColor = ratio < 0.33 ? '#EF4444' : ratio < 0.66 ? '#F59E0B' : '#10B981';
                         const maxW = 11 - 2; // inner padding
                         const w = Math.max(0.8, maxW * ratio);
-                        const strokeC = '#ffffff';
-                        const capC = '#ffffff';
+                        const strokeC = heroBatteryStrokeColor;
+                        const capC = heroBatteryCapColor;
                         return (
                           <>
                             {/* Battery body with white stroke for hero variant */}
@@ -1106,9 +1378,9 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
             {/* Streak chip in hero variant */}
             <View style={{ alignSelf: 'center' }}>
               <Chip 
-                onGradient 
+                onGradient={heroUsesGradient}
                 label={`${streakCurrent}`}
-                style={{ backgroundColor: 'transparent', borderColor: 'rgba(255,255,255,0.35)' }} 
+                style={heroUsesGradient ? { backgroundColor: 'transparent', borderColor: heroChipBorderColor } : undefined} 
                 textStyle={{ fontSize: 14, fontWeight: '800' }}
                 icon={
                   <MaterialCommunityIcons 
@@ -1169,6 +1441,45 @@ export default function MindScoreCard({ week, title = 'Zihin Skoru', showSparkli
 
 // -------------------- Styles --------------------
 const styles = StyleSheet.create({
+  skeletonCard: {
+    marginTop: 12,
+    marginHorizontal: 16,
+    marginBottom: 16,
+    borderRadius: 24,
+    backgroundColor: '#F3F4F6',
+    padding: 20,
+  },
+  heroSkeletonCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  skeletonRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 16,
+  },
+  skeletonCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    backgroundColor: '#E5E7EB',
+  },
+  skeletonCircleLarge: {
+    width: 200,
+    height: 200,
+    borderRadius: 100,
+    backgroundColor: '#E5E7EB',
+    marginBottom: 20,
+  },
+  skeletonLines: {
+    flex: 1,
+    gap: 12,
+  },
+  skeletonLine: {
+    height: 14,
+    borderRadius: 8,
+    backgroundColor: '#E5E7EB',
+  },
   whiteCard: {
     marginTop: 12,
     marginHorizontal: 16,

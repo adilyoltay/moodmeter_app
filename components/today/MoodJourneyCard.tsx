@@ -4,6 +4,7 @@ import { PanGestureHandler } from 'react-native-gesture-handler';
 import Svg, { Path, Circle, Rect, Defs, LinearGradient as SvgLinearGradient, Stop } from 'react-native-svg';
 import { LinearGradient } from 'expo-linear-gradient';
 import { formatIQRText } from '@/utils/format';
+import applyJourneyFilters, { JourneyFilterOptions } from '@/utils/moodJourneyFilters';
 import type { MoodJourneyData } from '@/services/todayService';
 import { getVAColorFromScores, getGradientFromBase, getBramanMoodColor, getAppleMoodColor } from '@/utils/colorUtils';
 import { useThemeColors } from '@/contexts/ThemeContext';
@@ -31,11 +32,12 @@ type Props = {
   onSelectedScoreChange?: (score: number | null) => void;
   // Also notify parent with meta for stats card (score, trend, label, M/E/A p50)
   onSelectedMetaChange?: (meta: { score: number | null; trendPct: number | null; periodLabel: string; dominant?: string | null; moodP50?: number | null; energyP50?: number | null; anxietyP50?: number | null }) => void;
+  onRangeEntriesChange?: (payload: { range: TimeRange; entries: any[] }) => void;
 };
 
 // Color mapping centralized in utils/colorUtils.ts
 
-export default function MoodJourneyCard({ data, initialOpenDate, initialRange, onSelectedScoreChange, onSelectedMetaChange }: Props) {
+export default function MoodJourneyCard({ data, initialOpenDate, initialRange, onSelectedScoreChange, onSelectedMetaChange, onRangeEntriesChange }: Props) {
   // CRITICAL: Wrap all date operations in try-catch to prevent crashes
   try {
     const { language } = useTranslation();
@@ -73,6 +75,7 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
   const [detailDate, setDetailDate] = React.useState<string | null>(null);
   const [detailEntries, setDetailEntries] = React.useState<any[]>([]);
   const [chartSelection, setChartSelection] = React.useState<{ date: string; index: number; totalCount: number; label: string; x: number; chartWidth: number } | null>(null);
+  const [filters, setFilters] = React.useState<JourneyFilterOptions>({ trigger: undefined, activity: undefined, keyword: undefined });
   const [externalSelectIndex, setExternalSelectIndex] = React.useState<number | null>(null);
   const [isDraggingTooltip, setIsDraggingTooltip] = React.useState(false);
   const [chartRegion, setChartRegion] = React.useState<{ top: number; height: number }>({ top: 0, height: 0 });
@@ -89,6 +92,31 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
   const [energyLocked, setEnergyLocked] = React.useState(true);
   const [anxietyLocked, setAnxietyLocked] = React.useState(true);
   const [visibleRanges, setVisibleRanges] = React.useState<TimeRange[]>(['week','month','6months','year']);
+  const insightsEntriesRef = React.useRef<Map<string, any>>(new Map());
+
+  const buildInsightsLookup = React.useCallback((ext: MoodJourneyExtended | null) => {
+    const lookup = new Map<string, any>();
+    if (!ext) return lookup;
+    const pushEntries = (entries?: any[]) => {
+      if (!Array.isArray(entries)) return;
+      entries.forEach((entry) => {
+        if (entry && typeof entry.id === 'string' && entry.id && !lookup.has(entry.id)) {
+          lookup.set(entry.id, entry);
+        }
+      });
+    };
+
+    pushEntries(ext.weeklyEntries);
+    pushEntries(ext.monthlyEntries);
+    pushEntries(ext.sixMonthEntries);
+    pushEntries(ext.yearlyEntries);
+
+    Object.values(ext.rawDataPoints || {}).forEach((bucket: any) => pushEntries(bucket?.entries));
+    Object.values(ext.rawHourlyDataPoints || {}).forEach((bucket: any) => pushEntries(bucket?.entries));
+    ext.aggregated?.data?.forEach((bucket: any) => pushEntries(bucket?.entries));
+
+    return lookup;
+  }, []);
 
   // Load overlay visibility preferences
   React.useEffect(() => {
@@ -155,6 +183,7 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
   // Range-level stats (p50 across selected time range)
   const rangeStats = React.useMemo(() => {
     if (!extended) return { moodP50: NaN, moodAvg: 0, energyP50: NaN, energyAvg: 0, anxietyP50: NaN, anxietyAvg: 0 };
+    const applyFilters = (entries: any[]) => applyJourneyFilters(entries, filters);
     const avg = (arr: number[]) => arr.length ? (arr.reduce((s,n)=>s+n,0)/arr.length) : 0;
     if (range === 'week') {
       const days = extended.dailyAverages || [];
@@ -162,7 +191,7 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
       const energyVals: number[] = [];
       days.forEach(d => {
         const rp = extended.rawDataPoints[d.date]?.entries || [];
-        rp.forEach((e: any) => {
+        applyFilters(rp).forEach((e: any) => {
           if (Number.isFinite(e.mood_score)) moodVals.push(Number(e.mood_score));
           if (Number.isFinite(e.energy_level)) energyVals.push(Number(e.energy_level));
         });
@@ -184,7 +213,7 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
       const anxVals: number[] = [];
       hours.forEach(h => {
         const list = (extended.rawHourlyDataPoints as any)?.[h.dateKey]?.entries || [];
-        list.forEach((e: any) => {
+        applyFilters(list).forEach((e: any) => {
           if (Number.isFinite(e.mood_score)) moodVals.push(Number(e.mood_score));
           if (Number.isFinite(e.energy_level)) energyVals.push(Number(e.energy_level));
           if (Number.isFinite(e.anxiety_level)) anxVals.push(Number(e.anxiety_level));
@@ -406,6 +435,7 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
         const base = series.length ? series[0] : null;
         if (chartSelection) {
           const list = extended.rawDataPoints?.[chartSelection.date]?.entries || [];
+          // Debug log removed for production
           const curr = computeScoreFromEntries(list);
           const trendPct = (typeof curr === 'number' && typeof base === 'number') ? pct(curr, base) : null;
           const p50s = computeP50sFromEntries(list);
@@ -468,6 +498,61 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
   }, [chartSelection, range, extended, onSelectedMetaChange, computeScoreFromEntries, computeScoreFromBucket]);
 
   // Helper: refresh current extended dataset for active range/page
+  const emitRangeEntries = React.useCallback((currentExtended: MoodJourneyExtended | null, currentRange: TimeRange) => {
+    // Debug log removed to prevent flicker
+    if (typeof onRangeEntriesChange !== 'function') return;
+    
+    // Skip emit if we're currently loading new range data
+    if (isLoadingRange && currentExtended) {
+      // Skipping emit during loading to prevent stale data
+      return;
+    }
+    
+    if (!currentExtended) {
+      onRangeEntriesChange({ range: currentRange, entries: [] });
+      return;
+    }
+
+    const flattened: any[] = [];
+    insightsEntriesRef.current = buildInsightsLookup(currentExtended);
+    const resolveEntry = (entry: any) => {
+      const lookup = insightsEntriesRef.current;
+      if (lookup && entry && entry.id && lookup.has(entry.id)) {
+        return lookup.get(entry.id);
+      }
+      return entry;
+    };
+    if (currentRange === 'week' || currentRange === 'day') {
+      const source = currentRange === 'day' && currentExtended.rawHourlyDataPoints
+        ? currentExtended.rawHourlyDataPoints
+        : currentExtended.rawDataPoints;
+      Object.entries(source || {}).forEach(([dateKey, bucket]: [string, any]) => {
+        const list = bucket?.entries;
+        const hasEntries = Array.isArray(list) && list.length > 0;
+        if (hasEntries) {
+          const resolvedList = list.map(resolveEntry);
+          const filtered = applyJourneyFilters(resolvedList, filters);
+          filtered.forEach((entry) => flattened.push(entry));
+        }
+      });
+    } else {
+      const agg = currentExtended.aggregated?.data || [];
+      agg.forEach((bucket: any, idx: number) => {
+        const hasEntries = Array.isArray(bucket?.entries) && bucket.entries.length > 0;
+        if (hasEntries) {
+          const resolvedList = bucket.entries.map(resolveEntry);
+          const filtered = applyJourneyFilters(resolvedList, filters);
+          filtered.forEach((entry: any) => {
+            flattened.push(entry);
+          });
+        }
+      });
+    }
+
+    // Debug log removed to prevent flicker
+    onRangeEntriesChange({ range: currentRange, entries: flattened });
+  }, [buildInsightsLookup, filters, onRangeEntriesChange, isLoadingRange]);
+
   const refreshExtended = React.useCallback(async () => {
     if (!user?.id) return;
     const daysForRange = (r: TimeRange) => (r === 'week' ? 7 : r === 'month' ? 30 : r === '6months' ? 183 : 365);
@@ -476,7 +561,11 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
     end.setHours(0, 0, 0, 0);
     const res = await moodDataLoader.loadTimeRangeAt(user.id, range, end);
     setExtended(res);
-  }, [user?.id, range, page]);
+    emitRangeEntries(res, range);
+  }, [user?.id, range, page, emitRangeEntries]);
+
+  // Removed: This useEffect was causing double emitRangeEntries calls with stale data
+  // emitRangeEntries is now called directly when fresh data is loaded
 
   // Handle initialRange only once at mount (do not react to later range changes)
   React.useEffect(() => {
@@ -531,12 +620,16 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
         
         end.setHours(0, 0, 0, 0);
         console.log(`MoodJourneyCard: Loading data for ${user.id}, ${range}, end=${end.toISOString()}`);
+        // Force invalidate cache for range change
+        moodDataLoader.invalidate(user.id, range);
         const res = await moodDataLoader.loadTimeRangeAt(user.id, range, end);
-        console.log(`MoodJourneyCard: Data loaded, setting extended... mounted=${mounted}`);
+        console.log(`MoodJourneyCard: Data loaded for range=${range}, setting extended... mounted=${mounted}, entriesCount=${res?.rawDataPoints ? Object.keys(res.rawDataPoints).reduce((sum, key) => sum + (res.rawDataPoints[key]?.entries?.length || 0), 0) : 0}`);
         if (mounted) {
           setExtended(res);
           setIsLoadingRange(false); // Clear loading state after data is set
           console.log(`MoodJourneyCard: Extended data set successfully`);
+          // Emit with fresh data directly (not from state)
+          emitRangeEntries(res, range);
         }
         
         // Prefetch neighbors (older and newer if exists) with safety
@@ -566,23 +659,29 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
           const fallbackEnd = new Date();
           fallbackEnd.setHours(0, 0, 0, 0);
           try {
+            // Force invalidate cache for fallback too
+            moodDataLoader.invalidate(user.id, range);
             const res = await moodDataLoader.loadTimeRangeAt(user.id, range, fallbackEnd);
             if (mounted) {
               setExtended(res);
               setIsLoadingRange(false);
+              // Emit with fresh fallback data directly
+              emitRangeEntries(res, range);
             }
           } catch (fallbackError) {
             console.error('Fallback load also failed:', fallbackError);
             if (mounted) {
               setExtended(null);
               setIsLoadingRange(false);
+              // Emit empty data for failed fallback
+              emitRangeEntries(null, range);
             }
           }
         }
       }
     })();
     return () => { mounted = false; };
-  }, [user?.id, range, page]);
+  }, [user?.id, range, page, emitRangeEntries]);
 
   // Ensure current range remains within allowed visible ranges
   React.useEffect(() => {
@@ -731,22 +830,24 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
           onChange={React.useCallback((newRange: TimeRange) => { 
             console.log(`MoodJourneyCard: Range changing to ${newRange}`);
             
+            // Force clear cache before range change
+            if (user?.id) {
+              console.log(`MoodJourneyCard: Invalidating cache for ${newRange}`);
+              moodDataLoader.invalidate(user.id, newRange);
+            }
+            
             // Start loading state immediately
             setIsLoadingRange(true);
             
-            // Force immediate state update by using callback form
-            setRange(currentRange => {
-              if (currentRange === newRange) {
-                setIsLoadingRange(false);
-                return currentRange;
-              }
-              return newRange;
-            });
+            // Clear extended data to prevent stale emit
+            setExtended(null);
             
+            // Directly set the new range
+            setRange(newRange);
             setPage(0);
             setChartSelection(null);
             setClearSignal(prev => prev + 1);
-          }, [])} 
+          }, [user?.id])} 
           visible={visibleRanges}
         />
         {/* Chip row aligned to selector (right) */}
@@ -774,8 +875,26 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
               {/* Left: Total entries + date range */}
               <View>
                 <Text style={styles.chartHeaderCount}>
-                  TOPLAM{'\n'}
-                  <Text style={styles.chartHeaderCountValue}>{extended?.statistics?.totalEntries || 0} <Text style={styles.chartHeaderCountUnit}>giriş</Text></Text>
+                  {chartSelection ? 'GÜN' : 'TOPLAM'}{'\n'}
+                  <Text style={styles.chartHeaderCountValue}>
+                    {(() => {
+                      if (!chartSelection) return extended?.statistics?.totalEntries || 0;
+                      
+                      // Week/day: specific day count
+                      if (range === 'week') {
+                        const list = extended?.rawDataPoints?.[chartSelection.date]?.entries || [];
+                        return list.length;
+                      } else if (range === 'day') {
+                        const list = (extended?.rawHourlyDataPoints as any)?.[chartSelection.date]?.entries || [];
+                        return list.length;
+                      }
+                      
+                      // Aggregated: specific bucket count
+                      const agg = extended?.aggregated?.data || [];
+                      const bucket = agg.find((b: any) => b.date === chartSelection.date);
+                      return bucket?.entries?.length || bucket?.count || 0;
+                    })()} <Text style={styles.chartHeaderCountUnit}>giriş</Text>
+                  </Text>
                 </Text>
                 <Text style={styles.chartHeaderDateRange}>{(() => {
                   const days = extended?.dailyAverages || [];
@@ -1058,8 +1177,26 @@ export default function MoodJourneyCard({ data, initialOpenDate, initialRange, o
                           {/* Simplified tooltip content: left-aligned header-style */}
                           <View style={{ alignItems: 'flex-start' }}>
                             <Text style={[styles.entryCount, { textAlign: 'left' }]}>
-                              TOPLAM{'\n'}
-                              <Text style={styles.entryCountValue}>{extended?.statistics?.totalEntries || 0} <Text style={styles.entryCountUnit}>giriş</Text></Text>
+                              {chartSelection ? 'GÜN' : 'TOPLAM'}{'\n'}
+                              <Text style={styles.entryCountValue}>
+                                {(() => {
+                                  if (!chartSelection) return extended?.statistics?.totalEntries || 0;
+                                  
+                                  // Week/day: specific day count
+                                  if (range === 'week') {
+                                    const list = extended?.rawDataPoints?.[chartSelection.date]?.entries || [];
+                                    return list.length;
+                                  } else if (range === 'day') {
+                                    const list = (extended?.rawHourlyDataPoints as any)?.[chartSelection.date]?.entries || [];
+                                    return list.length;
+                                  }
+                                  
+                                  // Aggregated: specific bucket count
+                                  const agg = extended?.aggregated?.data || [];
+                                  const bucket = agg.find((b: any) => b.date === chartSelection.date);
+                                  return bucket?.entries?.length || bucket?.count || 0;
+                                })()} <Text style={styles.entryCountUnit}>giriş</Text>
+                              </Text>
                             </Text>
                             <Text style={styles.dateRange}>{(() => {
                               const days = extended?.dailyAverages || [];

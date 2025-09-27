@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { 
   Text, 
   View, 
@@ -18,6 +18,7 @@ import { useFocusEffect } from '@react-navigation/native';
 import { Toast } from '@/components/ui/Toast';
 import MindScoreCard, { DayMetrics } from '@/components/MindScoreCard';
 import MindMetaRowCard from '@/components/MindMetaRowCard';
+import MoodInsightsCard from '@/components/today/MoodInsightsCard';
 // ✅ Extracted UI components handle their own visuals
 
 import { useGamificationStore } from '@/store/gamificationStore';
@@ -38,12 +39,15 @@ import { useAccentColor } from '@/contexts/AccentColorContext';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 // import { safeStorageKey } from '@/lib/queryClient'; // unused
 import todayService from '@/services/todayService';
+import type { TimeRange } from '@/types/mood';
+import type { MoodInsightEntry } from '@/utils/moodInsights';
 import { moodDataLoader } from '@/services/moodDataLoader';
 import { eventBus, Events } from '@/services/eventBus';
 import { getAdvancedMoodColor, getMoodGradient, getVAColorFromScores } from '@/utils/colorUtils';
 import { getUserDateString } from '@/utils/timezoneUtils';
 // Removed: ETS/AI debug triggers
 import { PanResponder, PanResponderGestureState, GestureResponderEvent } from 'react-native';
+import useOfflineMoodSync from '@/hooks/useOfflineMoodSync';
 
 // Stores
 
@@ -71,6 +75,7 @@ export default function TodayScreen() {
   const { t } = useTranslation();
 
   const [refreshing, setRefreshing] = useState(false);
+  const refreshingRef = useRef(false);
   const scrollRef = useRef<ScrollView>(null);
   const [moodSectionY, setMoodSectionY] = useState(0);
   // Swipe left to Settings
@@ -90,7 +95,9 @@ export default function TodayScreen() {
   ).current;
   const [showToast, setShowToast] = useState(false);
   const [toastMessage, setToastMessage] = useState('');
+  const [toastType, setToastType] = useState<'success' | 'error' | 'warning' | 'info'>('success');
   const [checkinSheetVisible, setCheckinSheetVisible] = useState(false);
+  const [checkinMode, setCheckinMode] = useState<'default' | 'voiceQuick'>('default');
   // Open Check-in on param (after HRV measure completes)
   useEffect(() => {
     const v = Array.isArray(params.openCheckin) ? params.openCheckin[0] : (params.openCheckin as string | undefined);
@@ -108,6 +115,21 @@ export default function TodayScreen() {
   const [heroStats, setHeroStats] = useState<{ moodVariance: number } | null>(null);
   const [selectedDayScore, setSelectedDayScore] = useState<number | null>(null);
   const [selectedMeta, setSelectedMeta] = useState<{ score: number | null; trendPct: number | null; periodLabel: string; dominant?: string | null; moodP50?: number | null; energyP50?: number | null; anxietyP50?: number | null } | null>(null);
+  
+  // Preserve MEA values during range transitions to prevent collapse
+  const [preservedMEA, setPreservedMEA] = useState<{ mood: number | null; energy: number | null; anxiety: number | null }>({ mood: null, energy: null, anxiety: null });
+  
+  // Update preserved MEA when we have valid data
+  useEffect(() => {
+    if (selectedMeta?.moodP50 != null || selectedMeta?.energyP50 != null || selectedMeta?.anxietyP50 != null) {
+      setPreservedMEA(prev => ({
+        mood: selectedMeta.moodP50 ?? prev.mood,
+        energy: selectedMeta.energyP50 ?? prev.energy,
+        anxiety: selectedMeta.anxietyP50 ?? prev.anxiety,
+      }));
+    }
+  }, [selectedMeta?.moodP50, selectedMeta?.energyP50, selectedMeta?.anxietyP50]);
+  
   const { colorMode, setColorMode, color: accentColor, gradient, setScore, setVA } = useAccentColor();
   // ✅ REMOVED: achievementsSheetVisible - Today'den başarı listesi kaldırıldı
   
@@ -185,29 +207,16 @@ export default function TodayScreen() {
     weeklyEnergyAvg: number;
     weeklyAnxietyAvg: number;
   } | null>(null);
-
-
-  
-  // 🚫 Adaptive Interventions - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
-  // const [adaptiveSuggestion, setAdaptiveSuggestion] = useState<AdaptiveSuggestion | null>(null);
-  // 🚫 Adaptive Suggestions - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
-  // const [adaptiveMeta, setAdaptiveMeta] = useState<any>(null);
-  // const adaptiveRef = useRef<boolean>(false);
-  // const { generateSuggestion, snoozeSuggestion, trackSuggestionClick, trackSuggestionDismissal, loading: adaptiveLoading } = useAdaptiveSuggestion();
-
-  // 🚫 DEBUG: Monitor adaptive suggestion state changes - DISABLED
-  /*
-  useEffect(() => {
-    console.log('🔍 AdaptiveSuggestion state changed:', { 
-      adaptiveSuggestion, 
-      show: adaptiveSuggestion?.show, 
-      category: adaptiveSuggestion?.category
-    });
-  }, [adaptiveSuggestion]);
-  */
-
-
-
+  const [insightEntries, setInsightEntries] = useState<MoodInsightEntry[]>([]);
+  const [insightRange, setInsightRange] = useState<TimeRange>('week');
+  const handleRangeEntriesChange = useCallback(
+    ({ range, entries }: { range: TimeRange; entries: any[] }) => {
+      // console.log(`[INDEX] handleRangeEntriesChange called - range: ${range}, entries count: ${entries?.length}`);
+      setInsightRange(range);
+      setInsightEntries(Array.isArray(entries) ? [...entries] : []);
+    },
+    []
+  );
   // Load data on mount
   useEffect(() => {
     if (user?.id) {
@@ -222,11 +231,20 @@ export default function TodayScreen() {
     if (!user?.id) return;
     const unsub = eventBus.on(Events.MoodEntrySaved, (payload) => {
       try {
-        if (!payload || !payload.userId || payload.userId !== user.id) return;
-        onRefresh();
-      } catch {}
+        if (!payload?.entry) return;
+        if (payload.userId && payload.userId !== user.id) return;
+        if (!refreshingRef.current) {
+          onRefresh();
+        }
+      } catch (error) {
+        if (__DEV__) console.warn('MoodEntrySaved handler failed', error);
+      }
     });
-    return () => { try { unsub(); } catch {} };
+    return () => {
+      try {
+        unsub();
+      } catch {}
+    };
   }, [user?.id]);
 
   // Deep-link focus: scroll to Mood Journey section (optional openDate handled by card)
@@ -320,9 +338,6 @@ export default function TodayScreen() {
         } catch {}
         onRefresh();
       })();
-
-      // 🚫 Adaptive Suggestion Reset - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
-      // adaptiveRef.current = false;
     }, [user?.id])
   );
 
@@ -330,6 +345,7 @@ export default function TodayScreen() {
   useEffect(() => {
     if (lastMicroReward) {
       setToastMessage(lastMicroReward.message || '👏 Güzel ilerleme!');
+      setToastType('success');
       setShowToast(true);
     }
   }, [lastMicroReward]);
@@ -426,6 +442,7 @@ export default function TodayScreen() {
   // (AI insights disabled; legacy helpers removed)
 
   const onRefresh = async () => {
+    refreshingRef.current = true;
     setRefreshing(true);
     
     try {
@@ -449,7 +466,6 @@ export default function TodayScreen() {
 
       setTodayStats(data.todayStats);
       setMoodJourneyData(data.moodJourneyData);
-
       // Extended week stats for MindScore stability from moodDataLoader
       try {
         const extended = await moodDataLoader.loadTimeRange(user.id, 'week');
@@ -548,50 +564,83 @@ export default function TodayScreen() {
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {
+      refreshingRef.current = false;
       setRefreshing(false);
     }
   };
 
-  const renderHeroSection = () => {
-    // Build 7-day metrics from normalized weeklyEntries if available
-    const week: DayMetrics[] = (() => {
-      const entries = moodJourneyData?.weeklyEntries || [];
-      if (!entries.length) return [];
-      return entries
+  // Move all calculations to component level with proper memoization
+  // Stable week data with throttled updates to prevent flicker
+  const [stableWeek, setStableWeek] = useState<DayMetrics[]>([]);
+  const weekUpdateTimerRef = useRef<NodeJS.Timeout | null>(null);
+  
+  useEffect(() => {
+    if (weekUpdateTimerRef.current) {
+      clearTimeout(weekUpdateTimerRef.current);
+    }
+    
+    weekUpdateTimerRef.current = setTimeout(() => {
+      const entries = insightEntries.length > 0 ? insightEntries : (moodJourneyData?.weeklyEntries || []);
+      if (!entries.length) {
+        setStableWeek(prevWeek => prevWeek.length === 0 ? prevWeek : []);
+        return;
+      }
+      
+      const processed = entries
         .map((e: any) => ({
           date: getUserDateString(e.timestamp),
           mood: Number.isFinite(e.mood_score) && e.mood_score > 0 ? Number(e.mood_score) : null,
-          energy: Number.isFinite(e.energy_level) && e.energy_level > 0 ? Number(e.energy_level) : null, // 1–10 skalası korunsun - MindScoreCard'da dönüştürülecek
-          anxiety: Number.isFinite(e.anxiety_level) && e.anxiety_level > 0 ? Number(e.anxiety_level) : null, // 1–10 skalası korunsun - MindScoreCard'da dönüştürülecek
+          energy: Number.isFinite(e.energy_level) && e.energy_level > 0 ? Number(e.energy_level) : null,
+          anxiety: Number.isFinite(e.anxiety_level) && e.anxiety_level > 0 ? Number(e.anxiety_level) : null,
         }))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date))); // ascending
-    })();
-
-    // Tutarlılık için weighted score'lardan variance hesapla (MindScoreCard ile uyumlu)
-    const moodVariance = heroStats?.moodVariance ?? (() => {
-      // MindScoreCard ile aynı util fonksiyonunu kullanarak hizala
-      try {
-        const { weightedScore } = require('@/utils/mindScore');
-        const scores: number[] = week
-          .map(d => weightedScore(d.mood, d.energy, d.anxiety))
-          .filter((v: any) => typeof v === 'number');
-        if (scores.length <= 1) return 0;
-        const mean = scores.reduce((s: number, n: number) => s + n, 0) / scores.length;
-        return scores.reduce((s: number, n: number) => s + Math.pow(n - mean, 2), 0) / (scores.length - 1);
-      } catch {
-        return 0;
+        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      
+      // Only update if data actually changed
+      setStableWeek(prevWeek => {
+        if (prevWeek.length !== processed.length) return processed;
+        const isDifferent = processed.some((newItem, idx) => {
+          const prevItem = prevWeek[idx];
+          return !prevItem || 
+            newItem.date !== prevItem.date ||
+            newItem.mood !== prevItem.mood ||
+            newItem.energy !== prevItem.energy ||
+            newItem.anxiety !== prevItem.anxiety;
+        });
+        return isDifferent ? processed : prevWeek;
+      });
+    }, 200); // 200ms throttle for stability
+    
+    return () => {
+      if (weekUpdateTimerRef.current) {
+        clearTimeout(weekUpdateTimerRef.current);
       }
-    })();
+    };
+  }, [insightEntries, moodJourneyData?.weeklyEntries, insightRange]);
 
-    // Weekly gradient removed for MindScoreCard hero variant.
-    // Card computes its own score-aligned gradient internally.
+  // Tutarlılık için weighted score'lardan variance hesapla (MindScoreCard ile uyumlu)
+  const moodVariance = useMemo(() => {
+    if (heroStats?.moodVariance != null) return heroStats.moodVariance;
+    // MindScoreCard ile aynı util fonksiyonunu kullanarak hizala
+    try {
+      const { weightedScore } = require('@/utils/mindScore');
+      const scores: number[] = stableWeek
+        .map(d => weightedScore(d.mood, d.energy, d.anxiety))
+        .filter((v: any) => typeof v === 'number');
+      if (scores.length <= 1) return 0;
+      const mean = scores.reduce((s: number, n: number) => s + n, 0) / scores.length;
+      return scores.reduce((s: number, n: number) => s + Math.pow(n - mean, 2), 0) / (scores.length - 1);
+    } catch {
+      return 0;
+    }
+  }, [heroStats?.moodVariance, stableWeek]);
 
-    // Compute EWMA-based score and 1g trend for external meta card
+  // Compute EWMA-based score and 1g trend for external meta card
+  const { scoreNow, trendPct } = useMemo(() => {
     let scoreNow: number | null = null;
     let trendPct: number | null = null;
     try {
       const { weightedScore } = require('@/utils/mindScore');
-      const series = week.map(d => weightedScore(d.mood, d.energy, d.anxiety));
+      const series = stableWeek.map(d => weightedScore(d.mood, d.energy, d.anxiety));
       const ewma = (arr: Array<number | null | undefined>) => {
         const vals = arr.map(v => (typeof v === 'number' && Number.isFinite(v) ? v : null));
         const n = vals.length; if (!n) return [] as number[];
@@ -611,13 +660,19 @@ export default function TodayScreen() {
         trendPct = Math.round(((scoreNow - base) / Math.max(1, base)) * 100);
       }
     } catch {}
+    return { scoreNow, trendPct };
+  }, [stableWeek]);
 
+  const renderHeroSection = useCallback(() => {
     // If we have no week data yet (fresh install), keep minimal graceful fallback
     return (
       <>
+        <View style={{ minHeight: 240, overflow: 'hidden' }}>
           <MindScoreCard
-            week={week}
-            loading={!moodJourneyData}
+            key="mindScore-static"  // Static key to prevent any remounting
+            week={stableWeek}
+            title={`Zihin Skoru (${insightRange === 'week' ? 'Hafta' : insightRange === 'month' ? 'Ay' : insightRange === '6months' ? '6 Ay' : 'Yıl'})`}
+            loading={false}
             onQuickStart={() => setCheckinSheetVisible(true)}
             sparkStyle={mindSparkStyle}
             moodVariance={moodVariance}
@@ -630,19 +685,31 @@ export default function TodayScreen() {
             dominantLabel={selectedMeta?.dominant ?? null}
             trendPctOverride={selectedMeta?.trendPct ?? null}
             periodLabelOverride={selectedMeta?.periodLabel ?? null}
-            meaMood={selectedMeta?.moodP50 ?? null}
-            meaEnergy={selectedMeta?.energyP50 ?? null}
-            meaAnxiety={selectedMeta?.anxietyP50 ?? null}
-            heroGaugeHeight={(() => { const h = Dimensions.get('window').height; return h < 740 ? 168 : (h < 820 ? 180 : 210); })()}
+            meaMood={selectedMeta?.moodP50 ?? preservedMEA.mood}
+            meaEnergy={selectedMeta?.energyP50 ?? preservedMEA.energy}
+            meaAnxiety={selectedMeta?.anxietyP50 ?? preservedMEA.anxiety}
+            heroGaugeHeight={useMemo(() => { 
+              const h = Dimensions.get('window').height; 
+              return h < 740 ? 168 : (h < 820 ? 180 : 210); 
+            }, [])}
         />
+        </View>
         <MindMetaRowCard
+          key="meta-static"  // Static key to prevent any flicker
           score={selectedMeta?.score ?? (typeof scoreNow === 'number' ? scoreNow : null)}
           streak={profile.streakCurrent}
           hp={todayStats?.healingPoints ?? 0}
         />
+        <MoodInsightsCard
+          key="insights-static"  // Static key to prevent any flicker
+          entries={insightEntries}
+          accentColor={accentColor}
+          isLoading={false}
+          range={insightRange}
+        />
       </>
     );
-  };
+  }, [stableWeek, insightRange, mindSparkStyle, moodVariance, profile.streakCurrent, profile.streakBest, profile.streakLevel, selectedDayScore, selectedMeta, insightEntries, accentColor, scoreNow, todayStats?.healingPoints]);
 
   /**
    * 🎯 Quick Mood Entry Button + Emoji Bottom Sheet
@@ -655,157 +722,17 @@ export default function TodayScreen() {
     { label: 'Zor', emoji: '😣', value: 1 },
   ];
 
-
-
-  /**
-   * 🎯 Handle Adaptive Suggestion CTA
-   */
-  const handleAdaptiveSuggestionAccept = async (suggestion: any) => {
-    console.log('✅ handleAdaptiveSuggestionAccept skipped (AI disabled)');
-    return; // 🚫 AI DISABLED - Sprint 2: Hard Stop AI Fallbacks
-    
-    // if (!user?.id || !suggestion.cta) return;
-
-    try {
-      const clickTime = Date.now();
-      
-      // 🚫 AI Telemetry - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
-      // await trackAIInteraction(AIEventType.ADAPTIVE_SUGGESTION_CLICKED, {
-      //   userId: user.id,
-      //   category: suggestion.category,
-      //   source: 'today',
-      //   targetScreen: suggestion.cta.screen,
-      //   hasNavigation: !!suggestion.cta.screen
-      // });
-      
-      // 🚫 Analytics tracking - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
-      // await trackSuggestionClick(user.id, suggestion);
-
-      // Navigate based on CTA
-      switch (suggestion.cta.screen) {
-        case '/(tabs)/breathwork':
-          router.push({
-            pathname: '/(tabs)/breathwork' as any,
-            params: {
-              autoStart: 'true',
-              protocol: suggestion.cta.params?.protocol || 'box',
-              source: 'adaptive_suggestion',
-              ...(suggestion.cta.params || {})
-            }
-          });
-          break;
-          
-        case '/(tabs)/cbt':
-          // Remap CBT CTA to Mood section on Today
-          router.push({
-            pathname: '/(tabs)/index' as any,
-            params: {
-              focus: 'mood',
-              source: 'adaptive_suggestion',
-              ...(suggestion.cta.params || {})
-            }
-          });
-          break;
-          
-        case '/(tabs)/mood':
-          router.push({
-            pathname: '/(tabs)/index' as any,
-            params: {
-              focus: 'mood',
-              source: 'adaptive_suggestion',
-              ...(suggestion.cta.params || {})
-            }
-          });
-          break;
-          
-        case '/(tabs)/tracking':
-          // Remap Tracking CTA to Breathwork
-          router.push({
-            pathname: '/(tabs)/breathwork' as any,
-            params: {
-              source: 'adaptive_suggestion',
-              ...(suggestion.cta.params || {})
-            }
-          });
-          break;
-          
-        default:
-          console.warn('⚠️ Unknown adaptive suggestion screen:', suggestion.cta.screen);
-          break;
-      }
-      
-      // 🚫 Hide suggestion after navigation - DISABLED
-      // setAdaptiveSuggestion(null);
-      // setAdaptiveMeta(null);
-      
-    } catch (error) {
-      console.error('❌ Failed to handle adaptive suggestion accept:', error);
-    }
-  };
-
-  /**
-   * 😴 Handle Adaptive Suggestion Dismiss (Snooze)
-   */
-  const handleAdaptiveSuggestionDismiss = async (suggestion: any) => {
-    console.log('✅ handleAdaptiveSuggestionDismiss skipped (AI disabled)');
-    return; // 🚫 AI DISABLED - Sprint 2: Hard Stop AI Fallbacks
-    
-    // if (!user?.id) return;
-
-    try {
-      const snoozeHours = 2;
-      
-      // 🚫 Track dismissal in analytics - DISABLED
-      // await trackSuggestionDismissal(user.id, suggestion, snoozeHours);
-      
-      // 🚫 Snooze for 2 hours - DISABLED
-      // await snoozeSuggestion(user.id, snoozeHours);
-      
-      // 🚫 Hide suggestion - DISABLED
-      // setAdaptiveSuggestion(null);
-      // setAdaptiveMeta(null);
-      
-      console.log('😴 Adaptive suggestion snoozed for 2 hours');
-    } catch (error) {
-      console.error('❌ Failed to dismiss adaptive suggestion:', error);
-    }
-  };
-
   // Weekly dynamic hero gradient computed at screen level so it can be reused by CTA
   const heroGradient = React.useMemo(() => {
     try {
       const { getVAGradientFromScores } = require('@/utils/colorUtils');
-      // Build simple week array from moodJourneyData if available
-      const entries = moodJourneyData?.weeklyEntries || [];
-      if (!entries.length) return gradient; // fallback to accent gradient
-      const week = entries
-        .map((e: any) => ({
-          date: getUserDateString(e.timestamp),
-          mood: Number.isFinite(e.mood_score) && e.mood_score > 0 ? Number(e.mood_score) : null,
-          energy: Number.isFinite(e.energy_level) && e.energy_level > 0 ? Number(e.energy_level) : null,
-          anxiety: Number.isFinite(e.anxiety_level) && e.anxiety_level > 0 ? Number(e.anxiety_level) : null,
-        }))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
+      if (!stableWeek.length) return gradient; // fallback to accent gradient
 
-      // Compute variance aligned with MindScore util
-      let mv = heroStats?.moodVariance as number | undefined;
-      if (typeof mv !== 'number') {
-        try {
-          const { weightedScore } = require('@/utils/mindScore');
-          const scores: number[] = week
-            .map(d => weightedScore(d.mood, d.energy, d.anxiety))
-            .filter((v: any) => typeof v === 'number');
-          if (scores.length > 1) {
-            const mean = scores.reduce((s: number, n: number) => s + n, 0) / scores.length;
-            mv = scores.reduce((s: number, n: number) => s + Math.pow(n - mean, 2), 0) / (scores.length - 1);
-          } else {
-            mv = 0;
-          }
-        } catch { mv = 0; }
-      }
+      // Use already computed variance
+      const mv = moodVariance;
 
-      const mVals = week.map(d => (typeof d.mood === 'number' ? d.mood : NaN)).filter((n: any) => Number.isFinite(n));
-      const eVals = week.map(d => (typeof d.energy === 'number' ? d.energy : NaN)).filter((n: any) => Number.isFinite(n));
+      const mVals = stableWeek.map(d => (typeof d.mood === 'number' ? d.mood : NaN)).filter((n: any) => Number.isFinite(n));
+      const eVals = stableWeek.map(d => (typeof d.energy === 'number' ? d.energy : NaN)).filter((n: any) => Number.isFinite(n));
       const avgMood = mVals.length ? mVals.reduce((s: number, n: number) => s + n, 0) / mVals.length : 55;
       const avgE10 = eVals.length ? eVals.reduce((s: number, n: number) => s + n, 0) / eVals.length : 6;
       const sd = Math.sqrt(Math.max(0, mv || 0));
@@ -814,17 +741,69 @@ export default function TodayScreen() {
     } catch {
       return gradient;
     }
-  }, [moodJourneyData?.weeklyEntries, heroStats?.moodVariance, gradient]);
+  }, [stableWeek, moodVariance, gradient]);
 
-  const handleCheckinComplete = (routingResult?: {
+  const handleShowToast = React.useCallback((message: string, type: 'success' | 'error' | 'warning' | 'info') => {
+    setToastMessage(message);
+    setToastType(type);
+    setShowToast(true);
+  }, []);
+
+  const {
+    pendingCount: offlineQueueCount,
+    refreshQueue: refreshOfflineQueue,
+  } = useOfflineMoodSync({
+    enabled: true,
+    onSync: () => {
+      onRefresh();
+      handleShowToast('Bekleyen mood kayıtları senkronize edildi.', 'success');
+    },
+    onError: () => {
+      handleShowToast('Mood kaydı senkronize edilemedi. Lütfen yeniden deneyin.', 'error');
+    },
+  });
+
+  const handleOpenCheckin = React.useCallback(() => {
+    setCheckinMode('default');
+    setCheckinSheetVisible(true);
+  }, []);
+
+  const handleQuickVoice = React.useCallback(() => {
+    setCheckinMode('voiceQuick');
+    setCheckinSheetVisible(true);
+  }, []);
+
+  const handleCloseCheckin = React.useCallback(() => {
+    setCheckinSheetVisible(false);
+    setCheckinMode('default');
+  }, []);
+
+  const handleManageSyncNavigation = React.useCallback(() => {
+    router.push('/(tabs)/settings' as any);
+  }, [router]);
+
+  const handleCheckinComplete = (result?: {
     type: 'MOOD' | 'BREATHWORK' | 'UNKNOWN';
     confidence: number;
     screen?: string;
     params?: any;
+    status?: 'SUCCESS' | 'QUEUED_OFFLINE';
+    queueItemId?: string;
+    toastShown?: boolean;
   }) => {
+    const status = result?.status ?? 'SUCCESS';
+
+    if (status === 'QUEUED_OFFLINE') {
+      refreshOfflineQueue();
+      if (!result?.toastShown) {
+        handleShowToast('Mood kaydedildi; bağlantı sağlanınca senkronize edilecek.', 'info');
+      }
+      return;
+    }
+
     // 🎯 Enhanced Contextual Treatment Navigation
-    if (routingResult) {
-      console.log('🧭 Smart routing result:', routingResult);
+    if (result) {
+      console.log('🧭 Smart routing result:', result);
       
       // 🚫 AI Telemetry - DISABLED (Sprint 2: Hard Stop AI Fallbacks)
       // trackAIInteraction(AIEventType.INSIGHTS_DELIVERED, {
@@ -835,10 +814,10 @@ export default function TodayScreen() {
       // });
       
       // Auto-navigate based on AI analysis (optional - user can dismiss)
-      const shouldAutoNavigate = routingResult.confidence > 0.7;
+      const shouldAutoNavigate = result.confidence > 0.7;
 
       // Remap legacy screens removed
-      let remappedScreen = routingResult.screen;
+      let remappedScreen = result.screen;
 
       if (shouldAutoNavigate && remappedScreen) {
         setTimeout(() => {
@@ -846,9 +825,9 @@ export default function TodayScreen() {
           router.push({
             pathname: `/(tabs)/${remappedScreen}` as any,
             params: {
-              ...routingResult.params,
+              ...result.params,
               source: 'ai_routing',
-              confidence: routingResult.confidence.toString()
+              confidence: result.confidence.toString()
             }
           });
         }, 2000);
@@ -857,6 +836,7 @@ export default function TodayScreen() {
     
     // Always refresh data after check-in
     onRefresh();
+    refreshOfflineQueue();
   };
 
   // Check-in butonu artık en altta olacak
@@ -868,8 +848,6 @@ export default function TodayScreen() {
   /**
    * 📊 Haftalık Özet Modül Kartları - Tüm modüllerden ilerleme
    */
-  // (extracted) WeeklySummaryGrid replaces inline module summary
-
   // ✅ REMOVED: renderAchievements() - Today sayfası sadelik için kaldırıldı
   // Detaylı başarı görüntüleme modül dashboard'larında mevcut
   // MicroReward/Toast sistemi unlock anında çalışmaya devam ediyor
@@ -899,39 +877,39 @@ export default function TodayScreen() {
         )}
         
         {/* 🎨 Mood Journey Card */}
-        {moodJourneyData && (
-          <View style={{ marginTop: 8 }} onLayout={(e) => setMoodSectionY(e.nativeEvent.layout.y)}>
-            <MoodJourneyCard
-              data={moodJourneyData}
-              initialOpenDate={(() => {
-                try {
-                  const v = Array.isArray(params.openDate) ? params.openDate[0] : (params.openDate as string | undefined);
-                  if (!v || typeof v !== 'string') return undefined;
-                  // Validate date string format and actual date
-                  if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return undefined;
-                  const testDate = new Date(v);
-                  if (!isFinite(testDate.getTime())) return undefined;
-                  return v;
-                } catch (error) {
-                  console.warn('Invalid initialOpenDate param:', error);
-                  return undefined;
-                }
-              })()}
-              initialRange={(() => {
-                try {
-                  const r = Array.isArray(params.openRange) ? params.openRange[0] : (params.openRange as string | undefined);
-                  const validRanges = ['week', 'month', '6months', 'year'] as const;
-                  return validRanges.includes(r as any) ? (r as any) : 'week'; // Fallback to week
-                } catch (error) {
-                  console.warn('Invalid initialRange param:', error);
-                  return 'week';
-                }
-              })()}
-              onSelectedScoreChange={setSelectedDayScore}
-              onSelectedMetaChange={setSelectedMeta}
-            />
-          </View>
-        )}
+        <View style={{ marginTop: 8 }} onLayout={(e) => setMoodSectionY(e.nativeEvent.layout.y)}>
+          <MoodJourneyCard
+            key="moodJourney-static"  // Static key to prevent remounting
+            data={moodJourneyData || { weeklyEntries: [], weeklyMoodAvg: 0, weeklyEnergyAvg: 0, weeklyAnxietyAvg: 0 }}
+            initialOpenDate={(() => {
+              try {
+                const v = Array.isArray(params.openDate) ? params.openDate[0] : (params.openDate as string | undefined);
+                if (!v || typeof v !== 'string') return undefined;
+                // Validate date string format and actual date
+                if (!/^\d{4}-\d{2}-\d{2}$/.test(v)) return undefined;
+                const testDate = new Date(v);
+                if (!isFinite(testDate.getTime())) return undefined;
+                return v;
+              } catch (error) {
+                console.warn('Invalid initialOpenDate param:', error);
+                return undefined;
+              }
+            })()}
+            initialRange={(() => {
+              try {
+                const r = Array.isArray(params.openRange) ? params.openRange[0] : (params.openRange as string | undefined);
+                const validRanges = ['week', 'month', '6months', 'year'] as const;
+                return validRanges.includes(r as any) ? (r as any) : 'week'; // Fallback to week
+              } catch (error) {
+                console.warn('Invalid initialRange param:', error);
+                return 'week';
+              }
+            })()}
+            onSelectedScoreChange={setSelectedDayScore}
+            onSelectedMetaChange={setSelectedMeta}
+            onRangeEntriesChange={handleRangeEntriesChange}
+          />
+        </View>
         {/* Risk section removed */}
         {renderArtTherapyWidget()}
         {/* ✅ REMOVED: Başarılarım bölümü - yinelenen bilgi, kalabalık yaratıyor */}
@@ -940,17 +918,24 @@ export default function TodayScreen() {
         {/* Check-in butonu en altta */}
         <BottomCheckinCTA
           isVisible={checkinSheetVisible}
-          onOpen={() => setCheckinSheetVisible(true)}
-          onClose={() => setCheckinSheetVisible(false)}
+          onOpen={handleOpenCheckin}
+          onClose={handleCloseCheckin}
           onComplete={handleCheckinComplete}
           accentColor={accentColor}
-          gradientColors={['#34d399', '#059669']}
+          gradientColors={heroGradient}
+          onQuickVoice={handleQuickVoice}
+          onShowToast={handleShowToast}
+          lastMoodEntry={moodJourneyData?.weeklyEntries?.[0] ?? null}
+          pendingQueueCount={offlineQueueCount}
+          onOfflineEnqueue={refreshOfflineQueue}
+          onManageSync={handleManageSyncNavigation}
         />
         {/* Render Check-in sheet at screen level so it can be opened via param */}
         <CheckinBottomSheet
           isVisible={checkinSheetVisible}
-          onClose={() => setCheckinSheetVisible(false)}
+          onClose={handleCloseCheckin}
           onComplete={handleCheckinComplete}
+          mode={checkinMode}
         />
         {/* Spacer removed to avoid visual gap above bottom tab */}
       </ScrollView>
@@ -959,7 +944,7 @@ export default function TodayScreen() {
       {/* Toast Notification */}
       <Toast
         message={toastMessage}
-        type={showToast && toastMessage.includes('hata') ? 'error' : 'success'}
+        type={toastType}
         visible={showToast}
         onHide={() => setShowToast(false)}
       />
