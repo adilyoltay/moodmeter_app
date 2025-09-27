@@ -1,0 +1,27 @@
+{
+  "deleteFiles": [
+    "features/ai-fallbacks/edgeAIService.ts"
+  ],
+  "removePackages": [
+    "@hookform/resolvers",
+    "@react-native-clipboard/clipboard",
+    "expo-audio",
+    "expo-background-fetch",
+    "expo-blur",
+    "expo-image-picker",
+    "expo-print",
+    "expo-sharing",
+    "expo-task-manager",
+    "expo-video",
+    "i18n-js",
+    "jwt-decode",
+    "react-hook-form",
+    "react-native-gifted-chat",
+    "react-native-modal",
+    "react-native-typing-animation",
+    "stream-chat",
+    "stream-chat-react-native"
+  ],
+  "estimatedImpact": "1 files + 18 packages",
+  "riskLevel": "LOW-MEDIUM"
+}

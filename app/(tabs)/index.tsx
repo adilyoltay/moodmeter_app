@@ -570,51 +570,18 @@ export default function TodayScreen() {
   };
 
   // Move all calculations to component level with proper memoization
-  // Stable week data with throttled updates to prevent flicker
-  const [stableWeek, setStableWeek] = useState<DayMetrics[]>([]);
-  const weekUpdateTimerRef = useRef<NodeJS.Timeout | null>(null);
-  
-  useEffect(() => {
-    if (weekUpdateTimerRef.current) {
-      clearTimeout(weekUpdateTimerRef.current);
-    }
-    
-    weekUpdateTimerRef.current = setTimeout(() => {
-      const entries = insightEntries.length > 0 ? insightEntries : (moodJourneyData?.weeklyEntries || []);
-      if (!entries.length) {
-        setStableWeek(prevWeek => prevWeek.length === 0 ? prevWeek : []);
-        return;
-      }
-      
-      const processed = entries
-        .map((e: any) => ({
-          date: getUserDateString(e.timestamp),
-          mood: Number.isFinite(e.mood_score) && e.mood_score > 0 ? Number(e.mood_score) : null,
-          energy: Number.isFinite(e.energy_level) && e.energy_level > 0 ? Number(e.energy_level) : null,
-          anxiety: Number.isFinite(e.anxiety_level) && e.anxiety_level > 0 ? Number(e.anxiety_level) : null,
-        }))
-        .sort((a, b) => String(a.date).localeCompare(String(b.date)));
-      
-      // Only update if data actually changed
-      setStableWeek(prevWeek => {
-        if (prevWeek.length !== processed.length) return processed;
-        const isDifferent = processed.some((newItem, idx) => {
-          const prevItem = prevWeek[idx];
-          return !prevItem || 
-            newItem.date !== prevItem.date ||
-            newItem.mood !== prevItem.mood ||
-            newItem.energy !== prevItem.energy ||
-            newItem.anxiety !== prevItem.anxiety;
-        });
-        return isDifferent ? processed : prevWeek;
-      });
-    }, 200); // 200ms throttle for stability
-    
-    return () => {
-      if (weekUpdateTimerRef.current) {
-        clearTimeout(weekUpdateTimerRef.current);
-      }
-    };
+  // Simple week calculation like main repo (no throttling for smooth pointer)
+  const week: DayMetrics[] = useMemo(() => {
+    const entries = insightEntries.length > 0 ? insightEntries : (moodJourneyData?.weeklyEntries || []);
+    if (!entries.length) return [];
+    return entries
+      .map((e: any) => ({
+        date: getUserDateString(e.timestamp),
+        mood: Number.isFinite(e.mood_score) && e.mood_score > 0 ? Number(e.mood_score) : null,
+        energy: Number.isFinite(e.energy_level) && e.energy_level > 0 ? Number(e.energy_level) : null,
+        anxiety: Number.isFinite(e.anxiety_level) && e.anxiety_level > 0 ? Number(e.anxiety_level) : null,
+      }))
+      .sort((a, b) => String(a.date).localeCompare(String(b.date)));
   }, [insightEntries, moodJourneyData?.weeklyEntries, insightRange]);
 
   // Tutarlılık için weighted score'lardan variance hesapla (MindScoreCard ile uyumlu)
@@ -623,7 +590,7 @@ export default function TodayScreen() {
     // MindScoreCard ile aynı util fonksiyonunu kullanarak hizala
     try {
       const { weightedScore } = require('@/utils/mindScore');
-      const scores: number[] = stableWeek
+      const scores: number[] = week
         .map(d => weightedScore(d.mood, d.energy, d.anxiety))
         .filter((v: any) => typeof v === 'number');
       if (scores.length <= 1) return 0;
@@ -632,15 +599,13 @@ export default function TodayScreen() {
     } catch {
       return 0;
     }
-  }, [heroStats?.moodVariance, stableWeek]);
+  }, [heroStats?.moodVariance, week]);
 
-  // Compute EWMA-based score and 1g trend for external meta card
-  const { scoreNow, trendPct } = useMemo(() => {
-    let scoreNow: number | null = null;
-    let trendPct: number | null = null;
+  // Compute trend for meta card (simplified)
+  const trendPct = useMemo(() => {
     try {
       const { weightedScore } = require('@/utils/mindScore');
-      const series = stableWeek.map(d => weightedScore(d.mood, d.energy, d.anxiety));
+      const series = week.map(d => weightedScore(d.mood, d.energy, d.anxiety));
       const ewma = (arr: Array<number | null | undefined>) => {
         const vals = arr.map(v => (typeof v === 'number' && Number.isFinite(v) ? v : null));
         const n = vals.length; if (!n) return [] as number[];
@@ -653,15 +618,14 @@ export default function TodayScreen() {
         return out;
       };
       const sm = ewma(series);
-      scoreNow = sm.length ? sm[sm.length - 1] : null;
-      // Weekly trend: last vs first of the 7-day EWMA window
+      const scoreNow = sm.length ? sm[sm.length - 1] : null;
       const base = sm.length > 1 ? sm[0] : null;
       if (scoreNow != null && base != null && base !== 0) {
-        trendPct = Math.round(((scoreNow - base) / Math.max(1, base)) * 100);
+        return Math.round(((scoreNow - base) / Math.max(1, base)) * 100);
       }
     } catch {}
-    return { scoreNow, trendPct };
-  }, [stableWeek]);
+    return null;
+  }, [week]);
 
   const renderHeroSection = useCallback(() => {
     // If we have no week data yet (fresh install), keep minimal graceful fallback
@@ -670,7 +634,7 @@ export default function TodayScreen() {
         <View style={{ minHeight: 240, overflow: 'hidden' }}>
           <MindScoreCard
             key="mindScore-static"  // Static key to prevent any remounting
-            week={stableWeek}
+            week={week}
             title={`Zihin Skoru (${insightRange === 'week' ? 'Hafta' : insightRange === 'month' ? 'Ay' : insightRange === '6months' ? '6 Ay' : 'Yıl'})`}
             loading={false}
             onQuickStart={() => setCheckinSheetVisible(true)}
@@ -696,20 +660,13 @@ export default function TodayScreen() {
         </View>
         <MindMetaRowCard
           key="meta-static"  // Static key to prevent any flicker
-          score={selectedMeta?.score ?? (typeof scoreNow === 'number' ? scoreNow : null)}
+          score={selectedMeta?.score}
           streak={profile.streakCurrent}
           hp={todayStats?.healingPoints ?? 0}
         />
-        <MoodInsightsCard
-          key="insights-static"  // Static key to prevent any flicker
-          entries={insightEntries}
-          accentColor={accentColor}
-          isLoading={false}
-          range={insightRange}
-        />
       </>
     );
-  }, [stableWeek, insightRange, mindSparkStyle, moodVariance, profile.streakCurrent, profile.streakBest, profile.streakLevel, selectedDayScore, selectedMeta, insightEntries, accentColor, scoreNow, todayStats?.healingPoints]);
+  }, [week, insightRange, mindSparkStyle, moodVariance, profile.streakCurrent, profile.streakBest, profile.streakLevel, selectedDayScore, selectedMeta, todayStats?.healingPoints]);
 
   /**
    * 🎯 Quick Mood Entry Button + Emoji Bottom Sheet
@@ -726,13 +683,13 @@ export default function TodayScreen() {
   const heroGradient = React.useMemo(() => {
     try {
       const { getVAGradientFromScores } = require('@/utils/colorUtils');
-      if (!stableWeek.length) return gradient; // fallback to accent gradient
+      if (!week.length) return gradient; // fallback to accent gradient
 
       // Use already computed variance
       const mv = moodVariance;
 
-      const mVals = stableWeek.map(d => (typeof d.mood === 'number' ? d.mood : NaN)).filter((n: any) => Number.isFinite(n));
-      const eVals = stableWeek.map(d => (typeof d.energy === 'number' ? d.energy : NaN)).filter((n: any) => Number.isFinite(n));
+      const mVals = week.map(d => (typeof d.mood === 'number' ? d.mood : NaN)).filter((n: any) => Number.isFinite(n));
+      const eVals = week.map(d => (typeof d.energy === 'number' ? d.energy : NaN)).filter((n: any) => Number.isFinite(n));
       const avgMood = mVals.length ? mVals.reduce((s: number, n: number) => s + n, 0) / mVals.length : 55;
       const avgE10 = eVals.length ? eVals.reduce((s: number, n: number) => s + n, 0) / eVals.length : 6;
       const sd = Math.sqrt(Math.max(0, mv || 0));
@@ -741,7 +698,7 @@ export default function TodayScreen() {
     } catch {
       return gradient;
     }
-  }, [stableWeek, moodVariance, gradient]);
+  }, [week, moodVariance, gradient]);
 
   const handleShowToast = React.useCallback((message: string, type: 'success' | 'error' | 'warning' | 'info') => {
     setToastMessage(message);
@@ -910,6 +867,16 @@ export default function TodayScreen() {
             onRangeEntriesChange={handleRangeEntriesChange}
           />
         </View>
+        
+        {/* 📊 Mood Insights Card - MoodJourneyCard'ın altında */}
+        <MoodInsightsCard
+          key="insights-static"  // Static key to prevent any flicker
+          entries={insightEntries}
+          accentColor={accentColor}
+          isLoading={false}
+          range={insightRange}
+        />
+        
         {/* Risk section removed */}
         {renderArtTherapyWidget()}
         {/* ✅ REMOVED: Başarılarım bölümü - yinelenen bilgi, kalabalık yaratıyor */}

@@ -1,0 +1,681 @@
+{
+  "unusedFiles": [
+    "scripts/audit-unused.mts",
+    "features/ai-fallbacks/edgeAIService.ts"
+  ],
+  "unusedDependencies": [
+    "@expo/config-plugins",
+    "@hookform/resolvers",
+    "@react-native-clipboard/clipboard",
+    "buffer",
+    "expo-audio",
+    "expo-background-fetch",
+    "expo-blur",
+    "expo-file-system",
+    "expo-image",
+    "expo-image-picker",
+    "expo-print",
+    "expo-sharing",
+    "expo-task-manager",
+    "expo-video",
+    "i18n-js",
+    "jwt-decode",
+    "react-dom",
+    "react-hook-form",
+    "react-native-gifted-chat",
+    "react-native-modal",
+    "react-native-typing-animation",
+    "stream-chat",
+    "stream-chat-react-native"
+  ],
+  "unusedExports": [
+    {
+      "file": "contexts/SupabaseAuthContext.tsx",
+      "export": "SupabaseAuthProvider",
+      "line": 58
+    },
+    {
+      "file": "contexts/NotificationContext.tsx",
+      "export": "useNotifications",
+      "line": 244
+    },
+    {
+      "file": "contexts/LanguageContext.tsx",
+      "export": "languageUtils",
+      "line": 158
+    },
+    {
+      "file": "lib/queryClient.ts",
+      "export": "storage",
+      "line": 30
+    },
+    {
+      "file": "components/navigation/NavigationGuard.tsx",
+      "export": "clearOnboardingCache",
+      "line": 20
+    },
+    {
+      "file": "components/ErrorBoundary.tsx",
+      "export": "ErrorBoundary",
+      "line": 22
+    },
+    {
+      "file": "services/performanceMonitor.ts",
+      "export": "performanceMonitor",
+      "line": 470
+    },
+    {
+      "file": "services/crossDeviceSync.ts",
+      "export": "default",
+      "line": 272
+    },
+    {
+      "file": "constants/Colors.ts",
+      "export": "Palettes",
+      "line": 97
+    },
+    {
+      "file": "components/ui/Card.tsx",
+      "export": "default",
+      "line": 104
+    },
+    {
+      "file": "services/syncMetrics.ts",
+      "export": "syncMetrics",
+      "line": 277
+    },
+    {
+      "file": "services/crashReporting.ts",
+      "export": "crashReporting",
+      "line": 219
+    },
+    {
+      "file": "services/asyncStorageHygiene.ts",
+      "export": "asyncStorageHygiene",
+      "line": 401
+    },
+    {
+      "file": "services/smartNotifications.ts",
+      "export": "smartNotifications",
+      "line": 415
+    },
+    {
+      "file": "services/heartpy/healthSignals.ts",
+      "export": "healthSignals",
+      "line": 147
+    },
+    {
+      "file": "services/heartpy/healthSignals.ts",
+      "export": "get7DayMinuteActivityWindow",
+      "line": 308
+    },
+    {
+      "file": "services/heartpy/index.ts",
+      "export": "runHeartPy",
+      "line": 9
+    },
+    {
+      "file": "services/heartpy/index.ts",
+      "export": "healthSignals",
+      "line": 41
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "getUserTimezoneOffset",
+      "line": 12
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "getUserTimezone",
+      "line": 19
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "getUserDayBounds",
+      "line": 82
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "groupEntriesByUserDay",
+      "line": 118
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "calculateStreakInUserTimezone",
+      "line": 137
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "filterEntriesByUserTimeRange",
+      "line": 176
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "getUtcDayKey",
+      "line": 228
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "toLocalStartOfDay",
+      "line": 240
+    },
+    {
+      "file": "utils/timezoneUtils.ts",
+      "export": "calcDayDiffUTC",
+      "line": 251
+    },
+    {
+      "file": "services/supabase.ts",
+      "export": "initializeSupabase",
+      "line": 1027
+    },
+    {
+      "file": "services/supabase.ts",
+      "export": "createSupabaseServiceForTest",
+      "line": 1045
+    },
+    {
+      "file": "utils/validators.ts",
+      "export": "UUID_REGEX",
+      "line": 49
+    },
+    {
+      "file": "utils/validators.ts",
+      "export": "EMAIL_REGEX",
+      "line": 54
+    },
+    {
+      "file": "components/ui/TabBarBackground.tsx",
+      "export": "useBottomTabOverflow",
+      "line": 9
+    },
+    {
+      "file": "constants/featureFlags.ts",
+      "export": "AI_CONFIG",
+      "line": 308
+    },
+    {
+      "file": "utils/storage.ts",
+      "export": "getUserStorageKey",
+      "line": 47
+    },
+    {
+      "file": "utils/storage.ts",
+      "export": "clearUserData",
+      "line": 92
+    },
+    {
+      "file": "services/todayService.ts",
+      "export": "todayService",
+      "line": 30
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "normalizeWord",
+      "line": 55
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "extractTokens",
+      "line": 61
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "getDominantTriggers",
+      "line": 68
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "getActivityMoodInsights",
+      "line": 93
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "getKeywordInsight",
+      "line": 148
+    },
+    {
+      "file": "utils/moodInsights.ts",
+      "export": "default",
+      "line": 181
+    },
+    {
+      "file": "services/moodDataLoader.ts",
+      "export": "OptimizedMoodDataLoader",
+      "line": 15
+    },
+    {
+      "file": "hooks/useOfflineMoodSync.ts",
+      "export": "useOfflineMoodSync",
+      "line": 42
+    },
+    {
+      "file": "components/ui/Button.tsx",
+      "export": "Button",
+      "line": 35
+    },
+    {
+      "file": "services/unifiedComplianceService.ts",
+      "export": "ComplianceValidator",
+      "line": 98
+    },
+    {
+      "file": "services/unifiedComplianceService.ts",
+      "export": "default",
+      "line": 790
+    },
+    {
+      "file": "constants/DesignSystem.ts",
+      "export": "AnimationConfig",
+      "line": 38
+    },
+    {
+      "file": "services/telemetry/noopTelemetry.ts",
+      "export": "default",
+      "line": 91
+    },
+    {
+      "file": "contexts/authBridge.ts",
+      "export": "setAuthProfile",
+      "line": 14
+    },
+    {
+      "file": "contexts/authBridge.ts",
+      "export": "getAuthUserId",
+      "line": 18
+    },
+    {
+      "file": "contexts/authBridge.ts",
+      "export": "default",
+      "line": 22
+    },
+    {
+      "file": "utils/secureStorageMigration.ts",
+      "export": "SecureStorageMigration",
+      "line": 7
+    },
+    {
+      "file": "hooks/useCacheInvalidation.ts",
+      "export": "queryKeys",
+      "line": 52
+    },
+    {
+      "file": "hooks/useCacheInvalidation.ts",
+      "export": "useCacheInvalidation",
+      "line": 123
+    },
+    {
+      "file": "hooks/useCacheInvalidation.ts",
+      "export": "emitAIInvalidation",
+      "line": 381
+    },
+    {
+      "file": "hooks/useCacheInvalidation.ts",
+      "export": "getCacheTTL",
+      "line": 392
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "enqueue",
+      "line": 61
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "remove",
+      "line": 81
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "peekAll",
+      "line": 88
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "markRetry",
+      "line": 92
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "flush",
+      "line": 112
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "clearAll",
+      "line": 118
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "clearAllStrict",
+      "line": 126
+    },
+    {
+      "file": "services/moodOfflineQueue.ts",
+      "export": "moodOfflineQueue",
+      "line": 161
+    },
+    {
+      "file": "services/api.ts",
+      "export": "default",
+      "line": 79
+    },
+    {
+      "file": "utils/idGenerator.ts",
+      "export": "generateShortSecureId",
+      "line": 47
+    },
+    {
+      "file": "utils/idGenerator.ts",
+      "export": "LEGACY_PATTERNS",
+      "line": 74
+    },
+    {
+      "file": "utils/idGenerator.ts",
+      "export": "isLegacyId",
+      "line": 89
+    },
+    {
+      "file": "utils/idGenerator.ts",
+      "export": "default",
+      "line": 93
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "normalizeValence",
+      "line": 3
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "getEnergyGradient",
+      "line": 9
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "getVAColor",
+      "line": 15
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "getConfidenceOpacity",
+      "line": 19
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "calculateAverage",
+      "line": 25
+    },
+    {
+      "file": "utils/chartUtils.ts",
+      "export": "hourFromTimestamp",
+      "line": 32
+    },
+    {
+      "file": "utils/statistics.ts",
+      "export": "lcg",
+      "line": 24
+    },
+    {
+      "file": "utils/dateAggregation.ts",
+      "export": "isFirstOfMonth",
+      "line": 16
+    },
+    {
+      "file": "utils/dateAggregation.ts",
+      "export": "isMonday",
+      "line": 21
+    },
+    {
+      "file": "services/sync/batchOptimizer.ts",
+      "export": "batchOptimizer",
+      "line": 101
+    },
+    {
+      "file": "services/staticMoodMerge.ts",
+      "export": "staticMoodMergeService",
+      "line": 235
+    },
+    {
+      "file": "services/staticMoodMerge.ts",
+      "export": "default",
+      "line": 243
+    },
+    {
+      "file": "services/optimizedStorage.ts",
+      "export": "optimizedStorage",
+      "line": 380
+    },
+    {
+      "file": "services/optimizedStorage.ts",
+      "export": "AsyncStorageAdapter",
+      "line": 398
+    },
+    {
+      "file": "services/optimizedStorage.ts",
+      "export": "WatermelonDBAdapter",
+      "line": 424
+    },
+    {
+      "file": "utils/moodTriggers.ts",
+      "export": "normalizeTriggerToken",
+      "line": 127
+    },
+    {
+      "file": "services/mood/moodMigration.ts",
+      "export": "migrateEntryToEncrypted",
+      "line": 76
+    },
+    {
+      "file": "services/unifiedConflictResolver.ts",
+      "export": "ConflictDetectionEngine",
+      "line": 74
+    },
+    {
+      "file": "services/unifiedConflictResolver.ts",
+      "export": "ResolutionStrategies",
+      "line": 179
+    },
+    {
+      "file": "services/unifiedConflictResolver.ts",
+      "export": "default",
+      "line": 478
+    },
+    {
+      "file": "utils/circuitBreaker.ts",
+      "export": "CircuitBreaker",
+      "line": 14
+    },
+    {
+      "file": "services/sync/offlineSyncOrchestrator.ts",
+      "export": "OfflineSyncOrchestrator",
+      "line": 11
+    },
+    {
+      "file": "services/telemetry/performanceMetricsService.ts",
+      "export": "performanceMetricsService",
+      "line": 62
+    },
+    {
+      "file": "services/staticGamification.ts",
+      "export": "calculateMoodEntryPoints",
+      "line": 29
+    },
+    {
+      "file": "services/staticGamification.ts",
+      "export": "calculateCheckinPoints",
+      "line": 45
+    },
+    {
+      "file": "services/staticGamification.ts",
+      "export": "generateDailyMissions",
+      "line": 62
+    },
+    {
+      "file": "services/staticGamification.ts",
+      "export": "generateWeeklyMissions",
+      "line": 87
+    },
+    {
+      "file": "services/staticGamification.ts",
+      "export": "default",
+      "line": 119
+    },
+    {
+      "file": "utils/dataStandardization.ts",
+      "export": "default",
+      "line": 205
+    },
+    {
+      "file": "utils/moodJourneyFilters.ts",
+      "export": "matchesTrigger",
+      "line": 11
+    },
+    {
+      "file": "utils/moodJourneyFilters.ts",
+      "export": "matchesActivity",
+      "line": 17
+    },
+    {
+      "file": "utils/moodJourneyFilters.ts",
+      "export": "matchesKeyword",
+      "line": 23
+    },
+    {
+      "file": "utils/moodJourneyFilters.ts",
+      "export": "applyJourneyFilters",
+      "line": 30
+    },
+    {
+      "file": "utils/moodQuickEntry.ts",
+      "export": "getQuickMoodPreset",
+      "line": 45
+    },
+    {
+      "file": "services/heartpy/calibration.ts",
+      "export": "calibrationService",
+      "line": 7
+    },
+    {
+      "file": "services/heartpy/inferenceMetaStore.ts",
+      "export": "default",
+      "line": 22
+    },
+    {
+      "file": "components/mood/AppleHealthDetailSheet.tsx",
+      "export": "AppleHealthDetailSheet",
+      "line": 121
+    },
+    {
+      "file": "components/mood/AppleHealthStyleChartV2.tsx",
+      "export": "AppleHealthStyleChartV2",
+      "line": 175
+    },
+    {
+      "file": "components/mood/AppleHealthTimeSelectorV2.tsx",
+      "export": "default",
+      "line": 167
+    },
+    {
+      "file": "utils/debugQueueTest.ts",
+      "export": "testQueueStats",
+      "line": 12
+    },
+    {
+      "file": "utils/debugQueueTest.ts",
+      "export": "testQueueOverflow",
+      "line": 33
+    },
+    {
+      "file": "utils/debugQueueTest.ts",
+      "export": "testQueueOverflowHeavy",
+      "line": 112
+    },
+    {
+      "file": "utils/debugQueueTest.ts",
+      "export": "quickQueueCheck",
+      "line": 118
+    },
+    {
+      "file": "utils/debugQueueTest.ts",
+      "export": "testQueueBoundary",
+      "line": 126
+    },
+    {
+      "file": "utils/debugIdempotency.ts",
+      "export": "testMoodDuplicates",
+      "line": 13
+    },
+    {
+      "file": "utils/debugIdempotency.ts",
+      "export": "getIdempotencyStats",
+      "line": 83
+    },
+    {
+      "file": "utils/debugIdempotency.ts",
+      "export": "cleanupIdempotency",
+      "line": 114
+    },
+    {
+      "file": "utils/debugIdempotency.ts",
+      "export": "stressTestIdempotency",
+      "line": 129
+    },
+    {
+      "file": "utils/debugMoodDeletion.ts",
+      "export": "debugMoodDeletion",
+      "line": 20
+    },
+    {
+      "file": "utils/debugMoodDeletion.ts",
+      "export": "debugForceDeletion",
+      "line": 98
+    },
+    {
+      "file": "utils/debugMoodDeletion.ts",
+      "export": "debugMoodStorageLocations",
+      "line": 134
+    },
+    {
+      "file": "utils/debugMoodDeletion.ts",
+      "export": "debugCleanAllMoodStorage",
+      "line": 174
+    },
+    {
+      "file": "utils/debugInvalidEntries.ts",
+      "export": "scanForInvalidEntries",
+      "line": 20
+    },
+    {
+      "file": "utils/debugInvalidEntries.ts",
+      "export": "cleanupInvalidEntriesForUser",
+      "line": 117
+    },
+    {
+      "file": "utils/debugInvalidEntries.ts",
+      "export": "testAutoRecovery",
+      "line": 183
+    },
+    {
+      "file": "utils/debugInvalidEntries.ts",
+      "export": "getMoodDataIntegrityReport",
+      "line": 204
+    }
+  ],
+  "duplicateFiles": [],
+  "referencedAssets": [
+    "assets/icon.png",
+    "assets/splash-icon.png",
+    "assets/adaptive-icon.png",
+    "assets/favicon.png"
+  ],
+  "summary": {
+    "totalFilesScanned": 193,
+    "totalUnusedFiles": 2,
+    "totalUnusedDependencies": 23,
+    "totalUnusedExports": 126,
+    "totalDuplicateGroups": 0,
+    "estimatedCleanupImpact": {
+      "filesKB": 10,
+      "packagesCount": 23
+    }
+  }
+}
