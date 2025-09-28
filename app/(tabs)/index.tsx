@@ -890,12 +890,6 @@ export default function TodayScreen() {
           onComplete={handleCheckinComplete}
           accentColor={accentColor}
           gradientColors={heroGradient}
-          onQuickVoice={handleQuickVoice}
-          onShowToast={handleShowToast}
-          lastMoodEntry={moodJourneyData?.weeklyEntries?.[0] ?? null}
-          pendingQueueCount={offlineQueueCount}
-          onOfflineEnqueue={refreshOfflineQueue}
-          onManageSync={handleManageSyncNavigation}
         />
         {/* Render Check-in sheet at screen level so it can be opened via param */}
         <CheckinBottomSheet
