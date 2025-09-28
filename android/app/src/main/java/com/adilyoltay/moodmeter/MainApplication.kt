@@ -1,4 +1,4 @@
-package com.adilyoltay.obslesstest
+package com.adilyoltay.moodmeter
 
 import android.app.Application
 import android.content.res.Configuration

@@ -1,4 +1,4 @@
-package com.adilyoltay.obslesstest
+package com.adilyoltay.moodmeter
 import expo.modules.splashscreen.SplashScreenManager
 
 import android.os.Build

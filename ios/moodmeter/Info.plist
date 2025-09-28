@@ -7,7 +7,7 @@
     <key>CFBundleDevelopmentRegion</key>
     <string>$(DEVELOPMENT_LANGUAGE)</string>
     <key>CFBundleDisplayName</key>
-    <string>obslessless-clean</string>
+    <string>MoodMeter</string>
     <key>CFBundleExecutable</key>
     <string>$(EXECUTABLE_NAME)</string>
     <key>CFBundleIdentifier</key>
@@ -27,14 +27,14 @@
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>obslesstest</string>
-          <string>com.adilyoltay.obslesstest</string>
+          <string>moodmeter</string>
+          <string>com.adilyoltay.moodmeter</string>
         </array>
       </dict>
       <dict>
         <key>CFBundleURLSchemes</key>
         <array>
-          <string>exp+obslessless-clean</string>
+          <string>exp+moodmeter</string>
         </array>
       </dict>
     </array>
