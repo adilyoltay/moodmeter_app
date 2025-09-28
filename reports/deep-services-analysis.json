@@ -1,0 +1,1594 @@
+[
+  {
+    "file": "services/messaging.ts",
+    "status": "ACTIVE",
+    "refs": 12,
+    "exports": [
+      "NotificationData",
+      "MessagingService",
+      "messagingService"
+    ],
+    "foundIn": [
+      "./contexts/NotificationContext.tsx"
+    ]
+  },
+  {
+    "file": "services/moodOfflineQueue.ts",
+    "status": "ACTIVE",
+    "refs": 891,
+    "exports": [
+      "moodOfflineQueue",
+      "SavedMoodPayload",
+      "OfflineMoodItem",
+      "peekAllDetailed",
+      "enqueue",
+      "remove",
+      "peekAll",
+      "markRetry",
+      "flush",
+      "clearAll",
+      "clearAllStrict",
+      "getBackoffDelay",
+      "buildSummary",
+      "moodOfflineQueue"
+    ],
+    "foundIn": [
+      "./components/settings/OfflineQueueManager.tsx",
+      "./hooks/useOfflineMoodSync.ts",
+      "./services/moodTrackingService.ts",
+      "./node_modules/@types/node/stream/web.d.ts",
+      "./node_modules/@types/node/stream.d.ts",
+      "./node_modules/jest-worker/build/index.d.ts",
+      "./node_modules/expo-file-system/src/next/streams.ts",
+      "./node_modules/typescript/lib/lib.dom.d.ts",
+      "./node_modules/typescript/lib/lib.webworker.d.ts",
+      "./node_modules/expo/src/winter/fetch/FetchResponse.ts",
+      "./node_modules/yocto-queue/index.d.ts",
+      "./node_modules/stream-chat/dist/types/offline-support/offline_support_api.d.ts",
+      "./node_modules/stream-chat/src/offline-support/offline_support_api.ts",
+      "./node_modules/react-native-gesture-handler/src/handlers/createHandler.tsx",
+      "./services/supabase.ts",
+      "./services/crossDeviceSync.ts",
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/_layout.tsx",
+      "./app/debug-clean-data.tsx",
+      "./archive/supabase/functions/clean-audio-temp/index.ts",
+      "./archive/ai-disabled-backup/core/helpers/PipelineCacheManager.ts",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV3.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlow.tsx",
+      "./archive/ai-disabled-backup/services/externalAIService.ts",
+      "./archive/services/patternPersistenceService.ts",
+      "./archive/services/edgeAIService.ts",
+      "./archive/services/voiceCleanupService.ts",
+      "./archive/services/sync/scheduledMaintenance.ts",
+      "./node_modules/expo-dev-client/plugin/src/getDefaultScheme.ts",
+      "./node_modules/zod/v4/core/registries.d.ts",
+      "./node_modules/zod/src/v4/core/registries.ts",
+      "./node_modules/zod/src/v4/core/to-json-schema.ts",
+      "./node_modules/ts-morph/lib/ts-morph.d.ts",
+      "./node_modules/react-native-gifted-chat/src/MessageContainer/components/Item/index.tsx",
+      "./node_modules/hosted-git-info/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/hosted-git-info/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@types/lodash/fp/remove.d.ts",
+      "./node_modules/@types/lodash/fp.d.ts",
+      "./node_modules/@types/lodash/common/common.d.ts",
+      "./node_modules/@types/lodash/common/array.d.ts",
+      "./node_modules/@types/lodash/remove.d.ts",
+      "./node_modules/@types/phoenix/index.d.ts",
+      "./node_modules/@types/babel__traverse/index.d.ts",
+      "./node_modules/@types/hammerjs/index.d.ts",
+      "./node_modules/@types/node/compatibility/iterators.d.ts",
+      "./node_modules/@types/node/path.d.ts",
+      "./node_modules/@types/node/domain.d.ts",
+      "./node_modules/@types/node/diagnostics_channel.d.ts",
+      "./node_modules/@types/node/sea.d.ts",
+      "./node_modules/@types/node/trace_events.d.ts",
+      "./node_modules/@types/node/events.d.ts",
+      "./node_modules/@types/node/querystring.d.ts",
+      "./node_modules/@types/node/worker_threads.d.ts",
+      "./node_modules/@types/node/timers.d.ts",
+      "./node_modules/@types/node/url.d.ts",
+      "./node_modules/@types/node/fs.d.ts",
+      "./node_modules/@types/node/module.d.ts",
+      "./node_modules/@types/node/process.d.ts",
+      "./node_modules/@types/node/fs/promises.d.ts",
+      "./node_modules/xml2js/node_modules/xmlbuilder/typings/index.d.ts",
+      "./node_modules/react-native-edge-to-edge/src/SystemBars.ts",
+      "./node_modules/expo-image-picker/src/utils.ts",
+      "./node_modules/expo-file-system/src/FileSystem.ts",
+      "./node_modules/expo-web-browser/plugin/src/withWebBrowserAndroid.ts",
+      "./node_modules/expo-web-browser/src/ExpoWebBrowser.web.ts",
+      "./node_modules/expo-web-browser/src/WebBrowser.ts",
+      "./node_modules/madge/node_modules/commander/typings/index.d.ts",
+      "./node_modules/sucrase/dist/types/util/removeMaybeImportAttributes.d.ts",
+      "./node_modules/sucrase/dist/types/transformers/ESMImportTransformer.d.ts",
+      "./node_modules/sucrase/dist/types/transformers/RootTransformer.d.ts",
+      "./node_modules/sucrase/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/sucrase/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/sucrase/node_modules/commander/typings/index.d.ts",
+      "./node_modules/expo-modules-autolinking/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/expo-modules-autolinking/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/expo-modules-autolinking/node_modules/commander/typings/index.d.ts",
+      "./node_modules/expo-modules-autolinking/src/reactNativeConfig/config.ts",
+      "./node_modules/@tanstack/query-core/build/legacy/hydration-BYonJkjc.d.ts",
+      "./node_modules/@tanstack/query-core/build/legacy/thenable.d.ts",
+      "./node_modules/@tanstack/query-core/build/modern/hydration-BYonJkjc.d.ts",
+      "./node_modules/@tanstack/query-core/build/modern/thenable.d.ts",
+      "./node_modules/@tanstack/query-core/src/queryCache.ts",
+      "./node_modules/@tanstack/query-core/src/mutationCache.ts",
+      "./node_modules/@tanstack/query-core/src/queryClient.ts",
+      "./node_modules/@tanstack/query-core/src/mutationObserver.ts",
+      "./node_modules/@tanstack/query-core/src/mutation.ts",
+      "./node_modules/@tanstack/query-core/src/query.ts",
+      "./node_modules/@tanstack/query-core/src/thenable.ts",
+      "./node_modules/type-fest/source/merge-exclusive.d.ts",
+      "./node_modules/commander/typings/index.d.ts",
+      "./node_modules/react-native-reanimated/lib/typescript/ViewDescriptorsSet.d.ts",
+      "./node_modules/react-native-reanimated/lib/typescript/UpdateLayoutAnimations.d.ts",
+      "./node_modules/react-native-reanimated/src/layoutReanimation/web/domUtils.ts",
+      "./node_modules/react-native-reanimated/src/ViewDescriptorsSet.ts",
+      "./node_modules/react-native-reanimated/src/UpdateLayoutAnimations.ts",
+      "./node_modules/react-native-reanimated/src/ConfigHelper.ts",
+      "./node_modules/react-native-reanimated/src/WorkletEventHandler.ts",
+      "./node_modules/react-native-reanimated/src/shareables.ts",
+      "./node_modules/react-native-reanimated/src/createAnimatedComponent/createAnimatedComponent.tsx",
+      "./node_modules/joi/lib/index.d.ts",
+      "./node_modules/estree-walker/types/sync.d.ts",
+      "./node_modules/estree-walker/types/walker.d.ts",
+      "./node_modules/estree-walker/types/index.d.ts",
+      "./node_modules/estree-walker/types/async.d.ts",
+      "./node_modules/@ts-morph/common/lib/ts-morph-common.d.ts",
+      "./node_modules/@ts-morph/common/lib/typescript.d.ts",
+      "./node_modules/expo-auth-session/src/SessionUrlProvider.ts",
+      "./node_modules/expo-keep-awake/src/ExpoKeepAwake.web.ts",
+      "./node_modules/expo-dev-launcher/bundle/providers/PendingDeepLinkProvider.tsx",
+      "./node_modules/expo-dev-launcher/bundle/native-modules/DevLauncherAuth.ts",
+      "./node_modules/expo-localization/src/ExpoLocalization.ts",
+      "./node_modules/expo-localization/src/ExpoLocalization.native.ts",
+      "./node_modules/react-native/Libraries/vendor/emitter/EventEmitter.d.ts",
+      "./node_modules/react-native/Libraries/EventEmitter/NativeEventEmitter.d.ts",
+      "./node_modules/react-native/Libraries/EventEmitter/RCTNativeAppEventEmitter.d.ts",
+      "./node_modules/babel-plugin-module-resolver/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/babel-plugin-module-resolver/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/expo-linking/build/RNLinking.web.d.ts",
+      "./node_modules/expo-linking/build/Linking.d.ts",
+      "./node_modules/expo-linking/build/ExpoLinking.web.d.ts",
+      "./node_modules/expo-linking/build/Linking.server.d.ts",
+      "./node_modules/expo-linking/src/ExpoLinking.web.ts",
+      "./node_modules/expo-linking/src/Linking.server.ts",
+      "./node_modules/expo-linking/src/Linking.ts",
+      "./node_modules/expo-linking/src/RNLinking.web.ts",
+      "./node_modules/expo-linking/src/createURL.ts",
+      "./node_modules/wrap-ansi/node_modules/string-width/index.d.ts",
+      "./node_modules/query-string/index.d.ts",
+      "./node_modules/@urql/core/dist/urql-core-chunk.d.ts",
+      "./node_modules/@gorhom/portal/src/state/reducer.ts",
+      "./node_modules/@gorhom/portal/src/components/portal/Portal.tsx",
+      "./node_modules/@gorhom/bottom-sheet/src/components/bottomSheetModalProvider/BottomSheetModalProvider.tsx",
+      "./node_modules/@gorhom/bottom-sheet/src/components/bottomSheetTextInput/BottomSheetTextInput.tsx",
+      "./node_modules/@gorhom/bottom-sheet/src/hooks/useAnimatedKeyboard.ts",
+      "./node_modules/magic-string/dist/magic-string.cjs.d.ts",
+      "./node_modules/reselect/src/versionedTypes/ts46-mergeParameters.ts",
+      "./node_modules/fast-xml-parser/src/fxp.d.ts",
+      "./node_modules/knip/dist/util/cli-arguments.d.ts",
+      "./node_modules/knip/node_modules/zod/v4/core/registries.d.ts",
+      "./node_modules/knip/node_modules/zod/src/v4/core/registries.ts",
+      "./node_modules/knip/node_modules/zod/src/v4/core/to-json-schema.ts",
+      "./node_modules/@react-native-clipboard/clipboard/dist/Clipboard.d.ts",
+      "./node_modules/@react-native-clipboard/clipboard/src/Clipboard.ts",
+      "./node_modules/@react-native-clipboard/clipboard/src/NativeClipboardModule.ts",
+      "./node_modules/typescript/lib/lib.es2015.reflect.d.ts",
+      "./node_modules/typescript/lib/lib.es2020.intl.d.ts",
+      "./node_modules/typescript/lib/lib.es5.d.ts",
+      "./node_modules/typescript/lib/lib.es2023.array.d.ts",
+      "./node_modules/typescript/lib/typescript.d.ts",
+      "./node_modules/xmlbuilder/typings/index.d.ts",
+      "./node_modules/react-hook-form/dist/types/fieldArray.d.ts",
+      "./node_modules/react-hook-form/dist/types/form.d.ts",
+      "./node_modules/react-hook-form/dist/utils/remove.d.ts",
+      "./node_modules/postcss-values-parser/lib/index.d.ts",
+      "./node_modules/postcss/lib/container.d.ts",
+      "./node_modules/postcss/lib/node.d.ts",
+      "./node_modules/@react-navigation/routers/lib/typescript/src/types.d.ts",
+      "./node_modules/@react-navigation/routers/src/StackRouter.tsx",
+      "./node_modules/@react-navigation/routers/src/types.tsx",
+      "./node_modules/@react-navigation/routers/src/TabRouter.tsx",
+      "./node_modules/@react-navigation/bottom-tabs/src/utils/useIsKeyboardShown.tsx",
+      "./node_modules/@react-navigation/core/lib/typescript/src/StaticNavigation.d.ts",
+      "./node_modules/@react-navigation/core/src/useNavigationBuilder.tsx",
+      "./node_modules/@react-navigation/core/src/usePreventRemoveContext.tsx",
+      "./node_modules/@react-navigation/core/src/StaticNavigation.tsx",
+      "./node_modules/@react-navigation/native/src/useLinking.native.tsx",
+      "./node_modules/@react-navigation/native/src/createMemoryHistory.tsx",
+      "./node_modules/@react-navigation/native/src/useBackButton.native.tsx",
+      "./node_modules/@react-navigation/native-stack/src/views/NativeStackView.native.tsx",
+      "./node_modules/strip-indent/index.d.ts",
+      "./node_modules/slugify/slugify.d.ts",
+      "./node_modules/logkitty/node_modules/string-width/index.d.ts",
+      "./node_modules/expo-build-properties/build/pluginConfig.d.ts",
+      "./node_modules/expo-build-properties/src/pluginConfig.ts",
+      "./node_modules/expo-build-properties/src/android.ts",
+      "./node_modules/expo-notifications/build/TokenEmitter.d.ts",
+      "./node_modules/expo-notifications/build/NotificationsEmitter.d.ts",
+      "./node_modules/expo-notifications/src/NotificationsHandler.ts",
+      "./node_modules/expo-notifications/src/PushTokenManager.ts",
+      "./node_modules/expo-notifications/src/utils/mapNotificationResponse.ts",
+      "./node_modules/expo-notifications/src/useLastNotificationResponse.ts",
+      "./node_modules/expo-notifications/src/TokenEmitter.ts",
+      "./node_modules/expo-notifications/src/NotificationsEmitter.ts",
+      "./node_modules/@vue/compiler-sfc/node_modules/postcss/lib/container.d.ts",
+      "./node_modules/@vue/compiler-sfc/node_modules/postcss/lib/node.d.ts",
+      "./node_modules/@vue/shared/dist/shared.d.ts",
+      "./node_modules/@react-native-community/netinfo/lib/typescript/src/internal/state.d.ts",
+      "./node_modules/@react-native-community/netinfo/src/internal/state.ts",
+      "./node_modules/@react-native-community/netinfo/src/index.ts",
+      "./node_modules/@react-native-community/cli-doctor/build/index.d.ts",
+      "./node_modules/expo/build/devtools/DevToolsPluginClient.d.ts",
+      "./node_modules/expo/src/Expo.fx.web.tsx",
+      "./node_modules/expo/src/launch/withDevTools.ios.tsx",
+      "./node_modules/expo/src/launch/withDevTools.tsx",
+      "./node_modules/expo/src/devtools/DevToolsPluginClient.ts",
+      "./node_modules/expo/src/hooks/useEvent.ts",
+      "./node_modules/expo/src/environment/DevLoadingView.tsx",
+      "./node_modules/expo/src/environment/DevLoadingView.web.tsx",
+      "./node_modules/expo/src/dom/dom-entry.tsx",
+      "./node_modules/expo/src/dom/webview-wrapper.tsx",
+      "./node_modules/expo/src/dom/webview/useDebugZeroHeight.ts",
+      "./node_modules/expo-image/src/ExpoImage.tsx",
+      "./node_modules/wrap-ansi-cjs/node_modules/string-width/index.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/utils/addEventListener.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/utils/BackHandler/BackHandler.d.ts",
+      "./node_modules/react-native-paper/src/core/PaperProvider.tsx",
+      "./node_modules/react-native-paper/src/utils/addEventListener.tsx",
+      "./node_modules/react-native-paper/src/utils/useIsKeyboardShown.tsx",
+      "./node_modules/react-native-paper/src/utils/BackHandler/BackHandler.tsx",
+      "./node_modules/react-native-paper/src/components/Tooltip/Tooltip.tsx",
+      "./node_modules/react-native-paper/src/components/TouchableRipple/TouchableRipple.tsx",
+      "./node_modules/react-native-paper/src/components/Menu/Menu.tsx",
+      "./node_modules/react-native-paper/src/components/Modal.tsx",
+      "./node_modules/ts-prune/node_modules/commander/typings/index.d.ts",
+      "./node_modules/ts-prune/node_modules/yaml/types.d.ts",
+      "./node_modules/ts-prune/node_modules/yaml/index.d.ts",
+      "./node_modules/expo-audio/build/AudioModule.types.d.ts",
+      "./node_modules/expo-audio/build/AudioModule.web.d.ts",
+      "./node_modules/expo-audio/src/ts-declarations/lib.dom.d.ts",
+      "./node_modules/expo-audio/src/AudioModule.web.ts",
+      "./node_modules/expo-audio/src/ExpoAudio.ts",
+      "./node_modules/expo-audio/src/ExpoAudio.web.ts",
+      "./node_modules/expo-audio/src/AudioModule.types.ts",
+      "./node_modules/expo-av/build/Audio/Sound.d.ts",
+      "./node_modules/expo-av/src/ts-declarations/lib.dom.d.ts",
+      "./node_modules/expo-av/src/Audio/Recording.ts",
+      "./node_modules/expo-av/src/Audio/Sound.ts",
+      "./node_modules/expo-av/src/FullscreenUtils.web.ts",
+      "./node_modules/expo-constants/scripts/src/getAppConfig.ts",
+      "./node_modules/expo-modules-core/build/ts-declarations/EventEmitter.d.ts",
+      "./node_modules/expo-modules-core/build/EventEmitter.d.ts",
+      "./node_modules/expo-modules-core/src/ts-declarations/EventEmitter.ts",
+      "./node_modules/expo-modules-core/src/EventEmitter.ts",
+      "./node_modules/expo-modules-core/src/LegacyEventEmitter.ts",
+      "./node_modules/expo-modules-core/src/web/CoreModule.ts",
+      "./node_modules/jest-util/build/index.d.ts",
+      "./node_modules/stream-chat-react-native/src/optionalDependencies/oniOS14GalleryLibrarySelectionChange.ts",
+      "./node_modules/@supabase/auth-js/dist/module/GoTrueClient.d.ts",
+      "./node_modules/@supabase/auth-js/dist/module/GoTrueAdminApi.d.ts",
+      "./node_modules/@supabase/auth-js/dist/module/lib/types.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/GoTrueClient.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/GoTrueAdminApi.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/lib/types.d.ts",
+      "./node_modules/@supabase/auth-js/src/lib/types.ts",
+      "./node_modules/@supabase/auth-js/src/GoTrueAdminApi.ts",
+      "./node_modules/@supabase/auth-js/src/GoTrueClient.ts",
+      "./node_modules/@supabase/storage-js/dist/module/packages/StorageFileApi.d.ts",
+      "./node_modules/@supabase/storage-js/dist/module/lib/fetch.d.ts",
+      "./node_modules/@supabase/storage-js/dist/main/packages/StorageFileApi.d.ts",
+      "./node_modules/@supabase/storage-js/dist/main/lib/fetch.d.ts",
+      "./node_modules/@supabase/storage-js/src/packages/StorageFileApi.ts",
+      "./node_modules/@supabase/storage-js/src/packages/StorageBucketApi.ts",
+      "./node_modules/@supabase/storage-js/src/lib/fetch.ts",
+      "./node_modules/@supabase/postgrest-js/src/types.ts",
+      "./node_modules/@expo/config-types/build/ExpoConfig.d.ts",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/modules/NativeLogBox/index.tsx",
+      "./node_modules/@expo/metro-runtime/src/async-require/fetchAsync.native.ts",
+      "./node_modules/@expo/metro-runtime/src/messageSocket.ts",
+      "./node_modules/@expo/fingerprint/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/fingerprint/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@expo/config/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/config/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@expo/cli/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/cli/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@expo/cli/static/template/+html.tsx",
+      "./node_modules/@expo/vector-icons/build/Ionicons.d.ts",
+      "./node_modules/@expo/vector-icons/build/FontAwesome.d.ts",
+      "./node_modules/@expo/vector-icons/build/Entypo.d.ts",
+      "./node_modules/@expo/vector-icons/build/SimpleLineIcons.d.ts",
+      "./node_modules/@expo/vector-icons/build/Foundation.d.ts",
+      "./node_modules/@expo/devcert/dist/certificate-authority.d.ts",
+      "./node_modules/@expo/devcert/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/devcert/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@expo/devcert/src/platforms/linux.ts",
+      "./node_modules/@expo/devcert/src/platforms/darwin.ts",
+      "./node_modules/@expo/devcert/src/platforms/shared.ts",
+      "./node_modules/@expo/devcert/src/platforms/win32.ts",
+      "./node_modules/@expo/devcert/src/certificate-authority.ts",
+      "./node_modules/@expo/config-plugins/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/config-plugins/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/@expo/config-plugins/build/utils/generateCode.d.ts",
+      "./node_modules/@expo/config-plugins/build/android/Manifest.d.ts",
+      "./node_modules/@expo/config-plugins/build/android/Colors.d.ts",
+      "./node_modules/@expo/metro-config/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/@expo/metro-config/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./node_modules/queue/index.d.ts",
+      "./node_modules/expo-system-ui/plugin/src/withAndroidUserInterfaceStyle.ts",
+      "./node_modules/cliui/node_modules/string-width/index.d.ts",
+      "./node_modules/precinct/node_modules/postcss/lib/container.d.ts",
+      "./node_modules/precinct/node_modules/postcss/lib/node.d.ts",
+      "./node_modules/yaml/dist/nodes/YAMLSeq.d.ts",
+      "./node_modules/yaml/dist/nodes/Collection.d.ts",
+      "./node_modules/yaml/dist/doc/Document.d.ts",
+      "./node_modules/ansi-escapes/node_modules/type-fest/source/merge-exclusive.d.ts",
+      "./node_modules/ansi-escapes/index.d.ts",
+      "./node_modules/yargs/node_modules/string-width/index.d.ts",
+      "./node_modules/event-target-shim/index.d.ts",
+      "./node_modules/stream-chat/dist/types/channel_state.d.ts",
+      "./node_modules/stream-chat/dist/types/types.d.ts",
+      "./node_modules/stream-chat/dist/types/offline-support/types.d.ts",
+      "./node_modules/stream-chat/dist/types/offline-support/offline_sync_manager.d.ts",
+      "./node_modules/stream-chat/dist/types/channel.d.ts",
+      "./node_modules/stream-chat/dist/types/middleware.d.ts",
+      "./node_modules/stream-chat/dist/types/moderation.d.ts",
+      "./node_modules/stream-chat/dist/types/notifications/NotificationManager.d.ts",
+      "./node_modules/stream-chat/src/middleware.ts",
+      "./node_modules/stream-chat/src/channel_state.ts",
+      "./node_modules/stream-chat/src/channel_manager.ts",
+      "./node_modules/stream-chat/src/offline-support/types.ts",
+      "./node_modules/stream-chat/src/offline-support/offline_sync_manager.ts",
+      "./node_modules/stream-chat/src/utils.ts",
+      "./node_modules/stream-chat/src/utils/mergeWith/mergeWithCore.ts",
+      "./node_modules/stream-chat/src/utils/mergeWith/mergeWithDiff.ts",
+      "./node_modules/stream-chat/src/connection.ts",
+      "./node_modules/stream-chat/src/types.ts",
+      "./node_modules/stream-chat/src/messageComposer/attachmentManager.ts",
+      "./node_modules/stream-chat/src/channel.ts",
+      "./node_modules/stream-chat/src/moderation.ts",
+      "./node_modules/stream-chat/src/thread.ts",
+      "./node_modules/stream-chat/src/notifications/NotificationManager.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/xml2js/node_modules/xmlbuilder/typings/index.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/xmlbuilder/typings/index.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/config-plugins/build/utils/generateCode.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/config-plugins/build/ios/Permissions.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/config-plugins/build/android/Colors.d.ts",
+      "./node_modules/@react-native-voice/voice/src/index.ts",
+      "./node_modules/@kingstinct/react-native-healthkit/src/index.ios.tsx",
+      "./node_modules/@kingstinct/react-native-healthkit/src/utils/subscribeToChanges.ts",
+      "./node_modules/sf-symbols-typescript/dist/index.d.ts",
+      "./node_modules/terser/node_modules/commander/typings/index.d.ts",
+      "./node_modules/@jridgewell/gen-mapping/dist/types/set-array.d.ts",
+      "./node_modules/@jridgewell/gen-mapping/src/gen-mapping.ts",
+      "./node_modules/@jridgewell/gen-mapping/src/set-array.ts",
+      "./node_modules/p-try/index.d.ts",
+      "./node_modules/expo-router/build/global-state/routing.d.ts",
+      "./node_modules/expo-router/vendor/react-helmet-async/lib/Dispatcher.d.ts",
+      "./node_modules/expo-router/vendor/react-helmet-async/lib/HelmetData.d.ts",
+      "./node_modules/react-native-screens/src/components/ScreenStack.tsx",
+      "./node_modules/react-native-screens/src/native-stack/utils/useBackPressSubscription.tsx",
+      "./node_modules/react-native-svg/src/css/css.tsx",
+      "./node_modules/react-native-svg/src/utils/fetchData.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/messagesContext/MessagesContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/components/Chat/hooks/useSyncDatabase.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/store/apis/dropPendingTasks.d.ts",
+      "./node_modules/stream-chat-react-native-core/src/contexts/overlayContext/OverlayProvider.tsx",
+      "./node_modules/stream-chat-react-native-core/src/contexts/messagesContext/MessagesContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/utils/utils.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/MessageList/MessageList.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Chat/hooks/useSyncDatabase.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/MessageInput/MessageInput.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/ChannelList/utils.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/ChannelList/hooks/usePaginatedChannels.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/Message/MessageSimple/utils/parseLinks.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/Message/Message.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/AttachmentPicker/AttachmentPicker.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/UIComponents/BottomSheetModal.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/KeyboardCompatibleView/KeyboardCompatibleView.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/KeyboardCompatibleView/KeyboardCompatibleViewFC.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/ImageGallery/hooks/useImageGalleryGestures.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/CreatePollOptions.tsx",
+      "./node_modules/stream-chat-react-native-core/src/hooks/useAppStateListener.ts",
+      "./node_modules/stream-chat-react-native-core/src/hooks/useScreenDimensions.ts",
+      "./node_modules/stream-chat-react-native-core/src/store/apis/addPendingTask.ts",
+      "./node_modules/stream-chat-react-native-core/src/store/apis/dropPendingTasks.ts",
+      "./node_modules/tar/dist/esm/options.d.ts",
+      "./node_modules/tar/dist/commonjs/options.d.ts",
+      "./node_modules/domutils/lib/esm/helpers.d.ts",
+      "./node_modules/domutils/lib/helpers.d.ts",
+      "./node_modules/metro-file-map/src/flow-types.d.ts",
+      "./node_modules/react-native-gesture-handler/src/web_hammer/utils.ts",
+      "./node_modules/react-native-gesture-handler/src/web_hammer/GestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/handlers/gestures/eventReceiver.ts",
+      "./node_modules/react-native-gesture-handler/src/findNodeHandle.web.ts",
+      "./node_modules/string-width-cjs/index.d.ts",
+      "./node_modules/ajv/lib/compile/jtd/parse.ts",
+      "./node_modules/ajv/lib/compile/index.ts",
+      "./node_modules/@ts-graphviz/common/lib/common.d.ts",
+      "./node_modules/@react-native-async-storage/async-storage/src/helpers.ts",
+      "./node_modules/react-native-keyboard-controller/src/module.ts",
+      "./node_modules/react-native-keyboard-controller/src/bindings.ts",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardToolbar/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/hooks/useKeyboardState/index.ts",
+      "./node_modules/react-native-keyboard-controller/src/hooks/useWindowDimensions/index.ts",
+      "./node_modules/path-scurry/node_modules/lru-cache/dist/esm/index.d.ts",
+      "./node_modules/path-scurry/node_modules/lru-cache/dist/commonjs/index.d.ts",
+      "./utils/debugInvalidEntries.ts",
+      "./components/MindScoreCard.tsx",
+      "./components/layout/ScreenLayout.tsx",
+      "./hooks/useCacheInvalidation.ts",
+      "./services/sync/deadLetterQueue.ts",
+      "./services/moodDeletionCache.ts",
+      "./services/asyncStorageHygiene.ts",
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./node_modules/@types/lodash/common/function.d.ts",
+      "./node_modules/@types/node/http2.d.ts",
+      "./node_modules/@types/node/zlib.d.ts",
+      "./node_modules/@types/ws/index.d.ts",
+      "./node_modules/@tanstack/query-core/src/notifyManager.ts",
+      "./node_modules/react-native-reanimated/src/updateProps/updateProps.ts",
+      "./node_modules/react-native-reanimated/src/threads.ts",
+      "./node_modules/react-native-reanimated/src/valueSetter.ts",
+      "./node_modules/knip/dist/util/Performance.d.ts",
+      "./node_modules/expo/src/winter/TextDecoder.ts",
+      "./node_modules/metro-core/src/Terminal.d.ts",
+      "./node_modules/minizlib/dist/esm/index.d.ts",
+      "./node_modules/minizlib/dist/commonjs/index.d.ts",
+      "./node_modules/@supabase/auth-js/dist/module/lib/base64url.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/lib/base64url.d.ts",
+      "./node_modules/@supabase/auth-js/src/lib/base64url.ts",
+      "./node_modules/stream-chat/dist/types/utils.d.ts",
+      "./node_modules/stream-chat/src/messageComposer/linkPreviewsManager.ts",
+      "./node_modules/@jridgewell/sourcemap-codec/src/sourcemap-codec.ts",
+      "./node_modules/@jridgewell/sourcemap-codec/src/strings.ts",
+      "./node_modules/@jridgewell/sourcemap-codec/src/scopes.ts",
+      "./services/optimizedStorage.ts",
+      "./services/smartNotifications.ts"
+    ]
+  },
+  {
+    "file": "services/nativeSpeechToText.ts",
+    "status": "UNUSED",
+    "refs": 0,
+    "exports": [
+      "NativeSpeechToTextService",
+      "NativeTranscriptionResult"
+    ],
+    "foundIn": []
+  },
+  {
+    "file": "services/encryption/secureDataService.ts",
+    "status": "ACTIVE",
+    "refs": 113,
+    "exports": [
+      "secureDataService",
+      "EncryptedData",
+      "secureDataService"
+    ],
+    "foundIn": [
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./archive/hooks/useSecureStorage.ts",
+      "./utils/secureStorageMigration.ts",
+      "./services/unifiedComplianceService.ts",
+      "./services/offlineSync.ts",
+      "./services/sync/queueRepository.ts",
+      "./services/mood/encryptionAdapter.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/notificationScheduler.ts",
+    "status": "ACTIVE",
+    "refs": 49,
+    "exports": [
+      "NotificationSchedule",
+      "NotificationScheduler"
+    ],
+    "foundIn": [
+      "./app/(tabs)/settings.tsx",
+      "./archive/__tests__/unit/moodOnboardingStore.test.ts",
+      "./store/moodOnboardingStore.ts",
+      "./node_modules/expo-notifications/build/NotificationScheduler.native.d.ts",
+      "./node_modules/expo-notifications/build/scheduleNotificationAsync.d.ts",
+      "./node_modules/expo-notifications/build/NotificationScheduler.d.ts",
+      "./node_modules/expo-notifications/build/NotificationScheduler.types.d.ts",
+      "./node_modules/expo-notifications/src/NotificationScheduler.ts",
+      "./node_modules/expo-notifications/src/scheduleNotificationAsync.ts",
+      "./node_modules/expo-notifications/src/getAllScheduledNotificationsAsync.ts",
+      "./node_modules/expo-notifications/src/cancelScheduledNotificationAsync.ts",
+      "./node_modules/expo-notifications/src/cancelAllScheduledNotificationsAsync.ts",
+      "./node_modules/expo-notifications/src/getNextTriggerDateAsync.ts",
+      "./node_modules/expo-notifications/src/NotificationScheduler.native.ts"
+    ]
+  },
+  {
+    "file": "services/unifiedComplianceService.ts",
+    "status": "ACTIVE",
+    "refs": 18,
+    "exports": [
+      "unifiedComplianceService",
+      "ConsentRecord",
+      "AuditLog",
+      "DataExportRequest",
+      "DeletionRequest",
+      "ComplianceStatus",
+      "ComplianceValidator",
+      "unifiedComplianceService"
+    ],
+    "foundIn": [
+      "./app/(tabs)/settings.tsx"
+    ]
+  },
+  {
+    "file": "services/unifiedConflictResolver.ts",
+    "status": "ACTIVE",
+    "refs": 31,
+    "exports": [
+      "unifiedConflictResolver",
+      "ConflictType",
+      "EntityType",
+      "UnifiedDataConflict",
+      "ConflictResolutionResult",
+      "ConflictLogItem",
+      "ResolutionStrategy",
+      "ConflictDetectionEngine",
+      "ResolutionStrategies",
+      "unifiedConflictResolver"
+    ],
+    "foundIn": [
+      "./services/offlineSync.ts"
+    ]
+  },
+  {
+    "file": "services/optimizedStorage.ts",
+    "status": "ACTIVE",
+    "refs": 36,
+    "exports": [
+      "optimizedStorage",
+      "optimizedStorage",
+      "LocalDatabaseAdapter",
+      "AsyncStorageAdapter",
+      "WatermelonDBAdapter"
+    ],
+    "foundIn": [
+      "./services/mood/moodRepository.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/todayService.ts",
+    "status": "ACTIVE",
+    "refs": 20,
+    "exports": [
+      "todayService",
+      "TodayStats",
+      "MoodJourneyData",
+      "TodayData",
+      "todayService"
+    ],
+    "foundIn": [
+      "./app/(tabs)/index.tsx",
+      "./components/today/MoodJourneyCard.tsx"
+    ]
+  },
+  {
+    "file": "services/performanceMonitor.ts",
+    "status": "ACTIVE",
+    "refs": 22,
+    "exports": [
+      "performanceMonitor",
+      "performanceMonitor"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./app/_layout.tsx"
+    ]
+  },
+  {
+    "file": "services/offlineSync.ts",
+    "status": "ACTIVE",
+    "refs": 215,
+    "exports": [
+      "SyncQueueItem",
+      "OfflineSyncService",
+      "offlineSyncService"
+    ],
+    "foundIn": [
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/debug-console.tsx",
+      "./app/_layout.tsx",
+      "./archive/components/ui/SyncErrorSummaryCard.tsx",
+      "./archive/ai-disabled-backup/services/onboardingSyncErrorService.ts",
+      "./archive/services/autoRecordService.ts",
+      "./utils/debugQueueTest.ts",
+      "./components/ui/OfflineBanner.tsx",
+      "./components/ui/SyncStatusNotification.tsx",
+      "./components/mood/AppleHealthDetailSheet.tsx",
+      "./services/sync/offlineSyncOrchestrator.ts",
+      "./services/sync/deadLetterQueue.ts",
+      "./services/sync/syncMaintenance.ts",
+      "./services/moodTrackingService.ts",
+      "./services/offlineSyncUserFeedbackService.ts",
+      "./services/crossDeviceSync.ts",
+      "./store/moodOnboardingStore.ts",
+      "./services/sync/queueValidator.ts",
+      "./archive/services/sync/maintenanceScheduler.ts"
+    ]
+  },
+  {
+    "file": "services/eventBus.ts",
+    "status": "ACTIVE",
+    "refs": 219,
+    "exports": [
+      "eventBus",
+      "Events"
+    ],
+    "foundIn": [
+      "./app/(tabs)/index.tsx",
+      "./hooks/useOfflineMoodSync.ts",
+      "./services/moodTrackingService.ts",
+      "./archive/components/dev/DebugAIPipelineOverlay.tsx",
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./node_modules/@types/node/events.d.ts",
+      "./node_modules/@types/node/child_process.d.ts",
+      "./node_modules/@types/node/process.d.ts",
+      "./node_modules/@types/react/ts5.0/v18/ts5.0/index.d.ts",
+      "./node_modules/@types/react/ts5.0/v18/index.d.ts",
+      "./node_modules/@types/react/ts5.0/index.d.ts",
+      "./node_modules/@types/react/index.d.ts",
+      "./node_modules/@types/ws/index.d.ts",
+      "./node_modules/abort-controller/dist/abort-controller.d.ts",
+      "./node_modules/react-native/Libraries/AppState/AppState.d.ts",
+      "./node_modules/react-native/Libraries/Interaction/InteractionManager.d.ts",
+      "./node_modules/babel-plugin-module-resolver/node_modules/path-scurry/node_modules/minipass/dist/esm/index.d.ts",
+      "./node_modules/babel-plugin-module-resolver/node_modules/path-scurry/node_modules/minipass/dist/commonjs/index.d.ts",
+      "./node_modules/typescript/lib/lib.dom.d.ts",
+      "./node_modules/typescript/lib/lib.webworker.d.ts",
+      "./node_modules/@isaacs/fs-minipass/dist/esm/index.d.ts",
+      "./node_modules/@isaacs/fs-minipass/dist/commonjs/index.d.ts",
+      "./node_modules/@react-native-community/netinfo/lib/typescript/src/internal/nativeModule.web.d.ts",
+      "./node_modules/@react-native-community/netinfo/lib/typescript/src/internal/privateTypes.d.ts",
+      "./node_modules/@react-native-community/netinfo/lib/typescript/src/internal/nativeInterface.web.d.ts",
+      "./node_modules/@react-native-community/netinfo/src/internal/nativeModule.web.ts",
+      "./node_modules/@react-native-community/netinfo/src/internal/privateTypes.ts",
+      "./node_modules/wonka/dist/wonka.d.ts",
+      "./node_modules/wonka/src/sources.ts",
+      "./node_modules/minipass/dist/esm/index.d.ts",
+      "./node_modules/minipass/dist/commonjs/index.d.ts",
+      "./node_modules/react-native-screens/src/components/Screen.tsx",
+      "./node_modules/tar/dist/esm/warn-method.d.ts",
+      "./node_modules/tar/dist/commonjs/warn-method.d.ts",
+      "./node_modules/react-native-gesture-handler/src/web/tools/EventManager.ts",
+      "./node_modules/react-native-gesture-handler/src/web/handlers/TapGestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/web/handlers/PanGestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/web/handlers/GestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/index.ts",
+      "./node_modules/react-native-gesture-handler/src/handlers/gestureHandlerCommon.ts",
+      "./node_modules/react-native-gesture-handler/src/handlers/gestureHandlerTypesCompat.ts"
+    ]
+  },
+  {
+    "file": "services/voiceCheckInHeuristicService.ts",
+    "status": "ACTIVE",
+    "refs": 21,
+    "exports": [
+      "voiceCheckInHeuristicService",
+      "RealtimeState"
+    ],
+    "foundIn": [
+      "./app/debug-voice-analysis.tsx",
+      "./components/checkin/VAMoodCheckin.tsx"
+    ]
+  },
+  {
+    "file": "services/staticGamification.ts",
+    "status": "ACTIVE",
+    "refs": 39,
+    "exports": [
+      "UnifiedPointsCalculation",
+      "UnifiedMission",
+      "calculateMoodEntryPoints",
+      "calculateCheckinPoints",
+      "generateDailyMissions",
+      "generateWeeklyMissions",
+      "unifiedGamificationService"
+    ],
+    "foundIn": [
+      "./store/gamificationStore.ts",
+      "./archive/features/ai-fallbacks/gamification.ts",
+      "./archive/ai-disabled-backup/services/unifiedGamificationService.ts"
+    ]
+  },
+  {
+    "file": "services/idempotency/moodContentHash.ts",
+    "status": "ACTIVE",
+    "refs": 21,
+    "exports": [
+      "MoodContentInput",
+      "MoodHashOptions",
+      "computeMoodContentHash"
+    ],
+    "foundIn": [
+      "./services/offlineSync.ts",
+      "./services/supabase/moodService.ts",
+      "./services/idempotencyService.ts"
+    ]
+  },
+  {
+    "file": "services/api.ts",
+    "status": "ACTIVE",
+    "refs": 392,
+    "exports": [
+      "api",
+      "apiService"
+    ],
+    "foundIn": [
+      "./archive/ai-disabled-backup/context/contextIntelligence.ts",
+      "./archive/ai-disabled-backup/services/sttService.ts",
+      "./archive/ai-disabled-backup/services/externalAIService.ts",
+      "./node_modules/oxc-resolver/index.d.ts",
+      "./node_modules/zod/v4/core/index.d.ts",
+      "./node_modules/zod/src/v4/core/function.ts",
+      "./node_modules/zod/src/v4/core/schemas.ts",
+      "./node_modules/zod/src/v4/core/index.ts",
+      "./node_modules/zod/src/v4/classic/schemas.ts",
+      "./node_modules/ts-morph/lib/ts-morph.d.ts",
+      "./node_modules/@types/node/diagnostics_channel.d.ts",
+      "./node_modules/@types/node/globals.d.ts",
+      "./node_modules/@types/node/crypto.d.ts",
+      "./node_modules/@types/node/buffer.d.ts",
+      "./node_modules/@types/node/worker_threads.d.ts",
+      "./node_modules/@types/node/stream/web.d.ts",
+      "./node_modules/@types/node/stream.d.ts",
+      "./node_modules/@types/node/process.d.ts",
+      "./node_modules/@types/node/util.d.ts",
+      "./node_modules/@types/babel__core/index.d.ts",
+      "./node_modules/@types/react/ts5.0/v18/ts5.0/index.d.ts",
+      "./node_modules/@types/react/ts5.0/v18/index.d.ts",
+      "./node_modules/ts-api-utils/lib/index.d.ts",
+      "./node_modules/expo-file-system/build/FileSystem.d.ts",
+      "./node_modules/expo-file-system/src/FileSystem.ts",
+      "./node_modules/@tanstack/query-core/build/legacy/hydration-BYonJkjc.d.ts",
+      "./node_modules/@tanstack/query-core/build/modern/hydration-BYonJkjc.d.ts",
+      "./node_modules/@tanstack/query-core/src/types.ts",
+      "./node_modules/react-native-reanimated/src/culori/oklab.ts",
+      "./node_modules/@ts-morph/common/lib/ts-morph-common.d.ts",
+      "./node_modules/@ts-morph/common/lib/typescript.d.ts",
+      "./node_modules/expo-dev-launcher/bundle/apiClient.ts",
+      "./node_modules/knip/dist/plugins/babel/types.d.ts",
+      "./node_modules/knip/dist/plugins/babel/helpers.d.ts",
+      "./node_modules/knip/dist/plugins/nano-staged/types.d.ts",
+      "./node_modules/knip/node_modules/zod/v4/core/index.d.ts",
+      "./node_modules/knip/node_modules/zod/v4/classic/schemas.d.ts",
+      "./node_modules/knip/node_modules/zod/src/v4/core/schemas.ts",
+      "./node_modules/knip/node_modules/zod/src/v4/core/index.ts",
+      "./node_modules/knip/node_modules/zod/src/v4/classic/schemas.ts",
+      "./node_modules/npm-run-path/index.d.ts",
+      "./node_modules/typescript/lib/typescript.d.ts",
+      "./node_modules/react-hook-form/dist/form.d.ts",
+      "./node_modules/undici/types/index.d.ts",
+      "./node_modules/@react-native/community-cli-plugin/node_modules/open/index.d.ts",
+      "./node_modules/@react-native/dev-middleware/node_modules/open/index.d.ts",
+      "./node_modules/logkitty/build/api.d.ts",
+      "./node_modules/undici-types/index.d.ts",
+      "./node_modules/expo-build-properties/build/pluginConfig.d.ts",
+      "./node_modules/expo-build-properties/src/pluginConfig.ts",
+      "./node_modules/expo-notifications/build/TokenEmitter.d.ts",
+      "./node_modules/expo-notifications/src/scheduleNotificationAsync.ts",
+      "./node_modules/expo-notifications/src/utils/updateDevicePushTokenAsync.ts",
+      "./node_modules/expo-notifications/src/getExpoPushTokenAsync.ts",
+      "./node_modules/expo-notifications/src/TokenEmitter.ts",
+      "./node_modules/is-stream/index.d.ts",
+      "./node_modules/@react-native-community/cli/build/index.d.ts",
+      "./node_modules/i18next/typescript/options.d.ts",
+      "./node_modules/path-key/index.d.ts",
+      "./node_modules/expo-av/src/ExponentAV.web.ts",
+      "./node_modules/better-opn/node_modules/open/index.d.ts",
+      "./node_modules/@supabase/auth-js/dist/module/GoTrueClient.d.ts",
+      "./node_modules/@supabase/auth-js/dist/module/lib/fetch.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/GoTrueClient.d.ts",
+      "./node_modules/@supabase/auth-js/dist/main/lib/fetch.d.ts",
+      "./node_modules/@supabase/auth-js/src/lib/helpers.ts",
+      "./node_modules/@supabase/auth-js/src/lib/fetch.ts",
+      "./node_modules/@supabase/auth-js/src/GoTrueClient.ts",
+      "./node_modules/@supabase/realtime-js/src/lib/transformers.ts",
+      "./node_modules/@supabase/storage-js/src/lib/types.ts",
+      "./node_modules/@supabase/postgrest-js/dist/cjs/select-query-parser/parser.d.ts",
+      "./node_modules/@supabase/postgrest-js/dist/cjs/PostgrestFilterBuilder.d.ts",
+      "./node_modules/@supabase/postgrest-js/dist/cjs/PostgrestError.d.ts",
+      "./node_modules/@supabase/postgrest-js/src/PostgrestFilterBuilder.ts",
+      "./node_modules/@supabase/postgrest-js/src/select-query-parser/parser.ts",
+      "./node_modules/@supabase/postgrest-js/src/PostgrestBuilder.ts",
+      "./node_modules/@supabase/postgrest-js/src/PostgrestError.ts",
+      "./node_modules/@expo/plist/build/parse.d.ts",
+      "./node_modules/@expo/plist/build/build.d.ts",
+      "./node_modules/@expo/config-types/build/ExpoConfig.d.ts",
+      "./node_modules/get-stream/index.d.ts",
+      "./node_modules/yaml/dist/index.d.ts",
+      "./node_modules/ansi-escapes/node_modules/type-fest/source/package-json.d.ts",
+      "./node_modules/ansi-escapes/node_modules/type-fest/source/async-return-type.d.ts",
+      "./node_modules/stream-chat/dist/types/types.d.ts",
+      "./node_modules/stream-chat/dist/types/client.d.ts",
+      "./node_modules/stream-chat/dist/types/notifications/types.d.ts",
+      "./node_modules/stream-chat/src/offline-support/offline_sync_manager.ts",
+      "./node_modules/stream-chat/src/offline-support/offline_support_api.ts",
+      "./node_modules/stream-chat/src/types.ts",
+      "./node_modules/stream-chat/src/messageComposer/middleware/attachmentManager/postUpload/uploadErrorHandler.ts",
+      "./node_modules/stream-chat/src/messageComposer/attachmentManager.ts",
+      "./node_modules/stream-chat/src/messageComposer/messageComposer.ts",
+      "./node_modules/stream-chat/src/client.ts",
+      "./node_modules/stream-chat/src/moderation.ts",
+      "./node_modules/stream-chat/src/notifications/types.ts",
+      "./node_modules/zustand/react.d.ts",
+      "./node_modules/zustand/traditional.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/plist/build/parse.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/plist/build/build.d.ts",
+      "./node_modules/@react-native-voice/voice/node_modules/@expo/config-types/build/ExpoConfig.d.ts",
+      "./node_modules/execa/index.d.ts",
+      "./node_modules/fast-glob/out/providers/sync.d.ts",
+      "./node_modules/fast-glob/out/providers/stream.d.ts",
+      "./node_modules/fast-glob/out/providers/async.d.ts",
+      "./node_modules/expo-router/build/imperative-api.d.ts",
+      "./node_modules/expo-router/build/exports.d.ts",
+      "./node_modules/expo-router/build/matchers.d.ts",
+      "./node_modules/expo-router/build/Route.d.ts",
+      "./node_modules/expo-router/build/hooks.d.ts",
+      "./node_modules/expo-router/build/rsc/router/client.d.ts",
+      "./node_modules/resolve-from/index.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/overlayContext/OverlayContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/messagesContext/MessagesContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/src/contexts/overlayContext/OverlayContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/contexts/messagesContext/MessagesContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/ChannelList/hooks/usePaginatedChannels.ts",
+      "./node_modules/stream-chat-react-native-core/src/mock-builders/api/sendReaction.ts",
+      "./node_modules/stream-chat-react-native-core/src/mock-builders/api/getOrCreateChannel.ts",
+      "./node_modules/stream-chat-react-native-core/src/mock-builders/api/channelMocks.tsx",
+      "./node_modules/stream-chat-react-native-core/src/store/OfflineDB.ts",
+      "./node_modules/react-native-gesture-handler/src/index.ts",
+      "./node_modules/open/index.d.ts",
+      "./node_modules/@react-native-async-storage/async-storage/lib/typescript/types.d.ts",
+      "./node_modules/@react-native-async-storage/async-storage/lib/typescript/AsyncStorage.native.d.ts",
+      "./node_modules/@react-native-async-storage/async-storage/src/AsyncStorage.native.ts",
+      "./node_modules/@react-native-async-storage/async-storage/src/types.ts",
+      "./node_modules/babel-preset-expo/build/expo-inline-manifest-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/environment-restricted-imports.d.ts",
+      "./node_modules/babel-preset-expo/build/inline-env-vars.d.ts",
+      "./node_modules/babel-preset-expo/build/server-actions-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/detect-dynamic-exports.d.ts",
+      "./node_modules/babel-preset-expo/build/restricted-react-api-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/use-dom-directive-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/client-module-proxy-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/expo-router-plugin.d.ts",
+      "./node_modules/babel-preset-expo/build/index.d.ts",
+      "./node_modules/babel-preset-expo/build/import-meta-transform-plugin.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/animated.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/bindings.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/types/module.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/components/KeyboardAwareScrollView/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/components/KeyboardToolbar/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/components/KeyboardStickyView/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/components/KeyboardAvoidingView/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/hooks/useKeyboardState/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/hooks/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/src/animated.tsx",
+      "./node_modules/react-native-keyboard-controller/src/types/module.ts",
+      "./node_modules/react-native-keyboard-controller/src/bindings.ts",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardAwareScrollView/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardToolbar/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardStickyView/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardAvoidingView/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/hooks/useKeyboardState/index.ts",
+      "./node_modules/react-native-keyboard-controller/src/hooks/index.ts",
+      "./node_modules/lightningcss/node/index.d.ts",
+      "./node_modules/lightningcss/node/ast.d.ts",
+      "./node_modules/pretty-ms/index.d.ts",
+      "./components/breathwork/BreathworkPro.tsx",
+      "./services/offlineSync.ts"
+    ]
+  },
+  {
+    "file": "services/syncMetrics.ts",
+    "status": "ACTIVE",
+    "refs": 56,
+    "exports": [
+      "syncMetrics",
+      "syncMetrics"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./components/settings/SyncHealthDebugCard.tsx",
+      "./services/offlineSync.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/thoughtService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "ThoughtService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/tableClient.ts",
+    "status": "ACTIVE",
+    "refs": 23,
+    "exports": [
+      "TableClient"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase/moodService.ts",
+      "./services/supabase/profileService.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/moodService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "MoodService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/authService.ts",
+    "status": "ACTIVE",
+    "refs": 33,
+    "exports": [
+      "GoogleOAuthStartResult",
+      "GoogleOAuthCompleteResult",
+      "AuthService"
+    ],
+    "foundIn": [
+      "./archive/__tests__/unit/authService.test.ts",
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/aiPredictionService.ts",
+    "status": "ACTIVE",
+    "refs": 12,
+    "exports": [
+      "AIPredictionService"
+    ],
+    "foundIn": [
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/aiService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "AIService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/voiceService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "VoiceService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/profileService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "ProfileService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/compulsionService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "CompulsionService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/supabase/breathService.ts",
+    "status": "ACTIVE",
+    "refs": 17,
+    "exports": [
+      "BreathService"
+    ],
+    "foundIn": [
+      "./archive/services/supabase/index.ts",
+      "./services/supabase.ts"
+    ]
+  },
+  {
+    "file": "services/smartNotifications.ts",
+    "status": "ACTIVE",
+    "refs": 14,
+    "exports": [
+      "smartNotifications",
+      "smartNotifications"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./archive/ai-disabled-backup/config/aiManager.ts"
+    ]
+  },
+  {
+    "file": "services/__tests__/moodOfflineQueue.test.ts",
+    "status": "UNUSED",
+    "refs": 0,
+    "exports": [],
+    "foundIn": []
+  },
+  {
+    "file": "services/speechToTextService.ts",
+    "status": "ACTIVE",
+    "refs": 13,
+    "exports": [
+      "speechToTextService"
+    ],
+    "foundIn": [
+      "./components/checkin/VAMoodCheckin.tsx",
+      "./services/voiceCheckInHeuristicService.ts"
+    ]
+  },
+  {
+    "file": "services/idempotencyService.ts",
+    "status": "ACTIVE",
+    "refs": 35,
+    "exports": [
+      "idempotencyService"
+    ],
+    "foundIn": [
+      "./utils/debugIdempotency.ts",
+      "./services/offlineSync.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/biometric.ts",
+    "status": "ACTIVE",
+    "refs": 47,
+    "exports": [
+      "BiometricFailureReason",
+      "BiometricCapability",
+      "BiometricPromptOptions",
+      "BiometricAuthenticateResult",
+      "biometricService"
+    ],
+    "foundIn": [
+      "./contexts/SupabaseAuthContext.tsx",
+      "./archive/__tests__/unit/biometric.test.ts",
+      "./hooks/useBiometric.ts"
+    ]
+  },
+  {
+    "file": "services/staticMoodMerge.ts",
+    "status": "ACTIVE",
+    "refs": 9,
+    "exports": [
+      "staticMoodMergeService",
+      "staticMoodMergeService",
+      "intelligentMergeService"
+    ],
+    "foundIn": [
+      "./services/moodTrackingService.ts",
+      "./archive/features/ai-fallbacks/intelligentMoodMergeService.ts"
+    ]
+  },
+  {
+    "file": "services/moodDataLoader.ts",
+    "status": "ACTIVE",
+    "refs": 46,
+    "exports": [
+      "OptimizedMoodDataLoader",
+      "moodDataLoader"
+    ],
+    "foundIn": [
+      "./app/(tabs)/index.tsx",
+      "./components/today/MoodJourneyCard.tsx",
+      "./components/checkin/VAMoodCheckin.tsx",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/telemetry/noopTelemetry.ts",
+    "status": "ACTIVE",
+    "refs": 1214,
+    "exports": [
+      "AIEventType",
+      "AIEventType",
+      "trackAIInteraction",
+      "safeTrackAIInteraction"
+    ],
+    "foundIn": [
+      "./archive/features/onboarding/analytics/onboardingEvents.ts",
+      "./archive/services/sync/scheduledMaintenance.ts",
+      "./archive/services/sync/syncQueue.ts",
+      "./constants/featureFlags.ts",
+      "./components/ui/SyncStatusNotification.tsx",
+      "./components/ErrorBoundary.tsx",
+      "./lib/queryClient.ts",
+      "./services/unifiedConflictResolver.ts",
+      "./services/offlineSync.ts",
+      "./services/supabase.ts",
+      "./services/sync/queueRepository.ts",
+      "./services/sync/deadLetterQueue.ts",
+      "./services/offlineSyncUserFeedbackService.ts",
+      "./store/moodOnboardingStore.ts",
+      "./app/(tabs)/index.tsx",
+      "./archive/components/dev/DebugAIPipelineOverlay.tsx",
+      "./archive/ai-disabled-backup/jitai/jitaiEngine.ts",
+      "./archive/ai-disabled-backup/pipeline/index.ts",
+      "./archive/ai-disabled-backup/pipeline/enhancedDataAggregation.ts",
+      "./archive/ai-disabled-backup/types/index.ts",
+      "./archive/ai-disabled-backup/context/userProfileAdapter.ts",
+      "./archive/ai-disabled-backup/context/contextIntelligence.ts",
+      "./archive/ai-disabled-backup/core/UnifiedAIPipeline.ts",
+      "./archive/ai-disabled-backup/core/helpers/PipelineCacheManager.ts",
+      "./archive/ai-disabled-backup/core/helpers/TelemetryWrapper.ts",
+      "./archive/ai-disabled-backup/config/aiManager.ts",
+      "./archive/ai-disabled-backup/feedback/aiErrorFeedbackService.ts",
+      "./archive/ai-disabled-backup/safety/contentFilter.ts",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV3.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/TreatmentPlanPreview.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/YBOCSAssessmentV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/YBOCSAssessmentUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/RiskAssessmentIndicator.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlow.tsx",
+      "./archive/ai-disabled-backup/components/ErrorBoundary.tsx",
+      "./archive/ai-disabled-backup/engines/onboardingEngine.ts",
+      "./archive/ai-disabled-backup/engines/treatmentPlanningEngine.ts",
+      "./archive/ai-disabled-backup/batch/dailyJobs.ts",
+      "./archive/ai-disabled-backup/hooks/useAdaptiveSuggestion.ts",
+      "./archive/ai-disabled-backup/prompts/therapeuticPrompts.ts",
+      "./archive/ai-disabled-backup/telemetry/telemetryHelpers.ts",
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./archive/ai-disabled-backup/interventions/adaptiveInterventions.ts",
+      "./archive/ai-disabled-backup/interventions/adaptiveInterventionsEngine.ts",
+      "./archive/ai-disabled-backup/services/checkinService.ts",
+      "./archive/ai-disabled-backup/services/unifiedGamificationService.ts",
+      "./archive/ai-disabled-backup/services/smartRoutingService.ts",
+      "./archive/ai-disabled-backup/services/intelligentMoodMergeService.ts",
+      "./archive/ai-disabled-backup/services/smartMoodJournalingService.ts",
+      "./archive/ai-disabled-backup/services/sttService.ts",
+      "./archive/ai-disabled-backup/services/voiceRecognition.ts",
+      "./archive/ai-disabled-backup/services/breathworkSuggestionService.ts",
+      "./archive/ai-disabled-backup/services/userProfilingService.ts",
+      "./archive/ai-disabled-backup/services/riskAssessmentService.ts",
+      "./archive/ai-disabled-backup/services/reframeService.ts",
+      "./archive/ai-disabled-backup/services/moodPatternAnalysisService.ts",
+      "./archive/ai-disabled-backup/services/externalAIService.ts",
+      "./features/ai-fallbacks/telemetry.ts",
+      "./components/breathwork/BreathworkPlayer.tsx",
+      "./services/unifiedComplianceService.ts",
+      "./services/moodTrackingService.ts",
+      "./archive/features/ai-fallbacks/telemetryHelpers.ts"
+    ]
+  },
+  {
+    "file": "services/telemetry/performanceMetricsService.ts",
+    "status": "ACTIVE",
+    "refs": 32,
+    "exports": [
+      "performanceMetricsService",
+      "DailyMetrics",
+      "performanceMetricsService"
+    ],
+    "foundIn": [
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./services/offlineSync.ts",
+      "./app/(tabs)/settings.tsx"
+    ]
+  },
+  {
+    "file": "services/heartpy/calibration.ts",
+    "status": "ACTIVE",
+    "refs": 35,
+    "exports": [
+      "calibrationService",
+      "MEA",
+      "calibrationService"
+    ],
+    "foundIn": [
+      "./components/checkin/CheckinBottomSheet.tsx",
+      "./app/(tabs)/index.tsx",
+      "./archive/ai-disabled-backup/core/UnifiedAIPipeline.ts",
+      "./archive/ai-disabled-backup/services/moodPatternAnalysisService.ts",
+      "./components/MindScoreCard.tsx",
+      "./components/checkin/VAMoodCheckin.tsx"
+    ]
+  },
+  {
+    "file": "services/heartpy/healthSignals.ts",
+    "status": "ACTIVE",
+    "refs": 34,
+    "exports": [
+      "healthSignals",
+      "HealthPermissionStatus",
+      "DailyHealthFeatures",
+      "healthSignals"
+    ],
+    "foundIn": [
+      "./app/measure-hrv.tsx",
+      "./app/(auth)/onboarding/notifications.tsx",
+      "./components/checkin/CheckinBottomSheet.tsx",
+      "./services/heartpy/index.ts"
+    ]
+  },
+  {
+    "file": "services/heartpy/inferenceMetaStore.ts",
+    "status": "ACTIVE",
+    "refs": 10,
+    "exports": [
+      "InferenceMeta",
+      "setLastInferenceMeta",
+      "getLastInferenceMeta"
+    ],
+    "foundIn": [
+      "./components/checkin/CheckinBottomSheet.tsx",
+      "./services/heartpy/index.ts"
+    ]
+  },
+  {
+    "file": "services/heartpy/index.ts",
+    "status": "ACTIVE",
+    "refs": 7,
+    "exports": [
+      "HeartPyInput",
+      "HeartPyMEA",
+      "healthSignals"
+    ],
+    "foundIn": [
+      "./app/measure-hrv.tsx",
+      "./app/(auth)/onboarding/notifications.tsx",
+      "./components/checkin/CheckinBottomSheet.tsx",
+      "./services/heartpy/healthSignals.ts"
+    ]
+  },
+  {
+    "file": "services/supabase.ts",
+    "status": "ACTIVE",
+    "refs": 485,
+    "exports": [
+      "supabaseService",
+      "supabaseService",
+      "createSupabaseServiceForTest"
+    ],
+    "foundIn": [
+      "./contexts/authBridge.ts",
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/(auth)/login.tsx",
+      "./app/(auth)/signup.tsx",
+      "./archive/features/dev/liveTestResults.ts",
+      "./archive/__tests__/unit/authService.test.ts",
+      "./archive/__tests__/unit/biometric.test.ts",
+      "./archive/ai-disabled-backup/pipeline/enhancedDataAggregation.ts",
+      "./archive/ai-disabled-backup/context/userProfileAdapter.ts",
+      "./archive/ai-disabled-backup/core/UnifiedAIPipeline.ts",
+      "./archive/ai-disabled-backup/core/MoodDataFlowTester.ts",
+      "./archive/ai-disabled-backup/core/helpers/PipelineCacheManager.ts",
+      "./archive/ai-disabled-backup/batch/dailyJobs.ts",
+      "./archive/ai-disabled-backup/telemetry/aiTelemetry.ts",
+      "./archive/ai-disabled-backup/interventions/adaptiveInterventionsEngine.ts",
+      "./archive/ai-disabled-backup/services/voiceRecognition.ts",
+      "./archive/services/autoRecordService.ts",
+      "./archive/services/supabase/index.ts",
+      "./archive/services/enhancedAchievementService.ts",
+      "./utils/moodDataCleanup.ts",
+      "./components/navigation/NavigationGuard.tsx",
+      "./components/breathwork/BreathworkPro.tsx",
+      "./components/mood/AppleHealthDetailSheet.tsx",
+      "./hooks/useBiometric.ts",
+      "./services/unifiedComplianceService.ts",
+      "./services/offlineSync.ts",
+      "./services/supabase/moodService.ts",
+      "./services/supabase/profileService.ts",
+      "./services/biometric.ts",
+      "./services/moodDataLoader.ts",
+      "./services/sync/queueRepository.ts",
+      "./services/mood/userIdResolver.ts",
+      "./services/moodTrackingService.ts",
+      "./services/crossDeviceSync.ts",
+      "./store/gamificationStore.ts",
+      "./store/moodOnboardingStore.ts",
+      "./archive/ai-disabled-backup/services/dataAggregationService.ts",
+      "./services/idempotencyService.ts"
+    ]
+  },
+  {
+    "file": "services/sync/queueRepository.ts",
+    "status": "ACTIVE",
+    "refs": 26,
+    "exports": [
+      "queueRepository"
+    ],
+    "foundIn": [
+      "./archive/services/sync/index.ts",
+      "./services/offlineSync.ts",
+      "./services/sync/offlineSyncOrchestrator.ts"
+    ]
+  },
+  {
+    "file": "services/sync/offlineSyncOrchestrator.ts",
+    "status": "ACTIVE",
+    "refs": 29,
+    "exports": [
+      "OfflineSyncOrchestrator",
+      "offlineSyncOrchestrator",
+      "createOfflineErrorHook",
+      "createDLQHandler"
+    ],
+    "foundIn": [
+      "./archive/services/sync/index.ts",
+      "./services/offlineSync.ts"
+    ]
+  },
+  {
+    "file": "services/sync/deadLetterQueue.ts",
+    "status": "ACTIVE",
+    "refs": 89,
+    "exports": [
+      "deadLetterQueue",
+      "DeadLetterItem",
+      "deadLetterQueue"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./app/_layout.tsx",
+      "./services/offlineSync.ts",
+      "./services/supabase.ts",
+      "./services/sync/offlineSyncOrchestrator.ts",
+      "./archive/services/sync/scheduledMaintenance.ts"
+    ]
+  },
+  {
+    "file": "services/sync/networkMonitor.ts",
+    "status": "ACTIVE",
+    "refs": 28,
+    "exports": [
+      "NetworkMonitor",
+      "networkMonitor"
+    ],
+    "foundIn": [
+      "./archive/services/sync/index.ts",
+      "./services/offlineSync.ts",
+      "./services/sync/offlineSyncOrchestrator.ts"
+    ]
+  },
+  {
+    "file": "services/sync/queueValidator.ts",
+    "status": "ACTIVE",
+    "refs": 62,
+    "exports": [
+      "ValidationResult",
+      "SyncQueueItem",
+      "QueueValidator",
+      "queueValidator"
+    ],
+    "foundIn": [
+      "./services/offlineSync.ts",
+      "./node_modules/joi/lib/index.d.ts",
+      "./node_modules/@supabase/postgrest-js/dist/cjs/types.d.ts",
+      "./node_modules/@supabase/postgrest-js/src/types.ts",
+      "./node_modules/@expo/schema-utils/build/index.d.ts",
+      "./services/sync/offlineSyncOrchestrator.ts",
+      "./services/sync/syncMaintenance.ts"
+    ]
+  },
+  {
+    "file": "services/sync/syncMaintenance.ts",
+    "status": "ACTIVE",
+    "refs": 24,
+    "exports": [
+      "syncMaintenance"
+    ],
+    "foundIn": [
+      "./archive/services/sync/index.ts",
+      "./services/offlineSync.ts",
+      "./services/sync/offlineSyncOrchestrator.ts"
+    ]
+  },
+  {
+    "file": "services/sync/batchOptimizer.ts",
+    "status": "ACTIVE",
+    "refs": 22,
+    "exports": [
+      "batchOptimizer",
+      "batchOptimizer"
+    ],
+    "foundIn": [
+      "./services/offlineSync.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/mood/moodMigration.ts",
+    "status": "ACTIVE",
+    "refs": 15,
+    "exports": [],
+    "foundIn": [
+      "./archive/services/mood/index.ts",
+      "./services/mood/moodRepository.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/mood/encryptionAdapter.ts",
+    "status": "ACTIVE",
+    "refs": 23,
+    "exports": [
+      "encryptionAdapter"
+    ],
+    "foundIn": [
+      "./archive/services/mood/index.ts",
+      "./services/mood/moodMigration.ts",
+      "./services/mood/moodRepository.ts"
+    ]
+  },
+  {
+    "file": "services/mood/moodRepository.ts",
+    "status": "ACTIVE",
+    "refs": 31,
+    "exports": [
+      "moodRepository"
+    ],
+    "foundIn": [
+      "./archive/services/mood/index.ts",
+      "./services/mood/moodMigration.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/mood/userIdResolver.ts",
+    "status": "ACTIVE",
+    "refs": 16,
+    "exports": [],
+    "foundIn": [
+      "./archive/services/mood/index.ts",
+      "./components/checkin/VAMoodCheckin.tsx",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/moodTrackingService.ts",
+    "status": "ACTIVE",
+    "refs": 322,
+    "exports": [
+      "moodTracker",
+      "MoodEntry",
+      "SaveMoodEntryResult",
+      "moodTracker"
+    ],
+    "foundIn": [
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/mind-face.tsx",
+      "./archive/utils/watermelonMigration.ts",
+      "./archive/__tests__/unit/moodOnboardingStore.test.ts",
+      "./archive/ai-disabled-backup/core/MoodDataFlowTester.ts",
+      "./archive/ai-disabled-backup/hooks/useAdaptiveSuggestion.ts",
+      "./archive/ai-disabled-backup/interventions/adaptiveInterventionsEngine.ts",
+      "./archive/ai-disabled-backup/services/unifiedGamificationService.ts",
+      "./archive/ai-disabled-backup/services/intelligentMoodMergeService.ts",
+      "./archive/ai-disabled-backup/services/moodPatternAnalysisService.ts",
+      "./archive/services/healthKitIntegration.ts",
+      "./archive/services/offlineMoodInsights.ts",
+      "./utils/debugInvalidEntries.ts",
+      "./utils/debugMoodDeletion.ts",
+      "./components/checkin/VAMoodCheckin.tsx",
+      "./components/mood/AppleHealthDetailSheet.tsx",
+      "./hooks/useOfflineMoodSync.ts",
+      "./services/optimizedStorage.ts",
+      "./services/todayService.ts",
+      "./services/offlineSync.ts",
+      "./services/smartNotifications.ts",
+      "./services/staticMoodMerge.ts",
+      "./services/moodDataLoader.ts",
+      "./services/mood/moodMigration.ts",
+      "./services/mood/moodRepository.ts",
+      "./store/moodOnboardingStore.ts"
+    ]
+  },
+  {
+    "file": "services/crashReporting.ts",
+    "status": "ACTIVE",
+    "refs": 36,
+    "exports": [
+      "crashReporting",
+      "crashReporting"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./components/settings/SyncHealthDebugCard.tsx",
+      "./components/ErrorBoundary.tsx"
+    ]
+  },
+  {
+    "file": "services/offlineSyncUserFeedbackService.ts",
+    "status": "ACTIVE",
+    "refs": 19,
+    "exports": [
+      "OfflineSyncUserFeedbackService",
+      "SyncErrorDetails",
+      "SyncErrorSummary"
+    ],
+    "foundIn": [
+      "./archive/components/ui/SyncErrorSummaryCard.tsx",
+      "./services/offlineSync.ts",
+      "./services/moodTrackingService.ts"
+    ]
+  },
+  {
+    "file": "services/moodDeletionCache.ts",
+    "status": "ACTIVE",
+    "refs": 32,
+    "exports": [
+      "DeletedEntryRecord",
+      "MoodDeletionCacheService",
+      "moodDeletionCache"
+    ],
+    "foundIn": [
+      "./archive/ai-disabled-backup/services/intelligentMoodMergeService.ts",
+      "./utils/debugHelper.ts",
+      "./services/moodTrackingService.ts",
+      "./services/staticMoodMerge.ts"
+    ]
+  },
+  {
+    "file": "services/asyncStorageHygiene.ts",
+    "status": "ACTIVE",
+    "refs": 12,
+    "exports": [
+      "asyncStorageHygiene",
+      "asyncStorageHygiene"
+    ],
+    "foundIn": [
+      "./app/debug-console.tsx"
+    ]
+  },
+  {
+    "file": "services/crossDeviceSync.ts",
+    "status": "ACTIVE",
+    "refs": 21,
+    "exports": [
+      "CrossDeviceSyncService",
+      "SyncResult",
+      "crossDeviceSync"
+    ],
+    "foundIn": [
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/_layout.tsx"
+    ]
+  }
+]
