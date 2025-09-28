@@ -1,0 +1,428 @@
+[
+  {
+    "file": "components/ui/SafeModeBanner.tsx",
+    "exports": [
+      "SafeModeBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/ConflictNotificationBanner.tsx",
+    "exports": [
+      "ConflictNotificationBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/TabBarBackground.tsx",
+    "exports": [
+      "TabBarBackground",
+      "useBottomTabOverflow"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/OfflineBanner.tsx",
+    "exports": [
+      "OfflineBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/GlobalLoading.tsx",
+    "exports": [
+      "GlobalLoading"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/SyncStatusNotification.tsx",
+    "exports": [
+      "SyncStatusNotification"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/settings/OfflineQueueManager.tsx",
+    "exports": [
+      "OfflineQueueManager"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/settings/SyncHealthDebugCard.tsx",
+    "exports": [
+      "SyncHealthDebugCard"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": false,
+    "status": "LOW",
+    "foundIn": [
+      "./app/debug-console.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": false
+    }
+  },
+  {
+    "file": "components/today/MoodInsightsCard.tsx",
+    "exports": [
+      "MoodInsightsCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/today/BottomCheckinCTA.tsx",
+    "exports": [
+      "BottomCheckinCTA"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/today/MoodJourneyCard.tsx",
+    "exports": [
+      "MoodJourneyCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/security/LockOverlay.tsx",
+    "exports": [
+      "LockOverlay"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/gamification/MicroRewardAnimation.tsx",
+    "exports": [
+      "MicroRewardAnimation"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/gamification/AchievementBadge.tsx",
+    "exports": [
+      "AchievementBadge"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/achievements.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/breathing/BreathingWave.tsx",
+    "exports": [
+      "BreathingWave"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/breathwork/BreathworkPro.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/breathwork/BreathworkPro.tsx",
+    "exports": [
+      "BreathworkPro"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/breathwork.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mind/MoodEnergyGaugeArc.tsx",
+    "exports": [
+      "MoodEnergyGaugeArc"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/MindScoreCard.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/HapticTab.tsx",
+    "exports": [
+      "HapticTab"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/MindMetaRowCard.tsx",
+    "exports": [
+      "MindMetaRowCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/MoodFaceCard.tsx",
+    "exports": [
+      "MoodFaceCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/mind-face.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/VAMoodCheckin.tsx",
+    "exports": [
+      "VAMoodCheckin"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/checkin/CheckinBottomSheet.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/MoodDetailsStep.tsx",
+    "exports": [
+      "MoodDetailsStep"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/checkin/VAMoodCheckin.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/CheckinBottomSheet.tsx",
+    "exports": [
+      "CheckinBottomSheet"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/onboarding/EmojiScale.tsx",
+    "exports": [
+      "EmojiScale"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(auth)/onboarding/first-mood.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/onboarding/Chips.tsx",
+    "exports": [
+      "Chips"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(auth)/onboarding/motivation.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  }
+]

@@ -1,0 +1,265 @@
+[dotenv@17.2.2] injecting env (4) from .env.local -- tip: ⚙️  override existing env vars with { override: true }
+[dotenv@17.2.2] injecting env (0) from .env.local -- tip: 🔐 prevent committing .env to code: https://dotenvx.com/precommit
+Unused dependencies (12)
+@hookform/resolvers                package.json:50:6 
+@react-native-clipboard/clipboard  package.json:53:6 
+buffer                             package.json:61:6 
+i18n-js                            package.json:96:6 
+jwt-decode                         package.json:97:6 
+react-dom                          package.json:99:6 
+react-hook-form                    package.json:100:6
+react-native-gifted-chat           package.json:103:6
+react-native-modal                 package.json:104:6
+react-native-typing-animation      package.json:111:6
+stream-chat                        package.json:113:6
+stream-chat-react-native           package.json:114:6
+Unused devDependencies (4)
+@react-native-community/cli    package.json:120:6
+@react-native/metro-config     package.json:121:6
+@testing-library/react-native  package.json:122:6
+madge                          package.json:128:6
+Unlisted dependencies (8)
+@react-navigation/native        app/_layout.tsx:1:10                        
+@react-navigation/native        app/(auth)/onboarding/notifications.tsx:3:10
+@react-navigation/native        app/(tabs)/_layout.tsx:5:10                 
+@react-navigation/native        app/(tabs)/index.tsx:15:10                  
+@react-navigation/bottom-tabs   components/HapticTab.tsx:1:10               
+@react-navigation/elements      components/HapticTab.tsx:2:10               
+@react-navigation/native        components/today/MoodJourneyCard.tsx:23:10  
+react-native-url-polyfill/auto  lib/supabase.ts:1:2                         
+Unlisted binaries (7)
+eslint       package.json
+jest         package.json
+open         package.json
+expo-doctor  package.json
+gitleaks     package.json
+ts-node      package.json
+tsx          package.json
+Unresolved imports (1)
+metro-minify-terser  metro.config.js
+Unused exports (125)
+ErrorBoundary                  class     components/ErrorBoundary.tsx:22:14                   
+AppleHealthDetailSheet                   components/mood/AppleHealthDetailSheet.tsx:121:14    
+AppleHealthStyleChartV2                  components/mood/AppleHealthStyleChartV2.tsx:175:14   
+default                                  components/mood/AppleHealthTimeSelectorV2.tsx:167:8  
+clearOnboardingCache           function  components/navigation/NavigationGuard.tsx:20:17      
+Button                         function  components/ui/Button.tsx:35:17                       
+default                                  components/ui/Card.tsx:104:8                         
+useBottomTabOverflow           function  components/ui/TabBarBackground.tsx:9:17              
+Palettes                                 constants/Colors.ts:97:14                            
+AnimationConfig                          constants/DesignSystem.ts:38:14                      
+AI_CONFIG                                constants/featureFlags.ts:308:14                     
+setAuthProfile                 function  contexts/authBridge.ts:14:17                         
+getAuthUserId                  function  contexts/authBridge.ts:18:17                         
+default                                  contexts/authBridge.ts:22:8                          
+languageUtils                            contexts/LanguageContext.tsx:158:14                  
+useNotifications                         contexts/NotificationContext.tsx:244:14              
+SupabaseAuthProvider           function  contexts/SupabaseAuthContext.tsx:58:17               
+queryKeys                                hooks/useCacheInvalidation.ts:52:14                  
+useCacheInvalidation           function  hooks/useCacheInvalidation.ts:123:17                 
+emitAIInvalidation             function  hooks/useCacheInvalidation.ts:381:17                 
+getCacheTTL                    function  hooks/useCacheInvalidation.ts:392:17                 
+useOfflineMoodSync                       hooks/useOfflineMoodSync.ts:42:14                    
+storage                                  lib/queryClient.ts:30:14                             
+default                        variable  services/api.ts:79:8                                 
+asyncStorageHygiene                      services/asyncStorageHygiene.ts:401:14               
+crashReporting                           services/crashReporting.ts:219:14                    
+default                        class     services/crossDeviceSync.ts:272:8                    
+calibrationService                       services/heartpy/calibration.ts:7:14                 
+healthSignals                            services/heartpy/healthSignals.ts:147:14             
+get7DayMinuteActivityWindow    function  services/heartpy/healthSignals.ts:308:23             
+runHeartPy                     function  services/heartpy/index.ts:9:23                       
+healthSignals                            services/heartpy/index.ts:41:9                       
+default                                  services/heartpy/inferenceMetaStore.ts:22:8          
+migrateEntryToEncrypted        function  services/mood/moodMigration.ts:76:23                 
+OptimizedMoodDataLoader        class     services/moodDataLoader.ts:15:14                     
+enqueue                                  services/moodOfflineQueue.ts:61:14                   
+remove                                   services/moodOfflineQueue.ts:81:14                   
+peekAll                                  services/moodOfflineQueue.ts:88:14                   
+markRetry                                services/moodOfflineQueue.ts:92:14                   
+flush                                    services/moodOfflineQueue.ts:112:14                  
+clearAll                                 services/moodOfflineQueue.ts:118:14                  
+clearAllStrict                           services/moodOfflineQueue.ts:126:14                  
+moodOfflineQueue                         services/moodOfflineQueue.ts:161:14                  
+optimizedStorage                         services/optimizedStorage.ts:380:14                  
+AsyncStorageAdapter            class     services/optimizedStorage.ts:398:14                  
+WatermelonDBAdapter            class     services/optimizedStorage.ts:424:14                  
+performanceMonitor                       services/performanceMonitor.ts:470:14                
+smartNotifications                       services/smartNotifications.ts:415:14                
+calculateMoodEntryPoints                 services/staticGamification.ts:29:14                 
+calculateCheckinPoints                   services/staticGamification.ts:45:14                 
+generateDailyMissions                    services/staticGamification.ts:62:14                 
+generateWeeklyMissions                   services/staticGamification.ts:87:14                 
+default                                  services/staticGamification.ts:119:8                 
+staticMoodMergeService                   services/staticMoodMerge.ts:235:14                   
+default                                  services/staticMoodMerge.ts:243:8                    
+initializeSupabase             function  services/supabase.ts:1027:23                         
+createSupabaseServiceForTest   function  services/supabase.ts:1045:17                         
+batchOptimizer                           services/sync/batchOptimizer.ts:101:14               
+OfflineSyncOrchestrator        class     services/sync/offlineSyncOrchestrator.ts:11:14       
+syncMetrics                              services/syncMetrics.ts:277:14                       
+default                                  services/telemetry/noopTelemetry.ts:91:1             
+performanceMetricsService                services/telemetry/performanceMetricsService.ts:62:14
+todayService                             services/todayService.ts:30:14                       
+ComplianceValidator            class     services/unifiedComplianceService.ts:98:14           
+default                                  services/unifiedComplianceService.ts:790:8           
+ConflictDetectionEngine        class     services/unifiedConflictResolver.ts:74:14            
+ResolutionStrategies           class     services/unifiedConflictResolver.ts:179:14           
+default                                  services/unifiedConflictResolver.ts:478:8            
+normalizeValence                         utils/chartUtils.ts:3:14                             
+getEnergyGradient                        utils/chartUtils.ts:9:14                             
+getVAColor                               utils/chartUtils.ts:15:14                            
+getConfidenceOpacity                     utils/chartUtils.ts:19:14                            
+calculateAverage                         utils/chartUtils.ts:25:14                            
+hourFromTimestamp                        utils/chartUtils.ts:32:14                            
+CircuitBreaker                 class     utils/circuitBreaker.ts:14:14                        
+default                                  utils/dataStandardization.ts:205:8                   
+isFirstOfMonth                           utils/dateAggregation.ts:16:14                       
+isMonday                                 utils/dateAggregation.ts:21:14                       
+testMoodDuplicates                       utils/debugIdempotency.ts:13:14                      
+getIdempotencyStats                      utils/debugIdempotency.ts:83:14                      
+cleanupIdempotency                       utils/debugIdempotency.ts:114:14                     
+stressTestIdempotency                    utils/debugIdempotency.ts:129:14                     
+scanForInvalidEntries          function  utils/debugInvalidEntries.ts:20:23                   
+cleanupInvalidEntriesForUser   function  utils/debugInvalidEntries.ts:117:23                  
+testAutoRecovery               function  utils/debugInvalidEntries.ts:183:23                  
+getMoodDataIntegrityReport     function  utils/debugInvalidEntries.ts:204:23                  
+debugMoodDeletion              function  utils/debugMoodDeletion.ts:20:23                     
+debugForceDeletion             function  utils/debugMoodDeletion.ts:98:23                     
+debugMoodStorageLocations      function  utils/debugMoodDeletion.ts:134:23                    
+debugCleanAllMoodStorage       function  utils/debugMoodDeletion.ts:174:23                    
+testQueueStats                           utils/debugQueueTest.ts:12:14                        
+testQueueOverflow                        utils/debugQueueTest.ts:33:14                        
+testQueueOverflowHeavy                   utils/debugQueueTest.ts:112:14                       
+quickQueueCheck                          utils/debugQueueTest.ts:118:14                       
+testQueueBoundary                        utils/debugQueueTest.ts:126:14                       
+generateShortSecureId          function  utils/idGenerator.ts:47:17                           
+LEGACY_PATTERNS                          utils/idGenerator.ts:74:14                           
+isLegacyId                     function  utils/idGenerator.ts:89:17                           
+default                                  utils/idGenerator.ts:93:8                            
+normalizeWord                            utils/moodInsights.ts:55:14                          
+extractTokens                            utils/moodInsights.ts:61:14                          
+getDominantTriggers                      utils/moodInsights.ts:68:14                          
+getActivityMoodInsights                  utils/moodInsights.ts:93:14                          
+getKeywordInsight                        utils/moodInsights.ts:148:14                         
+default                                  utils/moodInsights.ts:181:8                          
+matchesTrigger                           utils/moodJourneyFilters.ts:11:14                    
+matchesActivity                          utils/moodJourneyFilters.ts:17:14                    
+matchesKeyword                           utils/moodJourneyFilters.ts:23:14                    
+applyJourneyFilters                      utils/moodJourneyFilters.ts:30:14                    
+normalizeTriggerToken                    utils/moodTriggers.ts:127:14                         
+SecureStorageMigration         class     utils/secureStorageMigration.ts:7:14                 
+lcg                                      utils/statistics.ts:24:14                            
+getUserStorageKey                        utils/storage.ts:47:14                               
+clearUserData                            utils/storage.ts:92:14                               
+getUserTimezoneOffset          function  utils/timezoneUtils.ts:12:17                         
+getUserTimezone                function  utils/timezoneUtils.ts:19:17                         
+getUserDayBounds               function  utils/timezoneUtils.ts:82:17                         
+groupEntriesByUserDay          function  utils/timezoneUtils.ts:118:17                        
+calculateStreakInUserTimezone  function  utils/timezoneUtils.ts:137:17                        
+filterEntriesByUserTimeRange   function  utils/timezoneUtils.ts:176:17                        
+getUtcDayKey                   function  utils/timezoneUtils.ts:228:17                        
+toLocalStartOfDay              function  utils/timezoneUtils.ts:240:17                        
+calcDayDiffUTC                 function  utils/timezoneUtils.ts:251:17                        
+UUID_REGEX                               utils/validators.ts:49:14                            
+EMAIL_REGEX                              utils/validators.ts:54:14                            
+Unused exported types (67)
+SelectionPayload             type       components/mood/helpers/chartSelection.ts:3:13      
+MoodFaceColorSet             type       components/mood/MoodFace.tsx:4:13                   
+ThemedTextProps              type       components/ThemedText.tsx:5:13                      
+ThemedViewProps              type       components/ThemedView.tsx:5:13                      
+Language                     type       contexts/LanguageContext.tsx:11:13                  
+TranslationPath              type       contexts/LanguageContext.tsx:21:13                  
+AuthContextType              interface  contexts/SupabaseAuthContext.tsx:25:18              
+ThemeMode                    type       contexts/ThemeContext.tsx:6:13                      
+DerivedFlags                 interface  features/onboarding/lib/deriveFeatureFlags.ts:3:18  
+UseBiometricOptions          interface  hooks/useBiometric.ts:7:18                          
+UseBiometricResult           interface  hooks/useBiometric.ts:19:18                         
+CacheInvalidationHelpers     interface  hooks/useCacheInvalidation.ts:98:18                 
+UseOfflineMoodSyncOptions    interface  hooks/useOfflineMoodSync.ts:24:18                   
+OfflineMoodSyncHandle        interface  hooks/useOfflineMoodSync.ts:31:18                   
+BiometricPromptOptions       interface  services/biometric.ts:23:18                         
+BiometricAuthenticateResult  interface  services/biometric.ts:30:18                         
+SyncResult                   interface  services/crossDeviceSync.ts:16:18                   
+EncryptedData                interface  services/encryption/secureDataService.ts:4:18       
+MEA                          type       services/heartpy/calibration.ts:3:13                
+HealthPermissionStatus       type       services/heartpy/healthSignals.ts:4:13              
+DailyHealthFeatures          type       services/heartpy/healthSignals.ts:121:13            
+HeartPyInput                 type       services/heartpy/index.ts:4:13                      
+HeartPyMEA                   type       services/heartpy/index.ts:5:13                      
+InferenceMeta                type       services/heartpy/inferenceMetaStore.ts:1:13         
+NotificationData             interface  services/messaging.ts:17:18                         
+DeletedEntryRecord           interface  services/moodDeletionCache.ts:8:18                  
+SaveMoodEntryResult          type       services/moodTrackingService.ts:37:13               
+NativeTranscriptionResult    interface  services/nativeSpeechToText.ts:18:18                
+NotificationSchedule         interface  services/notificationScheduler.ts:9:18              
+SyncErrorDetails             interface  services/offlineSyncUserFeedbackService.ts:16:18    
+SyncErrorSummary             interface  services/offlineSyncUserFeedbackService.ts:31:18    
+LocalDatabaseAdapter         interface  services/optimizedStorage.ts:384:18                 
+SpeechToTextOptions          type       services/speechToTextService.ts:704:35              
+OCDProfile                   type       services/supabase.ts:19:15                          
+CompulsionRecord             type       services/supabase.ts:20:14                          
+TherapySession               type       services/supabase.ts:21:20                          
+GamificationProfile          type       services/supabase.ts:22:18                          
+VoiceCheckinRecord           type       services/supabase.ts:23:23                          
+ThoughtRecordItem            type       services/supabase.ts:24:22                          
+VoiceSessionDB               type       services/supabase.ts:25:21                          
+DeadLetterItem               interface  services/sync/deadLetterQueue.ts:3:18               
+ValidationResult             interface  services/sync/queueValidator.ts:8:18                
+SyncQueueItem                interface  services/sync/queueValidator.ts:14:18               
+DailyMetrics                 interface  services/telemetry/performanceMetricsService.ts:3:18
+TodayStats                   type       services/todayService.ts:6:13                       
+TodayData                    type       services/todayService.ts:22:13                      
+ConsentRecord                interface  services/unifiedComplianceService.ts:26:18          
+AuditLog                     interface  services/unifiedComplianceService.ts:40:18          
+DataExportRequest            interface  services/unifiedComplianceService.ts:54:18          
+DeletionRequest              interface  services/unifiedComplianceService.ts:68:18          
+ComplianceStatus             interface  services/unifiedComplianceService.ts:80:18          
+ConflictType                 type       services/unifiedConflictResolver.ts:22:13           
+ConflictResolutionResult     interface  services/unifiedConflictResolver.ts:42:18           
+ConflictLogItem              interface  services/unifiedConflictResolver.ts:54:18           
+ResolutionStrategy           interface  services/unifiedConflictResolver.ts:62:18           
+HealingPoints                interface  types/gamification.ts:50:18                         
+HourlyAverage                interface  types/mood.ts:33:18                                 
+CircuitState                 enum       utils/circuitBreaker.ts:1:13                        
+CircuitBreakerConfig         interface  utils/circuitBreaker.ts:7:18                        
+InvalidEntryReport           interface  utils/debugInvalidEntries.ts:10:18                  
+ActivityMoodInsight          interface  utils/moodInsights.ts:15:18                         
+KeywordInsight               interface  utils/moodInsights.ts:22:18                         
+MoodInsightsSummary          interface  utils/moodInsights.ts:27:18                         
+TriggerOption                type       utils/moodTriggers.ts:1:13                          
+OnboardingPayload            type       utils/onboardingMapper.ts:1:13                      
+IQR                          type       utils/statistics.ts:1:13                            
+Trend                        type       utils/trend.ts:1:13                                 
+Duplicate exports (31)
+ErrorBoundary|default                                   components/ErrorBoundary.tsx                   
+AppleHealthDetailSheet|default                          components/mood/AppleHealthDetailSheet.tsx     
+AppleHealthStyleChartV2|default                         components/mood/AppleHealthStyleChartV2.tsx    
+AppleHealthTimeSelectorV2|default                       components/mood/AppleHealthTimeSelectorV2.tsx  
+Button|default                                          components/ui/Button.tsx                       
+Card|default                                            components/ui/Card.tsx                         
+useOfflineMoodSync|default                              hooks/useOfflineMoodSync.ts                    
+asyncStorageHygiene|default                             services/asyncStorageHygiene.ts                
+crashReporting|default                                  services/crashReporting.ts                     
+secureDataService|default                               services/encryption/secureDataService.ts       
+calibrationService|default                              services/heartpy/calibration.ts                
+healthSignals|default                                   services/heartpy/healthSignals.ts              
+moodOfflineQueue|default                                services/moodOfflineQueue.ts                   
+moodTracker|default                                     services/moodTrackingService.ts                
+optimizedStorage|default                                services/optimizedStorage.ts                   
+performanceMonitor|default                              services/performanceMonitor.ts                 
+smartNotifications|default                              services/smartNotifications.ts                 
+staticMoodMergeService|intelligentMergeService|default  services/staticMoodMerge.ts                    
+supabaseService|default                                 services/supabase.ts                           
+batchOptimizer|default                                  services/sync/batchOptimizer.ts                
+deadLetterQueue|default                                 services/sync/deadLetterQueue.ts               
+syncMetrics|default                                     services/syncMetrics.ts                        
+performanceMetricsService|default                       services/telemetry/performanceMetricsService.ts
+todayService|default                                    services/todayService.ts                       
+unifiedComplianceService|default                        services/unifiedComplianceService.ts           
+unifiedConflictResolver|default                         services/unifiedConflictResolver.ts            
+useSecurityStore|default                                store/securityStore.ts                         
+dataStandardizer|default                                utils/dataStandardization.ts                   
+buildMoodInsights|default                               utils/moodInsights.ts                          
+applyJourneyFilters|default                             utils/moodJourneyFilters.ts                    
+SecureStorageMigration|default                          utils/secureStorageMigration.ts                

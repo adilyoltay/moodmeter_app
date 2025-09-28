@@ -1,0 +1,1072 @@
+[
+  {
+    "file": "components/va/VAPad.tsx",
+    "exports": [
+      "VAPad"
+    ],
+    "totalUsage": 4,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx",
+      "./components/checkin/VAMoodCheckin.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/SafeModeBanner.tsx",
+    "exports": [
+      "SafeModeBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/ConflictNotificationBanner.tsx",
+    "exports": [
+      "ConflictNotificationBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/TabBarBackground.tsx",
+    "exports": [
+      "TabBarBackground",
+      "useBottomTabOverflow"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/Card.tsx",
+    "exports": [
+      "Card",
+      "Card"
+    ],
+    "totalUsage": 163,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/debug-console.tsx",
+      "./app/(tabs)/index.tsx",
+      "./app/mind-face.tsx",
+      "./app/debug-voice-analysis.tsx",
+      "./app/debug-clean-data.tsx",
+      "./archive/components/ui/SyncErrorSummaryCard.tsx",
+      "./archive/ai-disabled-backup/components/voice/VoiceInterface.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV3.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/TreatmentPlanPreview.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/YBOCSAssessmentUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/RiskAssessmentIndicator.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlow.tsx",
+      "./archive/MindScoreCard.stories__.tsx",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardActions.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardTitle.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/Card.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardContent.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardCover.d.ts",
+      "./node_modules/react-native-paper/src/components/Card/Card.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardContent.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardTitle.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardActions.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardCover.tsx",
+      "./node_modules/react-native-paper/src/components/FAB/FABGroup.tsx",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/messagesContext/MessagesContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/src/contexts/messagesContext/MessagesContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Attachment/Attachment.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Channel/Channel.tsx",
+      "./components/settings/SyncHealthDebugCard.tsx"
+    ],
+    "usage": {
+      "imports": 45,
+      "jsxUsages": 118,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/OfflineBanner.tsx",
+    "exports": [
+      "OfflineBanner"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/GoogleSignInButton.tsx",
+    "exports": [
+      "GoogleSignInButton"
+    ],
+    "totalUsage": 4,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(auth)/login.tsx",
+      "./app/(auth)/signup.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/TabBarLabel.tsx",
+    "exports": [
+      "TabBarLabel"
+    ],
+    "totalUsage": 3,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/Switch.tsx",
+    "exports": [
+      "Switch"
+    ],
+    "totalUsage": 27,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx",
+      "./app/(auth)/onboarding/notifications.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderUI.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/SettingsScreen.tsx",
+      "./node_modules/expo-dev-menu/app/components/Main.tsx",
+      "./node_modules/@vue/compiler-core/dist/compiler-core.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Switch/Switch.d.ts",
+      "./node_modules/react-native-paper/src/components/Switch/Switch.tsx",
+      "./node_modules/@babel/types/lib/index.d.ts",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/MultipleAnswersField.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/CreatePollContent.tsx",
+      "./node_modules/react-native-gesture-handler/lib/typescript/mocks.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/GestureComponents.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/GestureComponents.web.d.ts"
+    ],
+    "usage": {
+      "imports": 16,
+      "jsxUsages": 11,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/GlobalLoading.tsx",
+    "exports": [
+      "GlobalLoading"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/TabBarIcon.tsx",
+    "exports": [
+      "TabBarIcon"
+    ],
+    "totalUsage": 5,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx",
+      "./node_modules/@react-navigation/bottom-tabs/src/views/BottomTabItem.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 3,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/Badge.tsx",
+    "exports": [
+      "Badge"
+    ],
+    "totalUsage": 34,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/achievements.tsx",
+      "./app/debug-console.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/TreatmentPlanPreview.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/RiskAssessmentIndicator.tsx",
+      "./node_modules/@react-navigation/bottom-tabs/src/views/TabBarIcon.tsx",
+      "./node_modules/expo-notifications/build/BadgeModule.d.ts",
+      "./node_modules/expo-notifications/build/BadgeModule.web.d.ts",
+      "./node_modules/expo-notifications/build/setBadgeCountAsync.d.ts",
+      "./node_modules/expo-notifications/build/BadgeModule.native.d.ts",
+      "./node_modules/expo-notifications/src/BadgeModule.native.ts",
+      "./node_modules/expo-notifications/src/BadgeModule.ts",
+      "./node_modules/expo-notifications/src/getBadgeCountAsync.ts",
+      "./node_modules/expo-notifications/src/setBadgeCountAsync.ts",
+      "./node_modules/expo-notifications/src/BadgeModule.web.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Badge.d.ts",
+      "./node_modules/react-native-paper/src/components/Drawer/DrawerCollapsedItem.tsx",
+      "./node_modules/react-native-paper/src/components/Badge.tsx",
+      "./node_modules/react-native-paper/src/components/BottomNavigation/BottomNavigationBar.tsx",
+      "./components/settings/SyncHealthDebugCard.tsx"
+    ],
+    "usage": {
+      "imports": 20,
+      "jsxUsages": 14,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/Button.tsx",
+    "exports": [
+      "Button",
+      "Button"
+    ],
+    "totalUsage": 428,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx",
+      "./app/(auth)/login.tsx",
+      "./app/(auth)/signup.tsx",
+      "./archive/ai-disabled-backup/components/voice/VoiceInterface.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlowV3.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/ProfileBuilderV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/TreatmentPlanPreviewV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/TreatmentPlanPreview.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/YBOCSAssessmentV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/YBOCSAssessmentUI.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/RiskAssessmentIndicator.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/SafetyPlanV2.tsx",
+      "./archive/ai-disabled-backup/components/onboarding/OnboardingFlow.tsx",
+      "./node_modules/expo-dev-launcher/bundle/providers/ToastStackProvider.tsx",
+      "./node_modules/expo-dev-launcher/bundle/providers/ModalStackProvider.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/KitchenSinkScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/UpdatesScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/BranchesScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/CrashReportScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/ExtensionsScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/BaseModal.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/BasicButton.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/ListButton.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/EmptyBranchesMessage.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/EASUpdatesRows.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/LogoutConfirmationModal.tsx",
+      "./node_modules/@react-navigation/bottom-tabs/lib/typescript/src/views/BottomTabItem.d.ts",
+      "./node_modules/@react-navigation/native/src/NavigationContainer.tsx",
+      "./node_modules/@react-navigation/elements/lib/typescript/src/Header/HeaderButton.d.ts",
+      "./node_modules/@react-navigation/elements/lib/typescript/src/Header/HeaderBackButton.d.ts",
+      "./node_modules/@react-navigation/elements/src/Header/HeaderSearchBar.tsx",
+      "./node_modules/@react-navigation/elements/src/Header/HeaderButton.tsx",
+      "./node_modules/@react-navigation/elements/src/Header/Header.tsx",
+      "./node_modules/@react-navigation/elements/src/Header/HeaderBackButton.tsx",
+      "./node_modules/@react-navigation/native-stack/lib/typescript/src/views/useHeaderConfigProps.d.ts",
+      "./node_modules/expo-dev-menu/app/components/Onboarding.tsx",
+      "./node_modules/react-native-paper/lib/typescript/components/Snackbar.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Appbar/AppbarAction.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Tooltip/Tooltip.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardActions.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Card/CardTitle.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/RadioButton/RadioButton.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/RadioButton/RadioButtonGroup.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/RadioButton/RadioButtonItem.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/RadioButton/index.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Modal.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/TextInput/Adornment/TextInputIcon.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Banner.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/SegmentedButtons/SegmentedButtons.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/ToggleButton/ToggleButtonRow.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/ToggleButton/ToggleButton.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/ToggleButton/index.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/ToggleButton/ToggleButtonGroup.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Dialog/DialogActions.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Dialog/Dialog.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/Menu/Menu.d.ts",
+      "./node_modules/react-native-paper/lib/typescript/components/IconButton/IconButton.d.ts",
+      "./node_modules/react-native-paper/src/components/Appbar/AppbarAction.tsx",
+      "./node_modules/react-native-paper/src/components/Banner.tsx",
+      "./node_modules/react-native-paper/src/components/Tooltip/Tooltip.tsx",
+      "./node_modules/react-native-paper/src/components/Card/Card.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardTitle.tsx",
+      "./node_modules/react-native-paper/src/components/Card/CardActions.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/RadioButtonIOS.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/RadioButtonItem.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/RadioButtonGroup.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/RadioButtonAndroid.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/RadioButton.tsx",
+      "./node_modules/react-native-paper/src/components/RadioButton/index.ts",
+      "./node_modules/react-native-paper/src/components/TextInput/Adornment/TextInputIcon.tsx",
+      "./node_modules/react-native-paper/src/components/SegmentedButtons/SegmentedButtons.tsx",
+      "./node_modules/react-native-paper/src/components/Searchbar.tsx",
+      "./node_modules/react-native-paper/src/components/ToggleButton/ToggleButtonRow.tsx",
+      "./node_modules/react-native-paper/src/components/ToggleButton/ToggleButton.tsx",
+      "./node_modules/react-native-paper/src/components/ToggleButton/index.ts",
+      "./node_modules/react-native-paper/src/components/ToggleButton/ToggleButtonGroup.tsx",
+      "./node_modules/react-native-paper/src/components/Dialog/DialogActions.tsx",
+      "./node_modules/react-native-paper/src/components/Dialog/Dialog.tsx",
+      "./node_modules/react-native-paper/src/components/Button/Button.tsx",
+      "./node_modules/react-native-paper/src/components/Menu/Menu.tsx",
+      "./node_modules/react-native-paper/src/components/IconButton/IconButton.tsx",
+      "./node_modules/react-native-paper/src/components/Modal.tsx",
+      "./node_modules/react-native-paper/src/components/Snackbar.tsx",
+      "./node_modules/react-native-paper/src/components/DataTable/DataTablePagination.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/overlay/LogBoxInspectorHeader.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/overlay/LogBoxInspectorSourceMapStatus.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/overlay/LogBoxInspectorStackFrame.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/overlay/LogBoxInspectorStackFrames.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/overlay/LogBoxInspectorCodeFrame.tsx",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/messagesContext/MessagesContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/contexts/messageInputContext/MessageInputContext.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/components/Poll/components/PollOption.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/components/Poll/components/PollButtons.d.ts",
+      "./node_modules/stream-chat-react-native-core/lib/typescript/components/Poll/components/PollAnswersList.d.ts",
+      "./node_modules/stream-chat-react-native-core/src/contexts/messagesContext/MessagesContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/contexts/messageInputContext/MessageInputContext.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/MessageMenu/MessageReactionPicker.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/MessageMenu/__tests__/ReactionButton.test.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/MessageMenu/MessageUserReactions.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Channel/Channel.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/PollOption.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/PollButtons.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/PollAnswersList.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/components/PollResults/PollResultItem.tsx",
+      "./node_modules/stream-chat-react-native-core/src/components/Poll/Poll.tsx",
+      "./node_modules/react-native-gesture-handler/lib/typescript/web/interfaces.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/web/handlers/IGestureHandler.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/web/handlers/GestureHandler.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/touchables/TouchableNativeFeedbackProps.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/touchables/GenericTouchableProps.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/touchables/TouchableNativeFeedback.android.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/DrawerLayout.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/ReanimatedDrawerLayout.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/GestureButtons.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/components/GestureHandlerButton.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/handlers/gestures/gesture.d.ts",
+      "./node_modules/react-native-gesture-handler/lib/typescript/handlers/gestureHandlerTypesCompat.d.ts",
+      "./node_modules/react-native-gesture-handler/src/web/tools/GestureHandlerWebDelegate.ts",
+      "./node_modules/react-native-gesture-handler/src/web/tools/PointerEventManager.ts",
+      "./node_modules/react-native-gesture-handler/src/web/handlers/IGestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/web/handlers/GestureHandler.ts",
+      "./node_modules/react-native-gesture-handler/src/components/touchables/GenericTouchableProps.ts",
+      "./node_modules/react-native-gesture-handler/src/components/touchables/GenericTouchable.tsx",
+      "./node_modules/react-native-gesture-handler/src/components/touchables/TouchableNativeFeedbackProps.tsx",
+      "./node_modules/react-native-gesture-handler/src/components/GestureHandlerButton.tsx",
+      "./node_modules/react-native-gesture-handler/src/components/Pressable/Pressable.tsx",
+      "./node_modules/react-native-gesture-handler/src/components/GestureButtons.tsx",
+      "./node_modules/react-native-keyboard-controller/lib/typescript/components/KeyboardToolbar/index.d.ts",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardToolbar/index.tsx",
+      "./components/HapticTab.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/SettingsScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/HomeScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/UserProfileScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/DeepLinkModal.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/UrlDropdown.tsx",
+      "./node_modules/expo-dev-launcher/bundle/components/AppHeader.tsx",
+      "./node_modules/expo-dev-menu/app/components/Main.tsx",
+      "./node_modules/react-native-keyboard-controller/src/components/KeyboardStickyView/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/views/KeyboardExtender/index.tsx",
+      "./node_modules/react-native-keyboard-controller/src/views/KeyboardExtender/index.ios.tsx"
+    ],
+    "usage": {
+      "imports": 188,
+      "jsxUsages": 240,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/Toast.tsx",
+    "exports": [
+      "Toast"
+    ],
+    "totalUsage": 33,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/index.tsx",
+      "./app/(tabs)/breathwork.tsx",
+      "./app/_layout.tsx",
+      "./node_modules/expo-dev-launcher/bundle/providers/AppProviders.tsx",
+      "./node_modules/expo-dev-launcher/bundle/queries/useChannelsForApp.tsx",
+      "./node_modules/expo-dev-launcher/bundle/queries/useBranchesForApp.tsx",
+      "./node_modules/expo-dev-launcher/bundle/queries/useUpdatesForBranch.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/KitchenSinkScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/SettingsScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/screens/HomeScreen.tsx",
+      "./node_modules/expo-dev-launcher/bundle/hooks/useOnUpdatePress.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/index.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/toast/ErrorToast.tsx",
+      "./node_modules/@expo/metro-runtime/src/error-overlay/toast/ErrorToastContainer.web.tsx",
+      "./node_modules/react-native-toast-message/lib/src/Toast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/useToast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/components/AnimatedContainer.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/components/InfoToast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/components/SuccessToast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/components/BaseToast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/components/ErrorToast.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/hooks/useSlideAnimation.d.ts",
+      "./node_modules/react-native-toast-message/lib/src/ToastUI.d.ts"
+    ],
+    "usage": {
+      "imports": 30,
+      "jsxUsages": 3,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ui/IconSymbol.tsx",
+    "exports": [
+      "IconSymbol"
+    ],
+    "totalUsage": 3,
+    "bundleIncluded": false,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx",
+      "./archive/components/Collapsible.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 1,
+      "bundleIncluded": false
+    }
+  },
+  {
+    "file": "components/ui/SyncStatusNotification.tsx",
+    "exports": [
+      "SyncStatusNotification"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/settings/OfflineQueueManager.tsx",
+    "exports": [
+      "OfflineQueueManager"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/settings/SyncHealthDebugCard.tsx",
+    "exports": [
+      "SyncHealthDebugCard"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": false,
+    "status": "LOW",
+    "foundIn": [
+      "./app/debug-console.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": false
+    }
+  },
+  {
+    "file": "components/ThemedText.tsx",
+    "exports": [
+      "ThemedText"
+    ],
+    "totalUsage": 5,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/+not-found.tsx",
+      "./archive/components/Collapsible.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 3,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/MindScoreCard.tsx",
+    "exports": [
+      "MindScoreCard"
+    ],
+    "totalUsage": 6,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/index.tsx",
+      "./archive/MindScoreCard.stories__.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 4,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/today/MoodInsightsCard.tsx",
+    "exports": [
+      "MoodInsightsCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/today/BottomCheckinCTA.tsx",
+    "exports": [
+      "BottomCheckinCTA"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/today/MoodJourneyCard.tsx",
+    "exports": [
+      "MoodJourneyCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/security/LockOverlay.tsx",
+    "exports": [
+      "LockOverlay"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/layout/ScreenLayout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/gamification/MicroRewardAnimation.tsx",
+    "exports": [
+      "MicroRewardAnimation"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/gamification/AchievementBadge.tsx",
+    "exports": [
+      "AchievementBadge"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/achievements.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/breathing/BreathingWave.tsx",
+    "exports": [
+      "BreathingWave"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/breathwork/BreathworkPro.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/layout/ScreenLayout.tsx",
+    "exports": [
+      "ScreenLayout"
+    ],
+    "totalUsage": 10,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/breathwork.tsx",
+      "./app/achievements.tsx",
+      "./app/(tabs)/settings.tsx",
+      "./app/(tabs)/index.tsx",
+      "./app/mind-face.tsx"
+    ],
+    "usage": {
+      "imports": 5,
+      "jsxUsages": 5,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ThemedView.tsx",
+    "exports": [
+      "ThemedView"
+    ],
+    "totalUsage": 5,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/+not-found.tsx",
+      "./archive/components/Collapsible.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 3,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/navigation/NavigationGuard.tsx",
+    "exports": [
+      "clearOnboardingCache",
+      "NavigationGuard"
+    ],
+    "totalUsage": 4,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./contexts/SupabaseAuthContext.tsx",
+      "./app/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 3,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/breathwork/BreathworkPro.tsx",
+    "exports": [
+      "BreathworkPro"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/breathwork.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/breathwork/BreathworkPlayer.tsx",
+    "exports": [
+      "BreathworkPlayer"
+    ],
+    "totalUsage": 5,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/breathwork.tsx",
+      "./components/breathing/BreathingWave.tsx",
+      "./components/breathwork/BreathworkPro.tsx"
+    ],
+    "usage": {
+      "imports": 3,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mind/MoodEnergyGaugeArc.tsx",
+    "exports": [
+      "MoodEnergyGaugeArc"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/MindScoreCard.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/HapticTab.tsx",
+    "exports": [
+      "HapticTab"
+    ],
+    "totalUsage": 1,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/_layout.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 0,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/MindMetaRowCard.tsx",
+    "exports": [
+      "MindMetaRowCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/MoodFaceCard.tsx",
+    "exports": [
+      "MoodFaceCard"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/mind-face.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/VAPad.tsx",
+    "exports": [
+      "VAPad"
+    ],
+    "totalUsage": 4,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(tabs)/settings.tsx",
+      "./components/checkin/VAMoodCheckin.tsx"
+    ],
+    "usage": {
+      "imports": 2,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/VAMoodCheckin.tsx",
+    "exports": [
+      "VAMoodCheckin"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/checkin/CheckinBottomSheet.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/MoodDetailsStep.tsx",
+    "exports": [
+      "MoodDetailsStep"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./components/checkin/VAMoodCheckin.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/checkin/CheckinBottomSheet.tsx",
+    "exports": [
+      "CheckinBottomSheet"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(tabs)/index.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mood/AppleHealthStyleChartV2.tsx",
+    "exports": [
+      "AppleHealthStyleChartV2",
+      "AppleHealthStyleChartV2"
+    ],
+    "totalUsage": 3,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./components/today/MoodJourneyCard.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mood/AppleHealthDetailSheet.tsx",
+    "exports": [
+      "AppleHealthDetailSheet",
+      "AppleHealthDetailSheet"
+    ],
+    "totalUsage": 3,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./components/today/MoodJourneyCard.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mood/MoodFace.tsx",
+    "exports": [
+      "MoodFace"
+    ],
+    "totalUsage": 5,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/mind-face.tsx",
+      "./components/MindScoreCard.tsx",
+      "./components/MoodFaceCard.tsx"
+    ],
+    "usage": {
+      "imports": 3,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/mood/AppleHealthTimeSelectorV2.tsx",
+    "exports": [
+      "AppleHealthTimeSelectorV2",
+      "AppleHealthTimeSelectorV2"
+    ],
+    "totalUsage": 3,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./components/today/MoodJourneyCard.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 2,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/onboarding/EmojiScale.tsx",
+    "exports": [
+      "EmojiScale"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(auth)/onboarding/first-mood.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/onboarding/Chips.tsx",
+    "exports": [
+      "Chips"
+    ],
+    "totalUsage": 2,
+    "bundleIncluded": true,
+    "status": "LOW",
+    "foundIn": [
+      "./app/(auth)/onboarding/motivation.tsx"
+    ],
+    "usage": {
+      "imports": 1,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/onboarding/ProgressDots.tsx",
+    "exports": [
+      "ProgressDots"
+    ],
+    "totalUsage": 12,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/(auth)/onboarding/motivation.tsx",
+      "./app/(auth)/onboarding/notifications.tsx",
+      "./app/(auth)/onboarding/lifestyle.tsx",
+      "./app/(auth)/onboarding/welcome.tsx",
+      "./app/(auth)/onboarding/first-mood.tsx",
+      "./app/(auth)/onboarding/summary.tsx"
+    ],
+    "usage": {
+      "imports": 6,
+      "jsxUsages": 6,
+      "bundleIncluded": true
+    }
+  },
+  {
+    "file": "components/ErrorBoundary.tsx",
+    "exports": [
+      "ErrorBoundary"
+    ],
+    "totalUsage": 4,
+    "bundleIncluded": true,
+    "status": "ACTIVE",
+    "foundIn": [
+      "./app/_layout.tsx",
+      "./node_modules/expo-router/build/Route.d.ts",
+      "./node_modules/expo-router/build/views/ErrorBoundary.d.ts"
+    ],
+    "usage": {
+      "imports": 3,
+      "jsxUsages": 1,
+      "bundleIncluded": true
+    }
+  }
+]

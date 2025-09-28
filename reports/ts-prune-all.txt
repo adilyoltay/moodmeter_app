@@ -1,0 +1,186 @@
+app.config.ts:137 - default
+app/_layout.tsx:47 - default
+app/+not-found.tsx:7 - default
+app/achievements.tsx:20 - default
+app/breathwork.tsx:7 - default
+app/debug-clean-data.tsx:25 - default
+app/debug-console.tsx:37 - default
+app/debug-voice-analysis.tsx:24 - default
+app/index.tsx:5 - default
+app/measure-hrv.tsx:9 - default
+app/mind-face.tsx:10 - default
+components/ErrorBoundary.tsx:22 - ErrorBoundary (used in module)
+components/ThemedText.tsx:5 - ThemedTextProps (used in module)
+components/ThemedView.tsx:5 - ThemedViewProps (used in module)
+constants/Colors.ts:97 - Palettes
+constants/DesignSystem.ts:38 - AnimationConfig
+constants/featureFlags.ts:308 - AI_CONFIG
+contexts/authBridge.ts:14 - setAuthProfile (used in module)
+contexts/authBridge.ts:18 - getAuthUserId (used in module)
+contexts/authBridge.ts:22 - default
+contexts/LanguageContext.tsx:11 - Language (used in module)
+contexts/LanguageContext.tsx:21 - TranslationPath (used in module)
+contexts/LanguageContext.tsx:158 - languageUtils
+contexts/NotificationContext.tsx:244 - useNotifications
+contexts/SupabaseAuthContext.tsx:58 - SupabaseAuthProvider (used in module)
+contexts/SupabaseAuthContext.tsx:25 - AuthContextType (used in module)
+contexts/ThemeContext.tsx:6 - ThemeMode (used in module)
+hooks/useBiometric.ts:7 - UseBiometricOptions (used in module)
+hooks/useBiometric.ts:19 - UseBiometricResult (used in module)
+hooks/useOfflineMoodSync.ts:24 - UseOfflineMoodSyncOptions (used in module)
+hooks/useOfflineMoodSync.ts:31 - OfflineMoodSyncHandle (used in module)
+hooks/useOfflineMoodSync.ts:42 - useOfflineMoodSync (used in module)
+lib/queryClient.ts:30 - storage
+services/api.ts:79 - default
+services/asyncStorageHygiene.ts:401 - asyncStorageHygiene (used in module)
+services/biometric.ts:23 - BiometricPromptOptions (used in module)
+services/biometric.ts:30 - BiometricAuthenticateResult (used in module)
+services/crashReporting.ts:219 - crashReporting (used in module)
+services/messaging.ts:17 - NotificationData (used in module)
+services/messaging.ts:24 - MessagingService (used in module)
+services/moodDataLoader.ts:15 - OptimizedMoodDataLoader (used in module)
+services/moodOfflineQueue.ts:61 - enqueue (used in module)
+services/moodOfflineQueue.ts:81 - remove (used in module)
+services/moodOfflineQueue.ts:88 - peekAll (used in module)
+services/moodOfflineQueue.ts:92 - markRetry (used in module)
+services/moodOfflineQueue.ts:112 - flush (used in module)
+services/moodOfflineQueue.ts:118 - clearAll (used in module)
+services/moodOfflineQueue.ts:126 - clearAllStrict (used in module)
+services/moodOfflineQueue.ts:161 - moodOfflineQueue (used in module)
+services/nativeSpeechToText.ts:18 - NativeTranscriptionResult (used in module)
+services/notificationScheduler.ts:9 - NotificationSchedule (used in module)
+services/optimizedStorage.ts:380 - optimizedStorage (used in module)
+services/optimizedStorage.ts:384 - LocalDatabaseAdapter (used in module)
+services/optimizedStorage.ts:398 - AsyncStorageAdapter
+services/optimizedStorage.ts:424 - WatermelonDBAdapter
+services/performanceMonitor.ts:470 - performanceMonitor (used in module)
+services/smartNotifications.ts:415 - smartNotifications (used in module)
+services/speechToTextService.ts:704 - SpeechToTextOptions (used in module)
+services/staticGamification.ts:29 - calculateMoodEntryPoints (used in module)
+services/staticGamification.ts:45 - calculateCheckinPoints (used in module)
+services/staticGamification.ts:62 - generateDailyMissions (used in module)
+services/staticGamification.ts:87 - generateWeeklyMissions (used in module)
+services/staticGamification.ts:119 - default
+services/staticMoodMerge.ts:235 - staticMoodMergeService (used in module)
+services/staticMoodMerge.ts:243 - default
+services/syncMetrics.ts:277 - syncMetrics (used in module)
+services/todayService.ts:6 - TodayStats (used in module)
+services/todayService.ts:22 - TodayData (used in module)
+services/todayService.ts:30 - todayService (used in module)
+services/unifiedComplianceService.ts:26 - ConsentRecord (used in module)
+services/unifiedComplianceService.ts:40 - AuditLog (used in module)
+services/unifiedComplianceService.ts:54 - DataExportRequest (used in module)
+services/unifiedComplianceService.ts:68 - DeletionRequest (used in module)
+services/unifiedComplianceService.ts:80 - ComplianceStatus (used in module)
+services/unifiedComplianceService.ts:98 - ComplianceValidator (used in module)
+services/unifiedComplianceService.ts:790 - default
+types/ai-sprint-schemas.d.ts:3 - CheckinRecord
+types/gamification.ts:50 - HealingPoints
+types/mood.ts:33 - HourlyAverage (used in module)
+utils/categoryMapping.ts:68 - isCanonicalCategory
+utils/categoryMapping.ts:3 - CanonicalCategory (used in module)
+utils/categoryMapping.ts:11 - CANONICAL_CATEGORIES (used in module)
+utils/categoryMapping.ts:77 - DatabaseCategory (used in module)
+utils/chartUtils.ts:3 - normalizeValence
+utils/chartUtils.ts:9 - getEnergyGradient
+utils/chartUtils.ts:15 - getVAColor
+utils/chartUtils.ts:19 - getConfidenceOpacity
+utils/chartUtils.ts:25 - calculateAverage
+utils/chartUtils.ts:32 - hourFromTimestamp
+utils/circuitBreaker.ts:1 - CircuitState (used in module)
+utils/circuitBreaker.ts:7 - CircuitBreakerConfig (used in module)
+utils/circuitBreaker.ts:14 - CircuitBreaker (used in module)
+utils/colorUtils.ts:74 - VA
+utils/colorUtils.ts:125 - getVAGradientFromScores
+utils/crossDeviceFilter.ts:1 - isUnsyncedLocalItem
+utils/dataStandardization.ts:205 - default (used in module)
+utils/dateAggregation.ts:16 - isFirstOfMonth
+utils/dateAggregation.ts:21 - isMonday
+utils/debugHelper.ts:8 - DebugHelper (used in module)
+utils/idGenerator.ts:47 - generateShortSecureId (used in module)
+utils/idGenerator.ts:89 - isLegacyId (used in module)
+utils/idGenerator.ts:74 - LEGACY_PATTERNS (used in module)
+utils/idGenerator.ts:93 - default
+utils/mindScore.ts:1 - clamp (used in module)
+utils/moodInsights.ts:15 - ActivityMoodInsight (used in module)
+utils/moodInsights.ts:22 - KeywordInsight (used in module)
+utils/moodInsights.ts:27 - MoodInsightsSummary (used in module)
+utils/moodInsights.ts:55 - normalizeWord (used in module)
+utils/moodInsights.ts:61 - extractTokens (used in module)
+utils/moodInsights.ts:68 - getDominantTriggers (used in module)
+utils/moodInsights.ts:93 - getActivityMoodInsights (used in module)
+utils/moodInsights.ts:148 - getKeywordInsight (used in module)
+utils/moodInsights.ts:181 - default
+utils/moodJourneyFilters.ts:11 - matchesTrigger (used in module)
+utils/moodJourneyFilters.ts:17 - matchesActivity (used in module)
+utils/moodJourneyFilters.ts:23 - matchesKeyword (used in module)
+utils/moodJourneyFilters.ts:30 - applyJourneyFilters (used in module)
+utils/moodTriggers.ts:1 - TriggerOption (used in module)
+utils/moodTriggers.ts:127 - normalizeTriggerToken
+utils/onboardingMapper.ts:1 - OnboardingPayload (used in module)
+utils/secureStorageMigration.ts:7 - SecureStorageMigration (used in module)
+utils/statistics.ts:1 - IQR (used in module)
+utils/statistics.ts:24 - lcg (used in module)
+utils/storage.ts:47 - getUserStorageKey (used in module)
+utils/storage.ts:92 - clearUserData
+utils/syncHeuristics.ts:1 - determineConcurrency
+utils/timezoneUtils.ts:12 - getUserTimezoneOffset (used in module)
+utils/timezoneUtils.ts:19 - getUserTimezone
+utils/timezoneUtils.ts:82 - getUserDayBounds
+utils/timezoneUtils.ts:118 - groupEntriesByUserDay (used in module)
+utils/timezoneUtils.ts:137 - calculateStreakInUserTimezone
+utils/timezoneUtils.ts:176 - filterEntriesByUserTimeRange
+utils/timezoneUtils.ts:228 - getUtcDayKey
+utils/timezoneUtils.ts:240 - toLocalStartOfDay
+utils/timezoneUtils.ts:251 - calcDayDiffUTC
+utils/trend.ts:1 - Trend (used in module)
+utils/validators.ts:49 - UUID_REGEX
+utils/validators.ts:54 - EMAIL_REGEX
+app/(auth)/_layout.tsx:5 - default
+app/(auth)/login.tsx:14 - default (used in module)
+app/(auth)/signup.tsx:13 - default (used in module)
+app/(tabs)/_layout.tsx:20 - default
+app/(tabs)/breathwork.tsx:7 - default
+app/(tabs)/index.tsx:71 - default
+app/(tabs)/settings.tsx:80 - default
+components/mood/AppleHealthDetailSheet.tsx:121 - AppleHealthDetailSheet (used in module)
+components/mood/AppleHealthStyleChartV2.tsx:175 - AppleHealthStyleChartV2 (used in module)
+components/mood/AppleHealthTimeSelectorV2.tsx:167 - default
+components/mood/MoodFace.tsx:4 - MoodFaceColorSet (used in module)
+components/ui/Button.tsx:35 - Button (used in module)
+components/ui/Card.tsx:104 - default
+components/ui/TabBarBackground.tsx:9 - useBottomTabOverflow
+services/encryption/secureDataService.ts:4 - EncryptedData (used in module)
+services/heartpy/calibration.ts:3 - MEA (used in module)
+services/heartpy/calibration.ts:7 - calibrationService (used in module)
+services/heartpy/healthSignals.ts:308 - get7DayMinuteActivityWindow
+services/heartpy/healthSignals.ts:4 - HealthPermissionStatus (used in module)
+services/heartpy/healthSignals.ts:121 - DailyHealthFeatures (used in module)
+services/heartpy/healthSignals.ts:147 - healthSignals (used in module)
+services/heartpy/index.ts:9 - runHeartPy (used in module)
+services/heartpy/index.ts:26 - runOnRecentSignal
+services/heartpy/index.ts:4 - HeartPyInput (used in module)
+services/heartpy/index.ts:5 - HeartPyMEA (used in module)
+services/heartpy/index.ts:41 - healthSignals (used in module)
+services/heartpy/inferenceMetaStore.ts:1 - InferenceMeta (used in module)
+services/heartpy/inferenceMetaStore.ts:22 - default
+services/supabase/aiPredictionService.ts:4 - AIPredictionService
+services/supabase/aiService.ts:3 - AIService
+services/supabase/authService.ts:40 - AuthService
+services/supabase/breathService.ts:4 - BreathService
+services/supabase/compulsionService.ts:5 - CompulsionService
+services/supabase/moodService.ts:9 - MoodService
+services/supabase/profileService.ts:9 - ProfileService
+services/supabase/thoughtService.ts:6 - ThoughtService
+services/supabase/voiceService.ts:6 - VoiceService
+services/sync/batchOptimizer.ts:101 - batchOptimizer (used in module)
+app/(auth)/onboarding/_layout.tsx:4 - default
+app/(auth)/onboarding/first-mood.tsx:9 - default
+app/(auth)/onboarding/index.tsx:16 - default
+app/(auth)/onboarding/lifestyle.tsx:8 - default
+app/(auth)/onboarding/motivation.tsx:17 - default
+app/(auth)/onboarding/notifications.tsx:23 - default
+app/(auth)/onboarding/summary.tsx:11 - default
+app/(auth)/onboarding/welcome.tsx:8 - default
+components/mood/helpers/chartSelection.ts:3 - SelectionPayload (used in module)
+features/onboarding/lib/deriveFeatureFlags.ts:3 - DerivedFlags (used in module)
