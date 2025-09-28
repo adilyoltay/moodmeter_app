@@ -10,6 +10,11 @@ import 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
+// 🔍 Usage Audit System
+import { initUsage, stopUsage } from '@/src/infra/usage';
+import { installReactElementHook } from '@/src/infra/usage/reactHook';
+import { patchFetch, patchSupabase } from '@/src/infra/usage/network';
+
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { AuthProvider } from '@/contexts/SupabaseAuthContext';
 import { LoadingProvider } from '@/contexts/LoadingContext';
@@ -48,6 +53,48 @@ export default function RootLayout() {
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
+
+  // 🔍 Usage Audit System Initialization
+  useEffect(() => {
+    const auditEnabled = process.env.EXPO_PUBLIC_USAGE_AUDIT === 'true';
+    
+    if (auditEnabled) {
+      console.log('🔍 Initializing Usage Audit System...');
+      
+      // Initialize core tracking
+      initUsage({ 
+        enabled: true, 
+        flushMs: 3000 
+      });
+      
+      // Install React component tracking
+      installReactElementHook();
+      
+      // Patch network requests
+      patchFetch();
+      
+      // Patch Supabase (will be done after supabase client is ready)
+      // patchSupabase will be called in SupabaseAuthContext
+      
+      console.log('🔍 Usage Audit System ACTIVE');
+    }
+    
+    // Cleanup on app state change
+    const handleAppStateChange = (nextAppState: string) => {
+      if (nextAppState === 'background' && auditEnabled) {
+        stopUsage().catch(() => {});
+      }
+    };
+    
+    const subscription = AppState.addEventListener('change', handleAppStateChange);
+    
+    return () => {
+      subscription?.remove();
+      if (auditEnabled) {
+        stopUsage().catch(() => {});
+      }
+    };
+  }, []);
 
   useEffect(() => {
     // Suppress noisy dev-only warning from RN internals/libraries

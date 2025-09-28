@@ -28,10 +28,14 @@ import performanceMonitor from '@/services/performanceMonitor';
 import smartNotifications from '@/services/smartNotifications';
 // offlineSyncService already imported above
 
+// 🔍 Usage Audit System
+import { getSessionInfo, exportUsageData, clearUsageData, initUsage, stopUsage } from '@/src/infra/usage';
+
 // Components
 import { Card } from '@/components/ui/Card';
 import { Badge } from '@/components/ui/Badge';
 import SyncHealthDebugCard from '@/components/settings/SyncHealthDebugCard';
+import UsageAuditCard from '@/components/debug/UsageAuditCard';
 import { offlineSyncService } from '@/services/offlineSync';
 
 export default function DebugConsole() {
@@ -43,6 +47,7 @@ export default function DebugConsole() {
   const [authInfo, setAuthInfo] = useState<any>(null);
   const [performance, setPerformance] = useState<any>(null);
   const [notifications, setNotifications] = useState<any>(null);
+  const [usageAudit, setUsageAudit] = useState<any>(null);
 
   const loadDebugData = async () => {
     try {
@@ -67,6 +72,10 @@ export default function DebugConsole() {
       setCrashes(crashSummary);
       setPerformance(performanceData);
       setNotifications(notificationStatus);
+
+      // Usage audit info
+      const auditInfo = getSessionInfo();
+      setUsageAudit(auditInfo);
 
       // Auth info (safe data only)
       setAuthInfo({
@@ -240,6 +249,12 @@ export default function DebugConsole() {
           <Text style={styles.title}>System Debug Console</Text>
           <Text style={styles.subtitle}>Internal QA & Production Monitoring</Text>
         </View>
+
+        {/* Usage Audit System */}
+        <UsageAuditCard 
+          auditInfo={usageAudit}
+          onRefresh={handleRefresh}
+        />
 
         {/* Auth Status */}
         <Card style={styles.section}>

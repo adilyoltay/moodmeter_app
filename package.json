@@ -17,6 +17,9 @@
     "tsprune": "ts-prune --ignore '**/__tests__/*' --ignore '**/*.test.*' --ignore '**/*.spec.*' --ignore '**/*.stories.*' --tsConfig tsconfig.json",
     "services:guard": "npm run knip && npm run tsprune",
     "services:report": "./scripts/report-services.sh",
+    "usage:audit": "EXPO_PUBLIC_USAGE_AUDIT=true npm start",
+    "usage:report": "node scripts/usage-report.js",
+    "components:guard": "npm run knip && npm run tsprune",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "jest --ci",
@@ -117,6 +120,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-transform-react-jsx-source": "^7.27.1",
     "@react-native-community/cli": "^19.1.1",
     "@react-native/metro-config": "^0.80.2",
     "@testing-library/react-native": "^13.3.1",
