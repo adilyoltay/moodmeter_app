@@ -1,4 +1,4 @@
-# 📝 ObsessLess - Changelog
+# 📝 MoodMeter - Changelog
 
 ## [3.1.0] - 2025-08-20 🌬️
 
@@ -43,7 +43,7 @@
 
 ### 🚀 **MAJOR RELEASE: Production-Ready AI System**
 
-Bu versiyon, ObsessLess uygulamasının **tam AI-güçlendirilmiş** halini sunuyor. Tüm AI özellikleri production-ready durumda ve gerçek kullanıcı verisi ile çalışıyor.
+Bu versiyon, MoodMeter uygulamasının **tam AI-güçlendirilmiş** halini sunuyor. Tüm AI özellikleri production-ready durumda ve gerçek kullanıcı verisi ile çalışıyor.
 
 ---
 
@@ -197,7 +197,7 @@ Bu versiyon, ObsessLess uygulamasının **tam AI-güçlendirilmiş** halini sunu
 
 ### 🙏 **ACKNOWLEDGMENTS**
 
-Bu major release, ObsessLess'in tam AI-güçlendirilmiş OCD yönetim uygulaması vizyonunu gerçekleştiriyor. Kullanıcıların "Dijital Sığınağı" olma hedefine önemli bir adım.
+Bu major release, MoodMeter'in tam AI-güçlendirilmiş OCD yönetim uygulaması vizyonunu gerçekleştiriyor. Kullanıcıların "Dijital Sığınağı" olma hedefine önemli bir adım.
 
 ---
 

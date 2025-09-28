@@ -120,7 +120,7 @@ export default function LoginScreen() {
             <View style={styles.logo}>
               <MaterialCommunityIcons name="brain" size={48} color="#10B981" />
             </View>
-            <Text style={styles.title}>ObsessLess</Text>
+            <Text style={styles.title}>MoodMeter</Text>
             <Text style={styles.subtitle}>Dijital Sığınağınız</Text>
           </Animated.View>
 

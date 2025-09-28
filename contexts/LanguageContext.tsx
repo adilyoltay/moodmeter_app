@@ -35,7 +35,7 @@ const translations = {
   en: enTranslations,
 };
 
-const STORAGE_KEY = '@obsessless_language';
+const STORAGE_KEY = '@moodmeter_language';
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
   const [language, setLanguageState] = useState<Language>('tr');

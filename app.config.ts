@@ -7,8 +7,8 @@ try {
 } catch {}
 
 const config: ExpoConfig = {
-  name: 'obslessless-clean',
-  slug: 'obslessless-clean',
+  name: 'MoodMeter',
+  slug: 'moodmeter',
   version: '3.0.1',
   sdkVersion: '53.0.0',
   orientation: 'portrait',
@@ -16,13 +16,13 @@ const config: ExpoConfig = {
   userInterfaceStyle: 'light',
   newArchEnabled: true,
   splash: {
-    image: './assets/splash-icon.png',
-    resizeMode: 'contain',
+    image: './assets/splash-screen.png',
+    resizeMode: 'cover',
     backgroundColor: '#F9FAFB',
   },
   ios: {
     supportsTablet: true,
-    bundleIdentifier: 'com.adilyoltay.obslesstest',
+    bundleIdentifier: 'com.adilyoltay.moodmeter',
     infoPlist: {
       // Allow local dev server asset loading (HTTP) for TFLite during development
       NSAppTransportSecurity: {
@@ -59,13 +59,13 @@ const config: ExpoConfig = {
       'com.apple.developer.healthkit': true,
     },
   },
-  scheme: 'obslesstest',
+  scheme: 'moodmeter',
   android: {
     adaptiveIcon: {
       foregroundImage: './assets/adaptive-icon.png',
       backgroundColor: '#ffffff',
     },
-    package: 'com.adilyoltay.obslesstest',
+    package: 'com.adilyoltay.moodmeter',
   },
   web: {
     favicon: './assets/favicon.png',

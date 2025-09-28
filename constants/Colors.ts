@@ -1,6 +1,6 @@
 
 /**
- * ObsessLess Color Palette - Based on Documentation
+ * MoodMeter Color Palette - Based on Documentation
  */
 
 export const Colors = {

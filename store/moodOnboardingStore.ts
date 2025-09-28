@@ -438,7 +438,7 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
         };
         
         return motivationMap[motivation] || `${motivation} konusunda hedeflerin var ve bu olumlu bir başlangıç.`;
-      }) || ['ObsessLess yolculuğuna başladığın için tebrikler!'];
+      }) || ['MoodMeter yolculuğuna başladığın için tebrikler!'];
 
       // 🎭 MOOD BASELINE: First mood analysis
       let moodBaseline = 'Ruh halini takip etmeye başladın, bu önemli bir adım.';
@@ -545,7 +545,7 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
       // MINIMAL FALLBACK: Very basic profile
       return {
         insights: [
-          'ObsessLess\'e hoş geldin! Mood takip yolculuğun başlıyor.',
+          'MoodMeter\'e hoş geldin! Mood takip yolculuğun başlıyor.',
           'Günlük mood kayıtları yaparak duygularını daha iyi anlayacaksın.',
           'Zamanla kişiselleştirilmiş öneriler almaya başlayacaksın.'
         ],

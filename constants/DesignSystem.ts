@@ -1,4 +1,4 @@
-export const ObsessLessColors = {
+export const MoodMeterColors = {
   primary: '#10B981',
   secondary: '#059669',
   accent: '#34D399',

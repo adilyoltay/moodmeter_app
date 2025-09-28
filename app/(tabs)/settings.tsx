@@ -504,8 +504,8 @@ export default function SettingsScreen() {
   const handleShareApp = async () => {
     try {
       await Share.share({
-        message: 'ObsessLess - OKB ile başa çıkmanızda size yardımcı olan uygulama. İndirin: https://obsessless.app',
-        title: 'ObsessLess Uygulamasını Paylaş'
+        message: 'MoodMeter - Ruh halinizi takip edin ve zihinsel sağlığınızı geliştirin. İndirin: https://moodmeter.app',
+        title: 'MoodMeter Uygulamasını Paylaş'
       });
     } catch (error) {
       console.error('Share error:', error);
@@ -513,11 +513,11 @@ export default function SettingsScreen() {
   };
 
   const handlePrivacyPolicy = () => {
-    Linking.openURL('https://obsessless.app/privacy');
+    Linking.openURL('https://moodmeter.app/privacy');
   };
 
   const handleTermsOfService = () => {
-    Linking.openURL('https://obsessless.app/terms');
+    Linking.openURL('https://moodmeter.app/terms');
   };
 
   const renderProfileSection = () => (
@@ -1086,7 +1086,7 @@ export default function SettingsScreen() {
 
         {/* Version Info */}
         <View style={styles.versionContainer}>
-          <Text style={styles.versionText}>ObsessLess v{Constants?.expoConfig?.version || '1.0.0'}</Text>
+          <Text style={styles.versionText}>MoodMeter v{Constants?.expoConfig?.version || '1.0.0'}</Text>
           <Text style={styles.versionSubtext}>Made with ❤️ for OCD warriors</Text>
         </View>
       </ScrollView>

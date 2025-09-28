@@ -1,4 +1,4 @@
-// Gamification Types for ObsessLess
+// Gamification Types for MoodMeter
 // Based on PILLAR 4: Anlamlı Oyunlaştırma ve Motivasyon
 
 export interface UserGamificationProfile {

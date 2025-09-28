@@ -29,6 +29,7 @@ import ErrorBoundary from '@/components/ErrorBoundary';
 import ConflictNotificationBanner from '@/components/ui/ConflictNotificationBanner';
 import { SyncStatusNotification } from '@/components/ui/SyncStatusNotification';
 import { ThemeProvider as AppThemeProvider } from '@/contexts/ThemeContext';
+import AppSplashScreen from '@/components/layout/AppSplashScreen';
 
 // Performance monitoring
 import performanceMonitor from '@/services/performanceMonitor';
@@ -194,6 +195,7 @@ export default function RootLayout() {
                 <AccentColorProvider>
                 <AppThemeProvider>
                 {/* 🚫 AIProvider - DISABLED (Hard Stop AI Cleanup) */}
+                <AppSplashScreen>
                 <NavigationGuard>
                     <GestureHandlerRootView style={{ flex: 1 }}>
                       <Slot />
@@ -203,6 +205,7 @@ export default function RootLayout() {
                       <Toast />
                     </GestureHandlerRootView>
                 </NavigationGuard>
+                </AppSplashScreen>
                 {/* 🚫 AIProvider closing tag removed */}
                 </AppThemeProvider>
                 </AccentColorProvider>

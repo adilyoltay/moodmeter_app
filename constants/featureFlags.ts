@@ -1,5 +1,5 @@
 /**
- * 🛡️ ObsessLess Feature Flag System - FAZ 0: Güvenlik ve Stabilite Hazırlığı
+ * 🛡️ MoodMeter Feature Flag System - FAZ 0: Güvenlik ve Stabilite Hazırlığı
  * 
  * Bu sistem "Kapsamlı Yol Haritası" belgesindeki Görev 0.0.1 gereksinimlerine uygun olarak
  * tasarlanmıştır. Tüm AI özellikleri tek bir master switch ile kontrol edilir.
@@ -206,7 +206,7 @@ export const FEATURE_FLAGS = {
     }
     
     // Remote kill switch capability (gelecekte API'den kontrol edilebilir)
-    if (typeof (global as any).__OBSESSLESS_KILL_SWITCH !== 'undefined') {
+    if (typeof (global as any).__MOODMETER_KILL_SWITCH !== 'undefined') {
       console.warn('🚨 Emergency kill switch activated');
       return false;
     }
@@ -233,7 +233,7 @@ export const FEATURE_FLAGS = {
     });
     
     // Global kill switch aktive et
-    (global as any).__OBSESSLESS_KILL_SWITCH = true;
+    (global as any).__MOODMETER_KILL_SWITCH = true;
     
     // Telemetry + persist
     try {
@@ -291,7 +291,7 @@ export const FEATURE_FLAGS = {
     }
     
     console.log('🔄 Reactivating all AI features');
-    delete (global as any).__OBSESSLESS_KILL_SWITCH;
+    delete (global as any).__MOODMETER_KILL_SWITCH;
     
     // Master switch'i aktifleştir
     const masterEnabled = (Constants.expoConfig?.extra?.EXPO_PUBLIC_ENABLE_AI === 'true') ||

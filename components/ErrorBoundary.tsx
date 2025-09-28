@@ -83,9 +83,9 @@ export class ErrorBoundary extends Component<Props, State> {
     
     // Create a simple error report
     const errorMessage = this.state.error?.message || 'Bilinmeyen hata';
-    const subject = encodeURIComponent('ObsessLess - Hata Raporu');
+    const subject = encodeURIComponent('MoodMeter - Hata Raporu');
     const body = encodeURIComponent(`
-Merhaba ObsessLess Destek Ekibi,
+Merhaba MoodMeter Destek Ekibi,
 
 Uygulamada bir hata oluştu:
 

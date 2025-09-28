@@ -155,6 +155,6 @@ This clean version is **ready for production deployment**:
 
 ---
 
-**Developed with ❤️ by the ObsessLess team**
+**Developed with ❤️ by the MoodMeter team**
 
 *This clean version represents the culmination of comprehensive code quality analysis and optimization efforts.*

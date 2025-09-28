@@ -6,7 +6,7 @@ import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import ProgressDots from '@/components/onboarding/ProgressDots';
-import { ObsessLessColors, Spacing } from '@/constants/DesignSystem';
+import { MoodMeterColors, Spacing } from '@/constants/DesignSystem';
 
 export default function Summary() {
   const theme = useThemeColors();
@@ -31,7 +31,7 @@ export default function Summary() {
       try { await AsyncStorage.setItem('ai_onboarding_completed', 'true'); } catch {}
       
       // Prefer auth user id, else fallback
-      const userId = user?.id || (global as any).__OBSESS_USER_ID || 'anon';
+      const userId = user?.id || (global as any).__MOODMETER_USER_ID || 'anon';
       
       // ✅ NEW: Enhanced completion with error management
       const result = await complete(userId);
@@ -192,17 +192,17 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#FEF3C7',
     borderWidth: 1,
-    borderColor: ObsessLessColors.warning,
+    borderColor: MoodMeterColors.warning,
   },
   reminderWarningTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: ObsessLessColors.warning,
+    color: MoodMeterColors.warning,
     marginBottom: Spacing.xs,
   },
   reminderWarningText: {
     fontSize: 13,
-    color: ObsessLessColors.primaryText,
+    color: MoodMeterColors.primaryText,
     lineHeight: 18,
   },
   healthCard: {

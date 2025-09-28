@@ -3,8 +3,8 @@ require('dotenv').config({ path: '.env.local' });
 
 module.exports = {
   expo: {
-    name: "obslessless-clean",
-    slug: "obslessless-clean",
+    name: "MoodMeter",
+    slug: "moodmeter",
     version: "3.0.0",
     sdkVersion: "53.0.0",
     orientation: "portrait",
@@ -12,26 +12,26 @@ module.exports = {
     userInterfaceStyle: "light",
     newArchEnabled: true,
     splash: {
-      image: "./assets/splash-icon.png",
-      resizeMode: "contain",
+      image: "./assets/splash-screen.png",
+      resizeMode: "cover",
       backgroundColor: "#F9FAFB"
     },
     assets: ["./assets/models"],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: "com.adilyoltay.obslesstest",
+      bundleIdentifier: "com.adilyoltay.moodmeter",
       infoPlist: {
         NSMicrophoneUsageDescription: "Sesli check-in ve nefes egzersizleri için mikrofon erişimine ihtiyaç duyuyoruz. Erişim yalnızca sizin başlatmanızla kullanılır.",
         NSSpeechRecognitionUsageDescription: "Sesli check-in sırasında konuşmanızı cihaz üzerinde yazıya dönüştürmek için konuşma tanıma iznine ihtiyaç duyuyoruz. Veriler gizlilik odaklı işlenir."
       }
     },
-    scheme: "obslesstest",
+    scheme: "moodmeter",
     android: {
       adaptiveIcon: {
         foregroundImage: "./assets/adaptive-icon.png",
         backgroundColor: "#ffffff"
       },
-      package: "com.adilyoltay.obslesstest"
+      package: "com.adilyoltay.moodmeter"
     },
     web: {
       favicon: "./assets/favicon.png"

@@ -1,5 +1,5 @@
 -- ================================
--- OBSESSLESS SUPABASE DATABASE SCHEMA
+-- MOODMETER SUPABASE DATABASE SCHEMA
 -- ================================
 
 -- Enable necessary extensions

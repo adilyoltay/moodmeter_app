@@ -1,4 +1,4 @@
-# ObsessLess Database Schema
+# MoodMeter Database Schema
 
 ## 🏗️ **Database Setup Guide**
 

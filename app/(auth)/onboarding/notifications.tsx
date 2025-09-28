@@ -6,7 +6,7 @@ import { useRouter } from 'expo-router';
 import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
 import ProgressDots from '@/components/onboarding/ProgressDots';
 import * as Notifications from 'expo-notifications';
-import { ObsessLessColors, Spacing } from '@/constants/DesignSystem';
+import { MoodMeterColors, Spacing } from '@/constants/DesignSystem';
 import { requestAppleHealthPermissions } from '@/services/heartpy/healthSignals';
 import type { HealthPermissionState } from '@/features/onboarding/types';
 
@@ -234,8 +234,8 @@ export default function NotificationsStep() {
             value={enabled}
             onValueChange={handleToggle}
             disabled={isRequestingPermission}
-            trackColor={{ false: ObsessLessColors.lightGray, true: ObsessLessColors.accent }}
-            thumbColor={enabled ? ObsessLessColors.primary : '#F3F4F6'}
+            trackColor={{ false: MoodMeterColors.lightGray, true: MoodMeterColors.accent }}
+            thumbColor={enabled ? MoodMeterColors.primary : '#F3F4F6'}
           />
         </View>
         <Text style={styles.scheduleText}>Saat: {time} — Günler: Hafta içi</Text>
@@ -328,14 +328,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 22,
     fontWeight: '700',
-    color: ObsessLessColors.darkerBg,
+    color: MoodMeterColors.darkerBg,
     marginTop: Spacing.md,
   },
   card: {
     marginTop: Spacing.lg,
     padding: Spacing.lg,
     borderRadius: 16,
-    backgroundColor: ObsessLessColors.white,
+    backgroundColor: MoodMeterColors.white,
     shadowColor: '#000',
     shadowOpacity: 0.05,
     shadowRadius: 6,
@@ -353,15 +353,15 @@ const styles = StyleSheet.create({
   cardTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: ObsessLessColors.primaryText,
+    color: MoodMeterColors.primaryText,
   },
   cardSubtitle: {
     marginTop: Spacing.xs,
-    color: ObsessLessColors.secondaryText,
+    color: MoodMeterColors.secondaryText,
   },
   scheduleText: {
     marginTop: Spacing.md,
-    color: ObsessLessColors.secondaryText,
+    color: MoodMeterColors.secondaryText,
     fontSize: 14,
   },
   errorCard: {
@@ -370,16 +370,16 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: '#FEE2E2',
     borderWidth: 1,
-    borderColor: ObsessLessColors.error,
+    borderColor: MoodMeterColors.error,
   },
   errorTitle: {
     fontSize: 14,
     fontWeight: '600',
-    color: ObsessLessColors.error,
+    color: MoodMeterColors.error,
   },
   errorMessage: {
     fontSize: 13,
-    color: ObsessLessColors.primaryText,
+    color: MoodMeterColors.primaryText,
   },
   errorAction: {
     alignSelf: 'flex-start',
@@ -387,10 +387,10 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.xs,
     paddingHorizontal: Spacing.sm,
     borderRadius: 8,
-    backgroundColor: ObsessLessColors.error,
+    backgroundColor: MoodMeterColors.error,
   },
   errorActionText: {
-    color: ObsessLessColors.white,
+    color: MoodMeterColors.white,
     fontWeight: '600',
   },
   healthCard: {
@@ -465,12 +465,12 @@ const styles = StyleSheet.create({
     paddingVertical: Spacing.md,
     borderRadius: 12,
     borderWidth: 1,
-    borderColor: ObsessLessColors.lightGray,
+    borderColor: MoodMeterColors.lightGray,
     alignItems: 'center',
     justifyContent: 'center',
   },
   secondaryButtonText: {
-    color: ObsessLessColors.primaryText,
+    color: MoodMeterColors.primaryText,
     fontWeight: '600',
   },
   primaryButton: {
@@ -479,7 +479,7 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: ObsessLessColors.primary,
+    backgroundColor: MoodMeterColors.primary,
   },
   buttonSpacing: {
     marginRight: Spacing.md,
@@ -488,13 +488,13 @@ const styles = StyleSheet.create({
     backgroundColor: '#9CA3AF',
   },
   primaryButtonText: {
-    color: ObsessLessColors.white,
+    color: MoodMeterColors.white,
     fontWeight: '700',
   },
   skipText: {
     marginTop: Spacing.sm,
     textAlign: 'center',
-    color: ObsessLessColors.secondaryText,
+    color: MoodMeterColors.secondaryText,
     fontWeight: '500',
   },
 });

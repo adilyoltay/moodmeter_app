@@ -15,7 +15,7 @@ export default function Welcome() {
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: theme.background, justifyContent: 'center' }}>
       <Text accessibilityRole="header" style={{ fontSize: 28, fontWeight: '700', color: '#111827', textAlign: 'center' }}>
-        ObsessLess'e Hoş Geldin
+        MoodMeter'e Hoş Geldin
       </Text>
       <Text style={{ fontSize: 16, color: '#374151', textAlign: 'center', marginTop: 8 }}>
         Daha sakin, daha farkında bir gün için küçük adımlarla başlayalım.
