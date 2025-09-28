@@ -1,34 +1,67 @@
-import React from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Platform } from 'react-native';
+import React, { useCallback, useMemo, useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Alert, ActivityIndicator } from 'react-native';
+import * as Haptics from 'expo-haptics';
 import { useLanguage } from '@/contexts/LanguageContext';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
 
 interface Props {
-  onPress: () => void;
   disabled?: boolean;
-  loading?: boolean;
   mode?: 'signin' | 'signup';
 }
 
-// Actually used in app/(auth)/signup.tsx - restoring export!
-export function GoogleSignInButton({ onPress, disabled = false, loading = false, mode = 'signin' }: Props) {
+export function GoogleSignInButton({ disabled = false, mode = 'signin' }: Props) {
   const { language } = useLanguage();
-  
-  const buttonText = language === 'tr' 
-    ? (mode === 'signin' ? 'Google ile Giriş Yap' : 'Google ile Kayıt Ol')
-    : (mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google');
+  const { signInWithGoogle, isLoading, clearError } = useAuth();
+  const [pending, setPending] = useState(false);
+
+  const buttonText = useMemo(() => {
+    if (language === 'tr') {
+      return mode === 'signin' ? 'Google ile Giriş Yap' : 'Google ile Kayıt Ol';
+    }
+    return mode === 'signin' ? 'Sign in with Google' : 'Sign up with Google';
+  }, [language, mode]);
+
+  const connectingText = language === 'tr' ? 'Bağlanıyor...' : 'Connecting...';
+  const isBusy = pending || isLoading;
+
+  const handlePress = useCallback(async () => {
+    if (disabled || isBusy) return;
+
+    try {
+      clearError();
+      setPending(true);
+      try {
+        await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      } catch {}
+
+      await signInWithGoogle();
+    } catch (error: any) {
+      const title = language === 'tr' ? 'Google Girişi' : 'Google Sign-In';
+      const message = error?.message || (language === 'tr'
+        ? 'Google ile giriş başarısız oldu. Lütfen daha sonra tekrar deneyin.'
+        : 'Google sign-in failed. Please try again.');
+      Alert.alert(title, message);
+    } finally {
+      setPending(false);
+    }
+  }, [clearError, disabled, isBusy, language, signInWithGoogle]);
 
   return (
     <TouchableOpacity
-      style={[styles.button, disabled && styles.buttonDisabled]}
-      onPress={onPress}
-      disabled={disabled || loading}
+      style={[styles.button, (disabled || isBusy) && styles.buttonDisabled]}
+      onPress={handlePress}
+      disabled={disabled || isBusy}
       activeOpacity={0.8}
     >
       <View style={styles.iconContainer}>
-        <Text style={styles.googleIcon}>G</Text>
+        {isBusy ? (
+          <ActivityIndicator size="small" color="#4285F4" />
+        ) : (
+          <Text style={styles.googleIcon}>G</Text>
+        )}
       </View>
-      <Text style={[styles.text, disabled && styles.textDisabled]}>
-        {loading ? (language === 'tr' ? 'Bağlanıyor...' : 'Connecting...') : buttonText}
+      <Text style={[styles.text, (disabled || isBusy) && styles.textDisabled]}>
+        {isBusy ? connectingText : buttonText}
       </Text>
     </TouchableOpacity>
   );
@@ -77,4 +110,4 @@ const styles = StyleSheet.create({
   textDisabled: {
     color: '#9CA3AF',
   },
-}); 
+});

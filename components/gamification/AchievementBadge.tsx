@@ -3,7 +3,7 @@ import { View, Text, StyleSheet, Pressable } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import { AchievementDefinition } from '@/types/gamification';
-import { Colors, Typography, Spacing, BorderRadius } from '@/constants/Colors';
+import { Colors, Typography, Spacing as SpacingTokens, BorderRadius } from '@/constants/Colors';
 
 interface AchievementBadgeProps {
   achievement: AchievementDefinition;
@@ -67,7 +67,7 @@ const styles = StyleSheet.create({
   container: {
     alignItems: 'center',
     width: 100,
-    padding: Spacing.sm,
+    padding: SpacingTokens.sm,
   },
   pressed: {
     opacity: 0.8,
@@ -82,7 +82,7 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.lg,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.xs,
+    marginBottom: SpacingTokens.xs,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,

@@ -12,7 +12,11 @@
     "test-ai": "node scripts/test-ai-integration.js",
     "flag-audit": "node scripts/flag-audit.js",
     "validate:docs": "node scripts/validate-docs.js",
-    "pre-commit": "npm run import-guard && npm run validate:docs",
+    "pre-commit": "npm run import-guard && npm run validate:docs && npm run services:guard",
+    "knip": "knip",
+    "tsprune": "ts-prune --ignore '**/__tests__/*' --ignore '**/*.test.*' --ignore '**/*.spec.*' --ignore '**/*.stories.*' --tsConfig tsconfig.json",
+    "services:guard": "npm run knip && npm run tsprune",
+    "services:report": "./scripts/report-services.sh",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "test": "jest --ci",
@@ -36,7 +40,9 @@
     "scan:secrets": "gitleaks detect --redact",
     "scan:deprecated": "bash scripts/find-deprecated-features.sh",
     "docs:deprecate": "ts-node scripts/update-documentation.ts",
-    "health:check": "node scripts/production-health-check.js"
+    "health:check": "node scripts/production-health-check.js",
+    "cleanup:apply": "npx tsx scripts/apply-cleanup.mts --confirm",
+    "cleanup:dry-run": "npx tsx scripts/audit-unused.mts"
   },
   "dependencies": {
     "@expo/config-plugins": "~10.1.1",
@@ -118,7 +124,9 @@
     "babel-plugin-module-resolver": "^5.0.2",
     "dotenv": "^17.2.1",
     "glob": "^11.0.3",
-    "knip": "^5.64.0",
+    "knip": "^5.64.1",
+    "madge": "^8.0.0",
+    "ts-prune": "^0.10.3",
     "typescript": "~5.8.3"
   },
   "private": true

@@ -35,5 +35,5 @@ export const Events = {
   MoodEntrySaved: 'mood_entry_saved',
   MoodEntryUpdated: 'mood_entry_updated',
   MoodEntryDeleted: 'mood_entry_deleted',
+  OfflineQueueUpdated: 'offline_queue_updated',
 } as const;
-

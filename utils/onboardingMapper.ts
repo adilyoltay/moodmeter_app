@@ -19,6 +19,10 @@ export function mapOnboardingPayloadToUserProfileRow(userId: string, payload: On
   const firstMoodScoreRaw = payload?.first_mood?.score;
   const first_mood_score = typeof firstMoodScoreRaw === 'number' ? Math.min(5, Math.max(1, firstMoodScoreRaw)) : (firstMoodScoreRaw != null ? Number(firstMoodScoreRaw) : null);
   const first_mood_tags = Array.isArray(payload?.first_mood?.tags) ? payload.first_mood.tags.filter((t: any) => typeof t === 'string') : [];
+  const featureFlags = { ...(payload?.feature_flags || {}) };
+  if (payload?.health?.status === 'granted') {
+    featureFlags.healthkit_sync = true;
+  }
 
   return {
     user_id: userId,
@@ -35,7 +39,7 @@ export function mapOnboardingPayloadToUserProfileRow(userId: string, payload: On
     reminder_enabled: !!payload?.reminders?.enabled,
     reminder_time: payload?.reminders?.time || null,
     reminder_days: payload?.reminders?.days || [],
-    feature_flags: payload?.feature_flags || {},
+    feature_flags: featureFlags,
     consent_accepted: !!payload?.consent?.accepted,
     consent_at: payload?.consent?.accepted ? new Date().toISOString() : null,
     onboarding_version: 2,
@@ -43,4 +47,3 @@ export function mapOnboardingPayloadToUserProfileRow(userId: string, payload: On
     updated_at: new Date().toISOString(),
   };
 }
-

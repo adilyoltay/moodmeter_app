@@ -67,31 +67,39 @@ async function checkOnboardingCompletion(userId: string, localKey: string): Prom
     let remoteCompleted = false;
     let remoteCheckFailed = false;
     
-    // EARLY RETURN: If local is definitively true and we're not forcing remote check
-    if (localCompleted && !remoteCheckFailed) {
-      // Cache the positive result
-      onboardingCheckCache.set(cacheKey, { result: true, timestamp: Date.now() });
-      console.log('✅ Early return - Local completed, cached');
-      return true;
-    }
-    
-    // Only do remote check if local is false or we need verification
-    if (!localCompleted || (!cached && Math.random() < 0.1)) { // 10% chance for periodic verification
+    const shouldVerifyRemote = !localCompleted || !cached || Math.random() < 0.1;
+
+    // Only do remote check if local is false or we explicitly need verification
+    if (shouldVerifyRemote) {
       try {
         // Check authoritative onboarding completion in user_profiles
         const { data: profile, error } = await supabaseService.supabaseClient
           .from('user_profiles')
-          .select('user_id, onboarding_completed_at, onboarding_version')
+          .select('user_id, onboarding_completed, onboarding_completed_at, onboarding_version')
           .eq('user_id', userId)
           .single();
           
         if (!error && profile) {
-          // Profile exists - onboarding was completed (v2 writes onboarding_completed_at)
-          remoteCompleted = true;
-          console.log('✅ Layer 2 - Remote verification: Profile found, onboarding completed');
-          
-          if ((profile as any).onboarding_completed_at) {
-            console.log('✅ Explicit onboarding_completed_at found');
+          const profileCompleted = Boolean(
+            (profile as any)?.onboarding_completed === true ||
+            (profile as any)?.onboarding_completed_at
+          );
+
+          remoteCompleted = profileCompleted;
+          console.log('✅ Layer 2 - Remote verification:', {
+            profileFound: true,
+            onboarding_completed: (profile as any)?.onboarding_completed,
+            onboarding_completed_at: (profile as any)?.onboarding_completed_at,
+            remoteCompleted,
+          });
+
+          if (!profileCompleted) {
+            try {
+              await AsyncStorage.removeItem(localKey);
+              await AsyncStorage.removeItem('ai_onboarding_completed');
+            } catch (clearErr) {
+              console.warn('⚠️ Failed to clear local onboarding cache after remote incomplete:', clearErr);
+            }
           }
         } else {
           console.log('⚠️ Layer 2 - Remote verification: No profile found');
@@ -100,7 +108,9 @@ async function checkOnboardingCompletion(userId: string, localKey: string): Prom
         console.warn('⚠️ Layer 2 - Remote verification failed (network/auth issue):', remoteError);
         remoteCheckFailed = true;
       }
-    } else {
+    }
+
+    if (!shouldVerifyRemote) {
       console.log('⚡ Skipping remote check - local completed and cached recently');
       remoteCompleted = localCompleted;
     }
@@ -153,20 +163,41 @@ export function NavigationGuard({ children }: NavigationGuardProps) {
   const [isInitialLoad, setIsInitialLoad] = useState(true);
 
   useEffect(() => {
-    // Skip if already navigated or still loading auth
-    if (hasPerformedNavigation || authLoading) {
-      if (!authLoading) {
-        setIsInitialLoad(false);
-      }
+    const currentPath = segments.join('/');
+    const isAuthStack = segments[0] === '(auth)';
+    const isOnboardingRoute = segments.includes('onboarding');
+    const isAtRoot = currentPath === '' || currentPath === 'index';
+
+    // Skip while loading auth
+    if (authLoading) {
       return;
     }
 
-    const currentPath = segments.join('/');
-    const isAtRoot = currentPath === '' || currentPath === 'index';
-    
-    // ONLY navigate if we're at the root page
-    if (!isAtRoot) {
-      console.log('✅ Not at root, no navigation needed:', currentPath);
+    // Handle authenticated user stuck on auth screens (e.g., login)
+    if (!isAtRoot && user && isAuthStack) {
+      if (isOnboardingRoute) {
+        console.log('🧭 Authenticated user on onboarding route — allow pending completion');
+      } else {
+        console.log('🚀 Auth user detected on auth stack, redirecting to tabs');
+        router.replace('/(tabs)');
+        setIsInitialLoad(false);
+        return;
+      }
+    }
+
+    // Handle signed-out user landing on protected stacks
+    if (!isAtRoot && !user && !isAuthStack) {
+      console.log('🚪 Signed-out user on protected stack, redirecting to login');
+      router.replace('/(auth)/login');
+      setIsInitialLoad(false);
+      return;
+    }
+
+    // Skip if navigation already performed and we are not at root
+    if (!isAtRoot || hasPerformedNavigation) {
+      if (!isAtRoot) {
+        console.log('✅ Not at root, no fresh navigation needed:', currentPath);
+      }
       setIsInitialLoad(false);
       return;
     }
@@ -183,13 +214,13 @@ export function NavigationGuard({ children }: NavigationGuardProps) {
           router.replace('/(auth)/login');
         } else {
           const aiKey = `ai_onboarding_completed_${user.id}`;
-          const completed = await AsyncStorage.getItem(aiKey);
-          
-          if (completed !== 'true') {
-            console.log('🚀 Onboarding needed');
+          const completed = await checkOnboardingCompletion(user.id, aiKey);
+
+          if (!completed) {
+            console.log('🚀 Onboarding needed (after state validation)');
             router.replace('/(auth)/onboarding');
           } else {
-            console.log('🚀 Navigate to main app');
+            console.log('🚀 Navigate to main app (onboarding already complete)');
             router.replace('/(tabs)');
           }
         }

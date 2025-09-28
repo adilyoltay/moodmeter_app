@@ -1,19 +1,34 @@
-import React, { useState } from 'react';
-import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import React, { useMemo, useState } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
 import { useThemeColors } from '@/contexts/ThemeContext';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { router } from 'expo-router';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useBiometric } from '@/hooks/useBiometric';
 
 export default function LoginScreen() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const theme = useThemeColors();
-  const { signInWithEmail, signInWithGoogle, isLoading, error, clearError, user } = useAuth() as any;
+  const { signInWithEmail, isLoading, error, clearError, user } = useAuth() as any;
+  const { language } = useLanguage();
+
+  const biometric = useBiometric({
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    language,
+  });
+
+  const primaryAccount = useMemo(() => {
+    if (!biometric.knownAccounts.length) return null;
+    return biometric.knownAccounts[biometric.knownAccounts.length - 1];
+  }, [biometric.knownAccounts]);
 
   // After successful auth, route based on onboarding completion
   React.useEffect(() => {
@@ -38,14 +53,22 @@ export default function LoginScreen() {
           const supabaseService = (await import('@/services/supabase')).default;
           const { data: profile, error } = await supabaseService.supabaseClient
             .from('user_profiles')
-            .select('user_id')
+            .select('user_id, onboarding_completed, onboarding_completed_at')
             .eq('user_id', user.id)
-            .single();
-          if (!cancelled && profile && !error) {
+            .maybeSingle();
+
+          const serverCompleted = !error && profile && (
+            profile.onboarding_completed === true ||
+            Boolean(profile.onboarding_completed_at)
+          );
+
+          if (!cancelled && serverCompleted) {
             router.replace('/(tabs)');
             return;
           }
-        } catch {}
+        } catch (remoteError) {
+          console.warn('⚠️ Onboarding server check failed:', remoteError);
+        }
         if (!cancelled) router.replace('/(auth)/onboarding');
       } catch {
         if (!cancelled) router.replace('/(auth)/onboarding');
@@ -69,15 +92,21 @@ export default function LoginScreen() {
     }
   };
 
-  const handleGoogleLogin = async () => {
-    try {
-      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
-      await signInWithGoogle();
-    } catch (error: any) {
-      Alert.alert('Hata', error.message || 'Google girişi başarısız');
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+  const handleBiometricLogin = async () => {
+    if (!primaryAccount) return;
+    const success = await biometric.loginWithBiometrics(primaryAccount.userId);
+    if (success) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
     }
   };
+
+  React.useEffect(() => {
+    if (biometric.error) {
+      Alert.alert(language === 'tr' ? 'Biometrik Doğrulama' : 'Biometric Authentication', biometric.error);
+    }
+  }, [biometric.error, language]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -164,15 +193,40 @@ export default function LoginScreen() {
 
           {/* Google Login Button */}
           <Animated.View entering={FadeInDown.delay(500)}>
-            <Pressable
-              style={[styles.googleButton, isLoading && styles.buttonDisabled]}
-              onPress={handleGoogleLogin}
-              disabled={isLoading}
-            >
-              <MaterialCommunityIcons name="google" size={20} color="#4285f4" />
-              <Text style={styles.googleButtonText}>Google ile Giriş Yap</Text>
-            </Pressable>
+            <GoogleSignInButton disabled={isLoading} mode="signin" />
           </Animated.View>
+
+          {/* Biometric Login CTA */}
+          {primaryAccount && (
+            <Animated.View entering={FadeInDown.delay(550)}>
+              <Pressable
+                style={[styles.biometricButton, (isLoading || biometric.processing) && styles.buttonDisabled]}
+                onPress={handleBiometricLogin}
+                disabled={isLoading || biometric.processing}
+              >
+                {biometric.processing ? (
+                  <ActivityIndicator color="#10B981" />
+                ) : (
+                  <MaterialCommunityIcons name="fingerprint" size={20} color="#10B981" />
+                )}
+                <Text style={styles.biometricButtonText}>
+                  {language === 'tr'
+                    ? `${primaryAccount.email} için biometrik giriş`
+                    : `Sign in as ${primaryAccount.email}`}
+                </Text>
+              </Pressable>
+            </Animated.View>
+          )}
+          {!primaryAccount && (
+            <Animated.View entering={FadeInDown.delay(550)} style={styles.biometricSettingsHintContainer}>
+              <MaterialCommunityIcons name="fingerprint" size={16} color="#10B981" style={{ marginRight: 6 }} />
+              <Text style={styles.biometricSettingsHint}>
+                {language === 'tr'
+                  ? 'Biometrik girişi etkinleştirmek için Profil > Ayarlar > Güvenlik bölümünü kullanın.'
+                  : 'Enable biometric login under Profile > Settings > Security.'}
+              </Text>
+            </Animated.View>
+          )}
 
           {/* Signup Link */}
           <Animated.View entering={FadeInDown.delay(600)} style={styles.footer}>
@@ -299,32 +353,40 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     fontFamily: 'Inter_600SemiBold',
   },
-  googleButton: {
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  biometricButton: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 24,
-    paddingVertical: 16,
-    borderRadius: 16,
-    marginBottom: 24,
+    gap: 10,
     borderWidth: 1,
-    borderColor: '#E5E7EB',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.05,
-    shadowRadius: 3,
-    elevation: 1,
+    borderColor: '#D1FAE5',
+    backgroundColor: '#F0FFF4',
+    paddingVertical: 14,
+    borderRadius: 16,
+    marginTop: 16,
   },
-  googleButtonText: {
-    color: '#374151',
+  biometricButtonText: {
+    color: '#047857',
     fontSize: 16,
-    fontWeight: '500',
-    marginLeft: 8,
-    fontFamily: 'Inter_500Medium',
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
   },
-  buttonDisabled: {
-    opacity: 0.6,
+  biometricSettingsHintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingHorizontal: 12,
+  },
+  biometricSettingsHint: {
+    flex: 1,
+    textAlign: 'center',
+    color: '#6B7280',
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
   },
   footer: {
     alignItems: 'center',

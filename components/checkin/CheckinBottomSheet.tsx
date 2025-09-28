@@ -12,6 +12,7 @@ interface CheckinBottomSheetProps {
   isVisible: boolean;
   onClose: () => void;
   onComplete?: (result?: any) => void;
+  mode?: 'default' | 'voiceQuick';
 }
 
 /**
@@ -30,6 +31,7 @@ export default function CheckinBottomSheet({
   isVisible,
   onClose,
   onComplete,
+  mode = 'default',
 }: CheckinBottomSheetProps) {
   const { user } = useAuth();
   const [prefillMEA, setPrefillMEA] = useState<{ mood: number; energy: number; anxiety: number } | null>(null);
@@ -89,9 +91,11 @@ export default function CheckinBottomSheet({
           }
         } catch {}
       }}
-      disableVoice={true}
+      disableVoice={mode !== 'voiceQuick'}
       initialMEA={prefillMEA}
       serviceMeta={serviceMeta}
+      autoVoiceStart={mode === 'voiceQuick'}
+      forceFullScreen={mode === 'voiceQuick'}
     />
   );
 }

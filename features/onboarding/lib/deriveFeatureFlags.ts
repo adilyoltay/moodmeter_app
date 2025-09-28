@@ -8,6 +8,7 @@ export interface DerivedFlags {
   pdf_export?: boolean;
   habit_cards?: boolean;
   sleep_energy_cards?: boolean;
+  healthkit_sync?: boolean;
 }
 
 export function deriveFeatureFlags(motivations: MotivationKey[]): DerivedFlags {
@@ -44,5 +45,4 @@ export function applyReminderRule(flags: DerivedFlags, remindersEnabled?: boolea
   }
   return flags;
 }
-
 

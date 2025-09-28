@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, Pressable, Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { View, Text, Pressable, Alert, ActivityIndicator, StyleSheet, Platform } from 'react-native';
 import { useThemeColors } from '@/contexts/ThemeContext';
 import { useRouter } from 'expo-router';
 import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
@@ -82,6 +82,37 @@ export default function Summary() {
   const flags = payload.feature_flags || {};
   const reminders = payload.reminders;
   const reminderWarning = reminders?.permissionStatus === 'denied';
+  const healthStatus = payload.health?.status ?? 'not_requested';
+  const showHealthCard = Platform.OS === 'ios';
+  const healthStatusLabel = (() => {
+    switch (healthStatus) {
+      case 'granted':
+        return 'İzin verildi';
+      case 'blocked':
+        return 'Ayarlar kapalı';
+      case 'denied':
+        return 'Reddedildi';
+      case 'unavailable':
+        return 'Desteklenmiyor';
+      case 'not_requested':
+      default:
+        return 'Henüz istekte bulunulmadı';
+    }
+  })();
+
+  let healthVariant: 'success' | 'warning' | 'info' = 'info';
+  let healthMessage = 'Apple Health iznini daha sonra Ayarlar > Sağlık > Verilerim > MoodMeter adımından yönetebilirsin.';
+  if (healthStatus === 'granted') {
+    healthVariant = 'success';
+    healthMessage = 'Apple Health verileri senkronize ediliyor. Ayarlar > Sağlık > Verilerim > MoodMeter yoluyla dilediğin zaman izni güncelleyebilirsin.';
+  } else if (healthStatus === 'blocked' || healthStatus === 'denied') {
+    healthVariant = 'warning';
+    healthMessage = 'Apple Health izni şu an kapalı. Ayarlar > Sağlık > Verilerim > MoodMeter adımından izni yeniden açabilirsin.';
+  } else if (healthStatus === 'unavailable') {
+    healthVariant = 'info';
+    healthMessage = 'Bu cihazda Apple Health kullanılamıyor; yine de mood kaydı ve içgörüler aktif kalacak.';
+  }
+
   const enabled = Object.keys(flags).filter((k) => (flags as any)[k]);
 
   return (
@@ -100,6 +131,23 @@ export default function Summary() {
           <Text style={styles.reminderWarningText}>
             Hatırlatmalar için bildirim izni verilmedi. Ayarlar’dan izin verdiğinizde günlük hatırlatmalar aktif olur.
           </Text>
+        </View>
+      )}
+
+      {showHealthCard && (
+        <View
+          style={[
+            styles.healthCard,
+            healthVariant === 'success'
+              ? styles.healthCardSuccess
+              : healthVariant === 'warning'
+                ? styles.healthCardWarning
+                : styles.healthCardInfo,
+          ]}
+        >
+          <Text style={styles.healthCardTitle}>Apple Health</Text>
+          <Text style={styles.healthCardStatus}>{healthStatusLabel}</Text>
+          <Text style={styles.healthCardText}>{healthMessage}</Text>
         </View>
       )}
 
@@ -155,6 +203,41 @@ const styles = StyleSheet.create({
   reminderWarningText: {
     fontSize: 13,
     color: ObsessLessColors.primaryText,
+    lineHeight: 18,
+  },
+  healthCard: {
+    marginTop: Spacing.lg,
+    padding: Spacing.md,
+    borderRadius: 12,
+    borderWidth: 1,
+  },
+  healthCardSuccess: {
+    backgroundColor: '#ECFDF5',
+    borderColor: '#34D399',
+  },
+  healthCardWarning: {
+    backgroundColor: '#FEF3C7',
+    borderColor: '#F59E0B',
+  },
+  healthCardInfo: {
+    backgroundColor: '#E5E7EB',
+    borderColor: '#D1D5DB',
+  },
+  healthCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  healthCardStatus: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginTop: Spacing.xs,
+  },
+  healthCardText: {
+    fontSize: 13,
+    color: '#374151',
+    marginTop: Spacing.sm,
     lineHeight: 18,
   },
 });

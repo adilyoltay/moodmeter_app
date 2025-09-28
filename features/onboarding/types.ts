@@ -5,6 +5,13 @@ export type MotivationKey =
   | 'sleep_energy'
   | 'therapy_report';
 
+export type HealthPermissionState =
+  | 'not_requested'
+  | 'granted'
+  | 'denied'
+  | 'blocked'
+  | 'unavailable';
+
 export interface OnboardingPayload {
   profile?: {
     age?: number;
@@ -29,6 +36,10 @@ export interface OnboardingPayload {
     timezone?: string;
     permissionStatus?: 'granted' | 'denied' | 'undetermined';
   };
+  health?: {
+    status: HealthPermissionState;
+    lastRequestedAt?: string;
+  };
   feature_flags?: {
     daily_prompt?: boolean;
     weekly_report?: boolean;
@@ -37,7 +48,7 @@ export interface OnboardingPayload {
     pdf_export?: boolean;
     habit_cards?: boolean;
     sleep_energy_cards?: boolean;
+    healthkit_sync?: boolean;
   };
   meta: { version: 1; created_at: string };
 }
-

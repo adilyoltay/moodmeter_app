@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Platform } from 'react-native';
 import { User, Session } from '@supabase/supabase-js';
 import { supabaseService, UserProfile, SignUpResult, AuthResult } from '@/services/supabase';
 import { registerAuthBridge } from '@/contexts/authBridge';
 import { useGamificationStore } from '@/store/gamificationStore';
-import { useOnboardingStore } from '@/store/onboardingStore';
 import { migrateToUserSpecificStorage } from '@/utils/storage';
 import SecureStorageMigration from '@/utils/secureStorageMigration';
+import { biometricService } from '@/services/biometric';
 import * as Linking from 'expo-linking';
 import * as WebBrowser from 'expo-web-browser';
-import * as AuthSession from 'expo-auth-session';
 import Constants from 'expo-constants';
 import { makeRedirectUri } from 'expo-auth-session';
 import * as Crypto from 'expo-crypto';
@@ -62,10 +62,21 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
   const [error, setError] = useState<string | null>(null);
   
   const { initializeGamification, setUserId } = useGamificationStore();
-  const { resetOnboarding } = useOnboardingStore();
   const lastProfileLoadRef = React.useRef<{ userId: string; ts: number } | null>(null);
   const isProfileLoadInFlightRef = React.useRef<boolean>(false);
   const oauthAppStateRef = React.useRef<string | null>(null);
+
+  const clearLegacyOnboardingState = useCallback(async (userId?: string | null) => {
+    try {
+      if (userId) {
+        await AsyncStorage.removeItem(`onboarding_state_${userId}`);
+        await AsyncStorage.removeItem(`ai_onboarding_completed_${userId}`);
+      }
+      await AsyncStorage.removeItem('ai_onboarding_completed');
+    } catch (error) {
+      console.warn('⚠️ Failed to clear legacy onboarding state:', error);
+    }
+  }, []);
 
   // ===========================
   // INITIALIZATION
@@ -86,69 +97,100 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     }
 
     const handleUrl = async (url: string) => {
+      if (!url) return;
       try {
-        if (!url) return;
         console.log('🔗 Received URL:', url);
-        const callbackUrl = new URL(url.replace('#', '?'));
-        const isCallback = callbackUrl.pathname?.includes('auth/callback') || url.includes('auth/callback');
+        let parsed: URL | null = null;
+        try {
+          parsed = new URL(url.includes('#') ? url.replace('#', '?') : url);
+        } catch {
+          try {
+            parsed = new URL(url);
+          } catch (error) {
+            console.warn('⚠️ Unable to parse OAuth callback URL:', error);
+          }
+        }
+
+        const isCallback = parsed?.pathname?.includes('auth/callback') || url.includes('auth/callback');
         if (!isCallback) return;
 
-        const errorParam = callbackUrl.searchParams.get('error');
-        const errorDescription = callbackUrl.searchParams.get('error_description');
-        const appState = callbackUrl.searchParams.get('app_state');
-        const accessToken = callbackUrl.searchParams.get('access_token');
-        const refreshToken = callbackUrl.searchParams.get('refresh_token');
-        const authCode = callbackUrl.searchParams.get('code');
+        const expectedState = oauthAppStateRef.current || undefined;
+        const result = await supabaseService.completeGoogleOAuth(url, expectedState);
 
-        // State validation
-        const expected = oauthAppStateRef.current || null;
-        if (expected && appState && expected !== appState) {
-          console.warn('⚠️ OAuth state mismatch');
-          setError('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
-          await WebBrowser.dismissBrowser();
-          return;
-        }
-
-        if (errorParam) {
-          console.error('❌ OAuth error:', errorParam, errorDescription);
-          setError('Google ile giriş iptal edildi veya başarısız oldu.');
-          await WebBrowser.dismissBrowser();
-          return;
-        }
-
-        if (accessToken && refreshToken) {
-          await supabaseService.setSession({
-            access_token: accessToken,
-            refresh_token: refreshToken,
-          });
-          await WebBrowser.dismissBrowser();
-        } else if (authCode) {
-          // Authorization Code flow with PKCE
-          const { data, error: exchError } = await supabaseService.supabaseClient.auth.exchangeCodeForSession(authCode as any);
-          if (exchError) {
-            console.error('❌ Code exchange failed:', exchError);
-            setError('Giriş başarısız. Lütfen tekrar deneyin.');
-          } else if (data?.user) {
-            setUser(data.user);
-            await loadUserProfile(data.user);
-          }
-          await WebBrowser.dismissBrowser();
+        if (result?.user) {
+          setUser(result.user);
+          await loadUserProfile(result.user);
         } else {
-          console.error('❌ OAuth callback missing tokens');
-          setError('Giriş tamamlanamadı. Lütfen tekrar deneyin.');
-          await WebBrowser.dismissBrowser();
+          const { data: refreshed } = await supabaseService.supabaseClient.auth.getSession();
+          if (refreshed?.session?.user) {
+            setUser(refreshed.session.user);
+            await loadUserProfile(refreshed.session.user);
+          } else {
+            setError('Giriş tamamlanamadı. Lütfen tekrar deneyin.');
+          }
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error('❌ OAuth callback processing failed:', err);
-        setError('Giriş tamamlanamadı.');
+        setError(err?.message || 'Giriş tamamlanamadı.');
       } finally {
-        // Clear transient OAuth state to avoid leaking across attempts
         oauthAppStateRef.current = null;
         try { await WebBrowser.dismissBrowser(); } catch {}
       }
     };
 
     // Kick off auth init
+    const attemptBiometricRestore = async (): Promise<boolean> => {
+      try {
+        const accounts = await biometricService.listKnownAccounts();
+        if (!accounts.length) return false;
+        const ordered = [...accounts].sort((a, b) => {
+          return new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime();
+        });
+
+        for (const account of ordered) {
+          const preference = await biometricService.getPreference(account.userId);
+          if (!preference) continue;
+
+          const refreshToken = await supabaseService.getBiometricRefreshToken(account.userId);
+          if (!refreshToken) continue;
+
+          try {
+            const permission = await biometricService.ensurePermission();
+            if (!permission.granted) {
+              console.warn('⚠️ Biometric permission not granted, skipping auto-restore');
+              continue;
+            }
+
+            const authResult = await biometricService.authenticate({
+              promptMessage: 'Biometrik giriş',
+              cancelLabel: 'İptal',
+            });
+
+            if (!authResult.success) {
+              if (authResult.reason === 'locked') {
+                console.warn('⚠️ Biometric locked, clearing stored token');
+                await biometricService.setPreference(account.userId, false);
+                await supabaseService.clearBiometricRefreshToken(account.userId);
+              }
+              continue;
+            }
+
+            const result = await supabaseService.signInWithRefreshToken(refreshToken);
+            setUser(result.user);
+            await loadUserProfile(result.user);
+            return true;
+          } catch (error) {
+            console.warn('⚠️ Biometric auto-restore failed, clearing stored token:', error);
+            await biometricService.setPreference(account.userId, false);
+            await supabaseService.clearBiometricRefreshToken(account.userId);
+          }
+        }
+      } catch (error) {
+        console.warn('⚠️ Unable to perform biometric restore:', error);
+      }
+      return false;
+    };
+
     (async () => {
       try {
         setLoading(true);
@@ -156,6 +198,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         if (currentUser && isMounted) {
           setUser(currentUser);
           await loadUserProfile(currentUser);
+        } else if (isMounted) {
+          await attemptBiometricRestore();
         }
       } catch (e) {
         console.error('❌ Auth initialization failed:', e);
@@ -211,7 +255,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       urlSub?.remove?.();
       authListener?.subscription?.unsubscribe?.();
     };
-  }, [setUserId]);
+  }, [setUserId, user?.id, loadUserProfile]);
 
   // ===========================
   // PROFILE LOADING
@@ -249,10 +293,12 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       // Initialize gamification for this user (idempotent at store level)
       await initializeGamification(user.id);
       
+      let moodOnboardingStore: typeof import('@/store/moodOnboardingStore').useMoodOnboardingStore | null = null;
       // Hydrate onboarding store from storage
       try {
-        const { useMoodOnboardingStore } = await import('@/store/moodOnboardingStore');
-        await useMoodOnboardingStore.getState().hydrateFromStorage(user.id);
+        const module = await import('@/store/moodOnboardingStore');
+        moodOnboardingStore = module.useMoodOnboardingStore;
+        await moodOnboardingStore.getState().hydrateFromStorage(user.id);
         console.log('🔄 Onboarding store hydrated for user:', user.id);
       } catch (error) {
         console.error('❌ Failed to hydrate onboarding store:', error);
@@ -279,6 +325,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         // 🚀 ONBOARDING FIX: Clear onboarding completion flags for new users
         console.log('🔄 New user detected - clearing onboarding flags for:', user.id);
         try {
+          await clearLegacyOnboardingState(user.id);
           await AsyncStorage.removeItem(`ai_onboarding_completed_${user.id}`);
           await AsyncStorage.removeItem('ai_onboarding_completed'); // Generic fallback
           
@@ -299,21 +346,52 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         } catch (flagError) {
           console.warn('⚠️ Failed to clear onboarding flags in loadUserProfile:', flagError);
         }
+
+        // Ensure stale onboarding payloads are cleared for brand-new users
+        try {
+          moodOnboardingStore?.getState().reset();
+        } catch (resetError) {
+          console.warn('⚠️ Failed to reset onboarding store for new user:', resetError);
+        }
       } else {
         console.log('✅ User profile loaded:', user.email);
-        // 🔧 Drift correction: if local completion flags missing but server profile exists, set them silently
-        try {
-          const aiKey = `ai_onboarding_completed_${user.id}`;
-          const localCompleted = await AsyncStorage.getItem(aiKey);
-          if (localCompleted !== 'true') {
-            await AsyncStorage.setItem(aiKey, 'true');
-            await AsyncStorage.setItem('ai_onboarding_completed', 'true');
-            await AsyncStorage.setItem('ai_onboarding_completed_at', new Date().toISOString());
-            await AsyncStorage.setItem(`onboarding_server_confirmed_${user.id}`, 'true');
-            console.log('🔧 Local onboarding flags restored from server profile');
+        const serverCompleted = Boolean(
+          (userProfile as any)?.onboarding_completed === true ||
+          (userProfile as any)?.onboarding_completed_at
+        );
+
+        if (serverCompleted) {
+          // 🔧 Drift correction: if local completion flags missing but server profile confirms completion
+          try {
+            const aiKey = `ai_onboarding_completed_${user.id}`;
+            const localCompleted = await AsyncStorage.getItem(aiKey);
+            if (localCompleted !== 'true') {
+              await AsyncStorage.setItem(aiKey, 'true');
+              await AsyncStorage.setItem('ai_onboarding_completed', 'true');
+              await AsyncStorage.setItem('ai_onboarding_completed_at', new Date().toISOString());
+              await AsyncStorage.setItem(`onboarding_server_confirmed_${user.id}`, 'true');
+              console.log('🔧 Local onboarding flags restored from server profile');
+            }
+          } catch (e) {
+            console.warn('⚠️ Failed to set local onboarding flags from server profile:', e);
           }
-        } catch (e) {
-          console.warn('⚠️ Failed to set local onboarding flags from server profile:', e);
+        } else {
+          // Server profile exists but onboarding not marked complete; ensure local flags are cleared
+          console.log('ℹ️ Server profile present but onboarding incomplete. Clearing local completion flags.');
+          try {
+            await AsyncStorage.removeItem(`ai_onboarding_completed_${user.id}`);
+            await AsyncStorage.removeItem('ai_onboarding_completed');
+            try {
+              const navigationModule = await import('@/components/navigation/NavigationGuard');
+              if (typeof (navigationModule as any).clearOnboardingCache === 'function') {
+                (navigationModule as any).clearOnboardingCache(user.id);
+              }
+            } catch (cacheError) {
+              console.log('ℹ️ Navigation cache clear skipped:', cacheError);
+            }
+          } catch (clearError) {
+            console.warn('⚠️ Failed to clear local onboarding flags for incomplete profile:', clearError);
+          }
         }
       }
       
@@ -334,7 +412,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     } finally {
       isProfileLoadInFlightRef.current = false;
     }
-  }, [setUserId, initializeGamification]);
+  }, [setUserId, initializeGamification, clearLegacyOnboardingState]);
 
   // ===========================
   // AUTH METHODS
@@ -466,30 +544,38 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       setError(null);
       console.log('🔐 Starting Google OAuth via AuthSession...');
 
-      // Request provider URL from Supabase
-      const supa = await supabaseService.signInWithGoogle();
-      const providerUrl: string | undefined = supa?.url;
+      const { url: providerUrl, redirectTo } = await supabaseService.signInWithGoogle();
       if (!providerUrl) throw new Error('GOOGLE_OAUTH_URL_MISSING');
 
-      // Generate cryptographic app_state and append to auth URL
       const randomBytes = await Crypto.getRandomBytesAsync(32);
       const appState = Array.from(randomBytes)
         .map((b) => b.toString(16).padStart(2, '0'))
         .join('');
       oauthAppStateRef.current = appState;
-      const authUrlWithState = providerUrl + (providerUrl.includes('?') ? '&' : '?') + `app_state=${appState}`;
 
-      // Compute return URL (must match service redirect). Prefer provider URL's redirect_to
-      let returnUrl: string;
+      const authUrlWithState = `${providerUrl}${providerUrl.includes('?') ? '&' : '?'}app_state=${appState}`;
+
+      let returnUrl = redirectTo;
       try {
         const parsed = new URL(providerUrl);
-        const redirectTo = parsed.searchParams.get('redirect_to');
-        returnUrl = redirectTo ? decodeURIComponent(redirectTo) : Linking.createURL('auth/callback');
+        const redirectParam = parsed.searchParams.get('redirect_to');
+        if (redirectParam) {
+          returnUrl = decodeURIComponent(redirectParam);
+        }
       } catch {
         const isExpoGo = Constants.appOwnership === 'expo';
         returnUrl = isExpoGo
           ? makeRedirectUri({ path: 'auth/callback' })
           : Linking.createURL('auth/callback');
+      }
+
+      if (Platform.OS === 'web') {
+        if (typeof window !== 'undefined') {
+          window.location.href = authUrlWithState;
+        } else {
+          console.warn('⚠️ Web OAuth flow triggered without window context.');
+        }
+        return;
       }
 
       const result = await WebBrowser.openAuthSessionAsync(authUrlWithState, returnUrl);
@@ -499,67 +585,38 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
         setError('Giriş iptal edildi.');
         return;
       }
-      // openAuthSessionAsync returns { type: 'success' | 'cancel', url?: string }
+
       if (result.type !== 'success' || !('url' in result) || !result.url) {
         setError('Giriş başarısız. Lütfen tekrar deneyin.');
         return;
       }
 
-      const urlObj = new URL(result.url.replace('#', '?'));
-      const cbState = urlObj.searchParams.get('app_state');
-      const errorParam = urlObj.searchParams.get('error');
-      const errorDesc = urlObj.searchParams.get('error_description');
-      const accessToken = urlObj.searchParams.get('access_token');
-      const refreshToken = urlObj.searchParams.get('refresh_token');
-      const authCode = urlObj.searchParams.get('code');
-      if (__DEV__) console.log('🔐 Parsed callback params:', { hasAccess: !!accessToken, hasRefresh: !!refreshToken, hasCode: !!authCode, cbState });
+      const completion = await supabaseService.completeGoogleOAuth(result.url, appState);
 
-      // Enforce state only if both are present and mismatch
-      if (oauthAppStateRef.current && cbState && oauthAppStateRef.current !== cbState) {
-        setError('Güvenlik doğrulaması başarısız. Lütfen tekrar deneyin.');
+      if (completion?.user) {
+        setUser(completion.user);
+        await loadUserProfile(completion.user);
         return;
       }
-      if (errorParam) {
-        setError('Google ile giriş başarısız veya iptal edildi.');
-        if (__DEV__) console.error('OAuth error:', errorParam, errorDesc);
-        return;
-      }
-      if (accessToken && refreshToken) {
-        await supabaseService.setSession({ access_token: accessToken, refresh_token: refreshToken });
-        return;
-      }
-      if (authCode) {
-        const { data, error: exchError } = await supabaseService.supabaseClient.auth.exchangeCodeForSession(authCode as any);
-        if (exchError) {
-          setError('Giriş başarısız. Lütfen tekrar deneyin.');
-          if (__DEV__) console.error('Code exchange error:', exchError);
-          return;
-        }
-        if (data?.user) {
-          setUser(data.user);
-          await loadUserProfile(data.user);
-          return;
-        }
-      }
-      // Fallback: attempt to refresh session (Supabase may have already set session)
+
       const { data: refreshed } = await supabaseService.supabaseClient.auth.getSession();
       if (refreshed?.session?.user) {
         setUser(refreshed.session.user);
         await loadUserProfile(refreshed.session.user);
         return;
       }
+
       setError('Giriş tamamlanamadı. Lütfen tekrar deneyin.');
     } catch (error: any) {
       console.error('❌ Google OAuth failed:', error);
-      setError(error.message || 'Google ile giriş başarısız');
+      setError(error?.message || 'Google ile giriş başarısız');
       throw error;
     } finally {
-      // Clear transient OAuth state regardless of outcome
       oauthAppStateRef.current = null;
       try { await WebBrowser.dismissBrowser(); } catch {}
       setLoading(false);
     }
-  }, []);
+  }, [loadUserProfile]);
 
   const signOut = useCallback(async (): Promise<void> => {
     try {
@@ -567,9 +624,14 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       console.log('🔐 Signing out...');
       
       // Reset onboarding state before signout
-      resetOnboarding();
+      await clearLegacyOnboardingState(user?.id);
       console.log('🔄 Onboarding state reset on signout');
-      
+      try {
+        const { useMoodOnboardingStore } = await import('@/store/moodOnboardingStore');
+        useMoodOnboardingStore.getState().reset();
+      } catch (error) {
+        console.warn('⚠️ Failed to reset mood onboarding store on signout:', error);
+      }
       await supabaseService.signOut();
       
       // Auth state change will handle cleanup
@@ -581,7 +643,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     } finally {
       setLoading(false);
     }
-  }, [resetOnboarding]);
+  }, [clearLegacyOnboardingState, user?.id]);
 
   const resendConfirmation = useCallback(async (email: string): Promise<void> => {
     try {
@@ -643,6 +705,28 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       console.error('❌ Failed to update AI preferences:', error);
       throw error;
     }
+  }, [user?.id]);
+
+  // Ensure biometric refresh token stays up to date for opted-in users
+  React.useEffect(() => {
+    if (!user?.id) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const enabled = await biometricService.getPreference(user.id);
+        if (!enabled) return;
+        const session = await supabaseService.supabaseClient.auth.getSession();
+        const refreshToken = session.data.session?.refresh_token;
+        if (refreshToken && !cancelled) {
+          await supabaseService.storeBiometricRefreshToken(user.id, refreshToken);
+        }
+      } catch (error) {
+        console.warn('⚠️ Failed to refresh biometric token:', error);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [user?.id]);
 
   // ===========================

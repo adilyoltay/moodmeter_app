@@ -1,10 +1,6 @@
-
-
 import React from 'react';
 import { Stack } from 'expo-router';
-import { View, StyleSheet } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
-import { LinearGradient } from 'expo-linear-gradient';
 
 export default function AuthLayout() {
   return (
@@ -23,10 +19,3 @@ export default function AuthLayout() {
     </>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-});
-

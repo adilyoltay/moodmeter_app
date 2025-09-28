@@ -1,84 +1,50 @@
-import React, { useEffect, useMemo, useRef } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { ActivityIndicator, StyleSheet, View } from 'react-native';
-import { useRouter } from 'expo-router';
-
-import Welcome from './welcome';
-import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
+import { useRouter, usePathname } from 'expo-router';
 import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
 
-const STEP_ROUTES: Record<number, string> = {
-  1: '/(auth)/onboarding/motivation',
-  2: '/(auth)/onboarding/first-mood',
-  3: '/(auth)/onboarding/lifestyle',
-  4: '/(auth)/onboarding/notifications',
-  5: '/(auth)/onboarding/summary',
-};
-
-const SUMMARY_ROUTE = '/(auth)/onboarding/summary';
-const STEP_ROUTE_KEYS = Object.keys(STEP_ROUTES).map((key) => Number(key)).filter((value) => Number.isFinite(value));
-const MAX_ROUTE_STEP = STEP_ROUTE_KEYS.length ? Math.max(...STEP_ROUTE_KEYS) : 0;
+const STEP_ROUTES = [
+  '/(auth)/onboarding/welcome',
+  '/(auth)/onboarding/motivation',
+  '/(auth)/onboarding/first-mood',
+  '/(auth)/onboarding/lifestyle',
+  '/(auth)/onboarding/notifications',
+  '/(auth)/onboarding/summary',
+] as const;
 
 export default function OnboardingIndex() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user } = useAuth() as any;
-  const step = useMoodOnboardingStore((state) => state.step);
+  const hydrateFromStorage = useMoodOnboardingStore((state) => state.hydrateFromStorage);
   const isHydrated = useMoodOnboardingStore((state) => state.isHydrated);
   const isLoading = useMoodOnboardingStore((state) => state.isLoading);
-  const hydrateFromStorage = useMoodOnboardingStore((state) => state.hydrateFromStorage);
-
-  const hydrationStateRef = useRef<{ userKey: string | null; pending: boolean }>({
-    userKey: null,
-    pending: false,
-  });
+  const step = useMoodOnboardingStore((state) => state.step);
 
   useEffect(() => {
-    if (isHydrated || isLoading) return;
-
-    const userKey = user?.id ? String(user.id) : 'anonymous';
-    const current = hydrationStateRef.current;
-    if (current.pending && current.userKey === userKey) return;
-
-    hydrationStateRef.current = { userKey, pending: true };
-    Promise.resolve(hydrateFromStorage(user?.id)).finally(() => {
-      hydrationStateRef.current = { userKey, pending: false };
-    });
-  }, [hydrateFromStorage, isHydrated, isLoading, user?.id]);
+    hydrateFromStorage(user?.id);
+  }, [hydrateFromStorage, user?.id]);
 
   const targetRoute = useMemo(() => {
     if (!isHydrated) return null;
-    const numericStep = Number.isFinite(step) ? Math.floor(step) : 0;
-    if (numericStep <= 0) return null;
-    if (STEP_ROUTES[numericStep]) return STEP_ROUTES[numericStep];
-    if (numericStep > 0 && MAX_ROUTE_STEP > 0) {
-      return STEP_ROUTES[MAX_ROUTE_STEP] || SUMMARY_ROUTE;
-    }
-    return SUMMARY_ROUTE;
+    const clampedStep = Number.isFinite(step)
+      ? Math.min(Math.max(Math.floor(step), 0), STEP_ROUTES.length - 1)
+      : 0;
+    return STEP_ROUTES[clampedStep];
   }, [isHydrated, step]);
 
   useEffect(() => {
-    if (!isHydrated) return;
-    if (!targetRoute) return;
+    if (!isHydrated || !targetRoute) return;
+    if (pathname === targetRoute) return;
     router.replace(targetRoute as any);
-  }, [isHydrated, targetRoute, router]);
+  }, [isHydrated, pathname, router, targetRoute]);
 
-
-  if (!isHydrated) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="large" color="#10B981" />
-      </View>
-    );
-  }
-
-  if (step > 0) {
-    return (
-      <View style={styles.loader}>
-        <ActivityIndicator size="small" color="#10B981" />
-      </View>
-    );
-  }
-
-  return <Welcome />;
+  return (
+    <View style={styles.loader}>
+      <ActivityIndicator size="large" color="#10B981" />
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({

@@ -1,0 +1,800 @@
+[
+  {
+    "file": "services/messaging.ts",
+    "exports": [
+      "NotificationData",
+      "MessagingService",
+      "messagingService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/moodOfflineQueue.ts",
+    "exports": [
+      "default",
+      "SavedMoodPayload",
+      "OfflineMoodItem",
+      "peekAllDetailed",
+      "enqueue",
+      "remove",
+      "peekAll",
+      "markRetry",
+      "flush",
+      "clearAll",
+      "clearAllStrict",
+      "getBackoffDelay",
+      "buildSummary",
+      "moodOfflineQueue"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/nativeSpeechToText.ts",
+    "exports": [
+      "default",
+      "NativeTranscriptionResult"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/encryption/secureDataService.ts",
+    "exports": [
+      "default",
+      "EncryptedData",
+      "secureDataService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/notificationScheduler.ts",
+    "exports": [
+      "NotificationSchedule",
+      "NotificationScheduler"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/unifiedComplianceService.ts",
+    "exports": [
+      "default",
+      "ConsentRecord",
+      "AuditLog",
+      "DataExportRequest",
+      "DeletionRequest",
+      "ComplianceStatus",
+      "ComplianceValidator",
+      "unifiedComplianceService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/unifiedConflictResolver.ts",
+    "exports": [
+      "default",
+      "ConflictType",
+      "EntityType",
+      "UnifiedDataConflict",
+      "ConflictResolutionResult",
+      "ConflictLogItem",
+      "ResolutionStrategy",
+      "ConflictDetectionEngine",
+      "ResolutionStrategies",
+      "unifiedConflictResolver"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/optimizedStorage.ts",
+    "exports": [
+      "default",
+      "optimizedStorage",
+      "LocalDatabaseAdapter",
+      "AsyncStorageAdapter",
+      "WatermelonDBAdapter"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/todayService.ts",
+    "exports": [
+      "default",
+      "TodayStats",
+      "MoodJourneyData",
+      "TodayData",
+      "todayService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/performanceMonitor.ts",
+    "exports": [
+      "default",
+      "performanceMonitor"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/offlineSync.ts",
+    "exports": [
+      "SyncQueueItem",
+      "OfflineSyncService",
+      "offlineSyncService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/eventBus.ts",
+    "exports": [
+      "eventBus",
+      "Events"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/voiceCheckInHeuristicService.ts",
+    "exports": [
+      "default",
+      "RealtimeState"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/staticGamification.ts",
+    "exports": [
+      "default",
+      "UnifiedPointsCalculation",
+      "UnifiedMission",
+      "calculateMoodEntryPoints",
+      "calculateCheckinPoints",
+      "generateDailyMissions",
+      "generateWeeklyMissions",
+      "unifiedGamificationService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/idempotency/moodContentHash.ts",
+    "exports": [
+      "MoodContentInput",
+      "MoodHashOptions",
+      "computeMoodContentHash"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/api.ts",
+    "exports": [
+      "default",
+      "apiService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/syncMetrics.ts",
+    "exports": [
+      "default",
+      "syncMetrics"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/thoughtService.ts",
+    "exports": [
+      "ThoughtService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/tableClient.ts",
+    "exports": [
+      "TableClient"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/moodService.ts",
+    "exports": [
+      "MoodService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/authService.ts",
+    "exports": [
+      "GoogleOAuthStartResult",
+      "GoogleOAuthCompleteResult",
+      "AuthService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/aiPredictionService.ts",
+    "exports": [
+      "AIPredictionService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/aiService.ts",
+    "exports": [
+      "AIService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/voiceService.ts",
+    "exports": [
+      "VoiceService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/profileService.ts",
+    "exports": [
+      "ProfileService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/compulsionService.ts",
+    "exports": [
+      "CompulsionService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase/breathService.ts",
+    "exports": [
+      "BreathService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/smartNotifications.ts",
+    "exports": [
+      "default",
+      "smartNotifications"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/__tests__/moodOfflineQueue.test.ts",
+    "exports": [],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/speechToTextService.ts",
+    "exports": [
+      "default"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/idempotencyService.ts",
+    "exports": [
+      "idempotencyService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/biometric.ts",
+    "exports": [
+      "BiometricFailureReason",
+      "BiometricCapability",
+      "BiometricPromptOptions",
+      "BiometricAuthenticateResult",
+      "biometricService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/staticMoodMerge.ts",
+    "exports": [
+      "default",
+      "staticMoodMergeService",
+      "intelligentMergeService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/moodDataLoader.ts",
+    "exports": [
+      "OptimizedMoodDataLoader",
+      "moodDataLoader"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/telemetry/noopTelemetry.ts",
+    "exports": [
+      "default",
+      "AIEventType",
+      "AIEventType",
+      "trackAIInteraction",
+      "safeTrackAIInteraction"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/telemetry/performanceMetricsService.ts",
+    "exports": [
+      "default",
+      "DailyMetrics",
+      "performanceMetricsService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/heartpy/calibration.ts",
+    "exports": [
+      "default",
+      "MEA",
+      "calibrationService"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/heartpy/healthSignals.ts",
+    "exports": [
+      "default",
+      "HealthPermissionStatus",
+      "DailyHealthFeatures",
+      "healthSignals"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/heartpy/inferenceMetaStore.ts",
+    "exports": [
+      "default",
+      "InferenceMeta",
+      "setLastInferenceMeta",
+      "getLastInferenceMeta"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/heartpy/index.ts",
+    "exports": [
+      "HeartPyInput",
+      "HeartPyMEA",
+      "healthSignals"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/supabase.ts",
+    "exports": [
+      "default",
+      "supabaseService",
+      "createSupabaseServiceForTest"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/queueRepository.ts",
+    "exports": [
+      "queueRepository"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/offlineSyncOrchestrator.ts",
+    "exports": [
+      "OfflineSyncOrchestrator",
+      "offlineSyncOrchestrator",
+      "createOfflineErrorHook",
+      "createDLQHandler"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/deadLetterQueue.ts",
+    "exports": [
+      "default",
+      "DeadLetterItem",
+      "deadLetterQueue"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/networkMonitor.ts",
+    "exports": [
+      "NetworkMonitor",
+      "networkMonitor"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/queueValidator.ts",
+    "exports": [
+      "ValidationResult",
+      "SyncQueueItem",
+      "QueueValidator",
+      "queueValidator"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/syncMaintenance.ts",
+    "exports": [
+      "syncMaintenance"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/sync/batchOptimizer.ts",
+    "exports": [
+      "default",
+      "batchOptimizer"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/mood/moodMigration.ts",
+    "exports": [],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/mood/encryptionAdapter.ts",
+    "exports": [
+      "encryptionAdapter"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/mood/moodRepository.ts",
+    "exports": [
+      "moodRepository"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/mood/userIdResolver.ts",
+    "exports": [],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/moodTrackingService.ts",
+    "exports": [
+      "default",
+      "MoodEntry",
+      "SaveMoodEntryResult",
+      "moodTracker"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/crashReporting.ts",
+    "exports": [
+      "default",
+      "crashReporting"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/offlineSyncUserFeedbackService.ts",
+    "exports": [
+      "default",
+      "SyncErrorDetails",
+      "SyncErrorSummary"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/moodDeletionCache.ts",
+    "exports": [
+      "DeletedEntryRecord",
+      "MoodDeletionCacheService",
+      "moodDeletionCache"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/asyncStorageHygiene.ts",
+    "exports": [
+      "default",
+      "asyncStorageHygiene"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  },
+  {
+    "file": "services/crossDeviceSync.ts",
+    "exports": [
+      "default",
+      "SyncResult",
+      "crossDeviceSync"
+    ],
+    "usage": {
+      "directImports": 0,
+      "namedImports": 0,
+      "defaultImports": 0
+    },
+    "importedBy": []
+  }
+]

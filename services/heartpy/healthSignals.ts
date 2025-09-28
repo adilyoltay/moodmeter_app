@@ -1,4 +1,122 @@
 // HealthKit read helpers for HeartPy-only, on-device processing
+import { Platform } from 'react-native';
+
+export type HealthPermissionStatus = 'granted' | 'denied' | 'blocked' | 'unavailable';
+
+function getHealthKitModule(): any | null {
+  try {
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    return require('@kingstinct/react-native-healthkit');
+  } catch (error) {
+    console.warn('⚠️ Apple HealthKit module unavailable:', error);
+    return null;
+  }
+}
+
+function buildReadTypes(HK: any): string[] {
+  const Q = HK?.HKQuantityTypeIdentifier || {};
+  const C = HK?.HKCategoryTypeIdentifier || {};
+  return [
+    Q.restingHeartRate || 'HKQuantityTypeIdentifierRestingHeartRate',
+    Q.heartRate || 'HKQuantityTypeIdentifierHeartRate',
+    Q.heartRateVariabilitySDNN || 'HKQuantityTypeIdentifierHeartRateVariabilitySDNN',
+    Q.stepCount || 'HKQuantityTypeIdentifierStepCount',
+    Q.activeEnergyBurned || 'HKQuantityTypeIdentifierActiveEnergyBurned',
+    Q.vo2Max || 'HKQuantityTypeIdentifierVO2Max',
+    C.sleepAnalysis || 'HKCategoryTypeIdentifierSleepAnalysis',
+  ];
+}
+
+async function resolveAuthorizationStatuses(HK: any, readTypes: string[]): Promise<number[]> {
+  if (typeof HK?.authorizationStatusFor !== 'function') return [];
+  const statuses: number[] = [];
+  for (const identifier of readTypes) {
+    try {
+      const status = await HK.authorizationStatusFor(identifier);
+      statuses.push(typeof status === 'number' ? status : Number(status));
+    } catch {
+      statuses.push(NaN);
+    }
+  }
+  return statuses;
+}
+
+const FALLBACK_AUTH_STATUS = {
+  notDetermined: 0,
+  sharingDenied: 1,
+  sharingAuthorized: 2,
+};
+
+async function performAuthorizationRequest(HK: any, readTypes: string[]): Promise<boolean> {
+  if (typeof HK?.requestAuthorization !== 'function') {
+    return false;
+  }
+  try {
+    const result = await HK.requestAuthorization({ read: readTypes, write: [] });
+    if (typeof result === 'boolean') {
+      return result;
+    }
+  } catch (error) {
+    // Some versions expect (read, write) signature
+    try {
+      const legacyResult = await HK.requestAuthorization(readTypes, []);
+      if (typeof legacyResult === 'boolean') {
+        return legacyResult;
+      }
+    } catch (legacyError) {
+      console.warn('⚠️ Apple Health legacy authorization failed:', legacyError);
+    }
+    console.warn('⚠️ Apple Health authorization failed:', error);
+  }
+  return false;
+}
+
+export async function requestAppleHealthPermissions(): Promise<HealthPermissionStatus> {
+  if (Platform.OS !== 'ios') {
+    return 'unavailable';
+  }
+
+  const HK = getHealthKitModule();
+  if (!HK) {
+    return 'unavailable';
+  }
+
+  try {
+    if (typeof HK.isHealthDataAvailable === 'function') {
+      const available = await HK.isHealthDataAvailable();
+      if (!available) {
+        return 'unavailable';
+      }
+    }
+
+    const readTypes = buildReadTypes(HK);
+    const authEnum = HK?.HKAuthorizationStatus || FALLBACK_AUTH_STATUS;
+
+    const preStatuses = await resolveAuthorizationStatuses(HK, readTypes);
+    if (preStatuses.length && preStatuses.every((value) => value === authEnum.sharingAuthorized)) {
+      return 'granted';
+    }
+
+    const requestGranted = await performAuthorizationRequest(HK, readTypes);
+
+    const postStatuses = await resolveAuthorizationStatuses(HK, readTypes);
+    if (postStatuses.length) {
+      if (postStatuses.every((value) => value === authEnum.sharingAuthorized)) {
+        return 'granted';
+      }
+      if (postStatuses.some((value) => value === authEnum.sharingDenied)) {
+        return 'blocked';
+      }
+      return 'denied';
+    }
+
+    // Fallback to boolean result when status APIs unavailable
+    return requestGranted ? 'granted' : 'denied';
+  } catch (error) {
+    console.warn('⚠️ Apple Health permission request failed:', error);
+    return 'denied';
+  }
+}
 
 export type DailyHealthFeatures = {
   dateYmdLocal: string;
@@ -28,36 +146,8 @@ function toDateRangeLocal(ymd: string): { start: Date; end: Date } {
 
 export const healthSignals = {
   async ensurePermissions(): Promise<boolean> {
-    try {
-      const HK: any = require('@kingstinct/react-native-healthkit');
-      const Q = HK.HKQuantityTypeIdentifier || {};
-      const C = HK.HKCategoryTypeIdentifier || {};
-      const readTypes = [
-        Q.restingHeartRate || 'restingHeartRate',
-        Q.heartRate || 'heartRate',
-        Q.heartRateVariabilitySDNN || 'heartRateVariabilitySDNN',
-        Q.stepCount || 'stepCount',
-        Q.activeEnergyBurned || 'activeEnergyBurned',
-        Q.vo2Max || 'vo2Max',
-        C.sleepAnalysis || 'sleepAnalysis',
-      ];
-      const writeTypes: any[] = [];
-      if (typeof HK.requestAuthorization === 'function') {
-        try {
-          const ok = await HK.requestAuthorization({ read: readTypes, write: writeTypes });
-          return !!ok;
-        } catch (e) {
-          try {
-            const ok2 = await HK.requestAuthorization(readTypes, writeTypes);
-            return !!ok2;
-          } catch {}
-        }
-      }
-      return true;
-    } catch (e) {
-      console.warn('HealthKit ensurePermissions failed (soft fallback):', e);
-      return true;
-    }
+    const status = await requestAppleHealthPermissions();
+    return status === 'granted';
   },
 
   async getDailyFeatures(dateYmdLocal: string): Promise<DailyHealthFeatures> {

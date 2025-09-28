@@ -1,13 +1,14 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { 
-  Text, 
-  View, 
-  StyleSheet, 
-  ScrollView, 
+import React, { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import {
+  Text,
+  View,
+  StyleSheet,
+  ScrollView,
   Pressable,
   Alert,
   Share,
-  Linking
+  Linking,
+  ActivityIndicator,
 } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
@@ -18,7 +19,7 @@ import { Switch } from '@/components/ui/Switch';
 import ScreenLayout from '@/components/layout/ScreenLayout';
 import { useAccentColor } from '@/contexts/AccentColorContext';
 import VAPad from '@/components/va/VAPad';
-import { Colors } from '@/constants/Colors';
+import { Colors, Spacing as SpacingTokens } from '@/constants/Colors';
 
 import Button from '@/components/ui/Button';
 import type { TimeRange } from '@/types/mood';
@@ -33,6 +34,9 @@ import Constants from 'expo-constants';
 import { Picker } from '@react-native-picker/picker';
 import { useRouter } from 'expo-router';
 import { PanResponder, PanResponderGestureState, GestureResponderEvent } from 'react-native';
+import { useBiometric } from '@/hooks/useBiometric';
+import useOfflineMoodSync from '@/hooks/useOfflineMoodSync';
+import OfflineQueueManager from '@/components/settings/OfflineQueueManager';
 
 // Stores
 
@@ -75,7 +79,7 @@ interface SettingsData {
 
 export default function SettingsScreen() {
   const router = useRouter();
-  const { t } = useTranslation();
+  const { t, language } = useTranslation();
   const { mode: themeMode, setMode: setThemeMode } = useTheme();
   // Dil seçimi kaldırıldı; uygulama sistem dilini otomatik kullanır
   const { user, signOut, profile: authProfile } = useAuth();
@@ -129,6 +133,56 @@ export default function SettingsScreen() {
     visibleTimeRanges: ['week','month','6months','year'],
     colorPalette: 'va',
   });
+
+  const {
+    pendingCount: offlinePendingCount,
+    items: offlineQueueItems,
+    isSyncing: offlineSyncing,
+    retryItem: retryOfflineItem,
+    deleteItem: deleteOfflineItem,
+    clearQueue: clearOfflineQueue,
+    flushQueue: flushOfflineQueue,
+    refreshQueue: refreshOfflineQueue,
+  } = useOfflineMoodSync({
+    enabled: true,
+    onError: () => {
+      Alert.alert('Senkronizasyon Hatası', 'Mood kaydı yeniden gönderilemedi. Lütfen bağlantınızı kontrol edin.');
+    },
+  });
+
+  const handleRetryAllQueued = useCallback(async () => {
+    await flushOfflineQueue();
+    await refreshOfflineQueue();
+    Alert.alert('Senkronizasyon', 'Bekleyen mood kayıtları tekrar deneniyor.');
+  }, [flushOfflineQueue, refreshOfflineQueue]);
+
+  const handleRetryQueuedItem = useCallback(
+    async (itemId: string) => {
+      const result = await retryOfflineItem(itemId);
+      if (result === 'FAILED') {
+        Alert.alert('Senkronizasyon Hatası', 'Mood kaydı gönderilemedi. Lütfen bağlantınızı kontrol edin.');
+      }
+      if (result === 'SUCCESS') {
+        Alert.alert('Senkronizasyon', 'Mood kaydı başarıyla gönderildi.');
+      }
+      return result;
+    },
+    [retryOfflineItem]
+  );
+
+  const handleDeleteQueuedItem = useCallback(
+    async (itemId: string) => {
+      await deleteOfflineItem(itemId);
+      await refreshOfflineQueue();
+      Alert.alert('Kuyruk Güncellendi', 'Seçilen mood kaydı kuyruktan kaldırıldı.');
+    },
+    [deleteOfflineItem, refreshOfflineQueue]
+  );
+
+  const handleClearQueuedItems = useCallback(async () => {
+    await clearOfflineQueue();
+    await refreshOfflineQueue();
+  }, [clearOfflineQueue, refreshOfflineQueue]);
 
   // Swipe right to navigate back to Today
   const panResponder = useRef(
@@ -280,6 +334,30 @@ export default function SettingsScreen() {
     } catch {}
   };
 
+  const biometric = useBiometric({
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    language,
+  });
+
+  const primaryBiometricAccount = useMemo(() => {
+    if (!biometric.knownAccounts.length) return null;
+    return biometric.knownAccounts[biometric.knownAccounts.length - 1];
+  }, [biometric.knownAccounts]);
+
+  useEffect(() => {
+    setSettings((prev) => (prev.biometric === biometric.enabled ? prev : { ...prev, biometric: biometric.enabled }));
+  }, [biometric.enabled]);
+
+  useEffect(() => {
+    if (biometric.error) {
+      Alert.alert(
+        language === 'tr' ? 'Biometrik Doğrulama' : 'Biometric Authentication',
+        biometric.error
+      );
+    }
+  }, [biometric.error, language]);
+
 
 
   // handleContinueAIOnboarding function removed - AI onboarding section removed
@@ -299,6 +377,24 @@ export default function SettingsScreen() {
       }
     } catch (error) {
       console.error('Error saving settings:', error);
+    }
+  };
+
+  const handleToggleBiometric = async (value: boolean) => {
+    const ok = await biometric.toggleBiometric(value);
+    if (ok) {
+      await updateSetting('biometric', value);
+      Haptics.notificationAsync(Haptics.ImpactFeedbackStyle.Light);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  };
+
+  const handleClearBiometric = async () => {
+    const ok = await biometric.toggleBiometric(false);
+    if (ok) {
+      await updateSetting('biometric', false);
+      Haptics.notificationAsync(Haptics.ImpactFeedbackStyle.Light);
     }
   };
 
@@ -637,6 +733,37 @@ export default function SettingsScreen() {
           </View>
         </View>
 
+        {/* Senkronizasyon Yönetimi */}
+        <View style={styles.section}>
+          <View style={styles.sectionHeaderRow}>
+            <Text style={[styles.sectionTitle, { marginBottom: 0 }]}>Senk. Yönetimi</Text>
+            {offlinePendingCount > 0 ? (
+              <View style={styles.badge}>
+                <Text style={styles.badgeText}>{offlinePendingCount}</Text>
+              </View>
+            ) : null}
+          </View>
+          <View style={styles.sectionContent}>
+            {offlinePendingCount > 5 ? (
+              <View style={styles.queueWarning}>
+                <MaterialCommunityIcons name="alert-circle" size={18} color={Colors.status.warning} />
+                <Text style={styles.queueWarningText}>
+                  {`Kuyrukta ${offlinePendingCount} kayıt var. Bağlantınızı kontrol edip senkronizasyonu başlatın.`}
+                </Text>
+              </View>
+            ) : null}
+            <OfflineQueueManager
+              items={offlineQueueItems}
+              isSyncing={offlineSyncing}
+              onRetryAll={handleRetryAllQueued}
+              onRetry={handleRetryQueuedItem}
+              onDelete={handleDeleteQueuedItem}
+              onClearAll={handleClearQueuedItems}
+              onRefresh={refreshOfflineQueue}
+            />
+          </View>
+        </View>
+
         {/* Görünüm Tercihleri */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Görünüm Tercihleri</Text>
@@ -745,19 +872,61 @@ export default function SettingsScreen() {
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Güvenlik</Text>
           <View style={styles.sectionContent}>
-            {renderSettingItem(
-              'Biyometrik Kilit',
-              'fingerprint',
-              settings.biometric,
-              async (value) => {
-                await updateSetting('biometric', value);
-                try {
-                  const { setBiometricEnabled } = (await import('@/store/securityStore')).useSecurityStore.getState();
-                  await setBiometricEnabled(value);
-                } catch (e) {
-                  console.warn('Biometric toggle failed to apply:', e);
-                }
-              }
+            <View style={styles.biometricCard}>
+              <View style={styles.biometricCardLeft}>
+                <Text style={styles.biometricCardTitle}>
+                  {language === 'tr' ? 'Biometrik Giriş' : 'Biometric Login'}
+                </Text>
+                <Text style={styles.biometricCardSubtitle}>
+                  {language === 'tr'
+                    ? 'FaceID/TouchID ile uygulamaya hızlı ve güvenli giriş yap.'
+                    : 'Use FaceID/TouchID for quick and secure access.'}
+                </Text>
+                {primaryBiometricAccount ? (
+                  <View style={styles.biometricMeta}>
+                    <MaterialCommunityIcons name="account-circle" size={18} color="#047857" />
+                    <View style={{ marginLeft: 8 }}>
+                      <Text style={styles.biometricMetaText}>
+                        {language === 'tr' ? 'Kayıtlı hesap:' : 'Saved account:'} {primaryBiometricAccount.email}
+                      </Text>
+                      <Text style={styles.biometricMetaSubText}>
+                        {language === 'tr' ? 'Güncellendi:' : 'Updated:'}{' '}
+                        {new Date(primaryBiometricAccount.updatedAt).toLocaleString(language)}
+                      </Text>
+                    </View>
+                  </View>
+                ) : (
+                  <Text style={styles.biometricMetaHint}>
+                    {language === 'tr'
+                      ? 'Şifrenizle bir kez giriş yaptıktan sonra buradan biometrik erişimi etkinleştirebilirsiniz.'
+                      : 'Sign in once with your password, then enable biometric access here.'}
+                  </Text>
+                )}
+              </View>
+              <View style={styles.biometricSwitchColumn}>
+                <Switch
+                  value={biometric.enabled}
+                  onValueChange={handleToggleBiometric}
+                  disabled={biometric.processing || !user}
+                />
+                {biometric.processing && (
+                  <ActivityIndicator size="small" color="#10B981" style={{ marginTop: 8 }} />
+                )}
+              </View>
+            </View>
+
+            {primaryBiometricAccount && (
+              <Pressable
+                style={styles.biometricAction}
+                onPress={handleClearBiometric}
+                disabled={biometric.processing}
+                accessibilityRole="button"
+              >
+                <MaterialCommunityIcons name="trash-can-outline" size={18} color="#B91C1C" />
+                <Text style={styles.biometricActionText}>
+                  {language === 'tr' ? 'Kayıtlı biometrik erişimi kaldır' : 'Remove saved biometric access'}
+                </Text>
+              </Pressable>
             )}
           </View>
         </View>
@@ -1159,16 +1328,113 @@ const styles = StyleSheet.create({
     marginBottom: 24,
     paddingHorizontal: 20,
   },
+  sectionHeaderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 12,
+  },
   sectionTitle: {
     fontSize: 16,
     fontWeight: '600',
     color: '#1F2937',
     marginBottom: 12,
   },
+  badge: {
+    minWidth: 28,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 999,
+    backgroundColor: '#ECFDF5',
+    borderWidth: 1,
+    borderColor: 'rgba(16, 185, 129, 0.4)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  badgeText: {
+    color: '#047857',
+    fontWeight: '700',
+    fontSize: 12,
+  },
+  queueWarning: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: SpacingTokens.sm,
+    paddingHorizontal: SpacingTokens.md,
+    paddingVertical: SpacingTokens.sm,
+    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: 'rgba(245, 158, 11, 0.25)',
+  },
+  queueWarningText: {
+    flex: 1,
+    color: Colors.status.warning,
+    fontSize: 13,
+    fontWeight: '600',
+  },
   sectionContent: {
     backgroundColor: Colors.ui.card,
     borderRadius: 12,
     overflow: 'hidden',
+  },
+  biometricCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    justifyContent: 'space-between',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#F3F4F6',
+    gap: 16,
+  },
+  biometricCardLeft: {
+    flex: 1,
+    gap: 8,
+  },
+  biometricCardTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  biometricCardSubtitle: {
+    fontSize: 14,
+    color: '#6B7280',
+  },
+  biometricMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ECFDF5',
+    borderRadius: 10,
+    padding: 10,
+  },
+  biometricMetaText: {
+    fontSize: 13,
+    color: '#065F46',
+    fontWeight: '600',
+  },
+  biometricMetaSubText: {
+    fontSize: 12,
+    color: '#047857',
+    marginTop: 2,
+  },
+  biometricMetaHint: {
+    fontSize: 13,
+    color: '#6B7280',
+  },
+  biometricSwitchColumn: {
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+  },
+  biometricAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 8,
+    padding: 16,
+  },
+  biometricActionText: {
+    color: '#B91C1C',
+    fontSize: 13,
+    fontWeight: '600',
   },
   settingItem: {
     flexDirection: 'row',

@@ -1,0 +1,15 @@
+{
+  "entry": ["app/**/*.tsx", "index.js"],
+  "project": ["**/*.{ts,tsx}"],
+  "ignore": [
+    "**/__tests__/**",
+    "**/*.test.{ts,tsx}",
+    "**/*.spec.{ts,tsx}",
+    "**/*.stories.{ts,tsx}",
+    "storybook/**",
+    "archive/**",
+    "scripts/**"
+  ],
+  "ignoreBinaries": ["expo", "react-native"],
+  "ignoreDependencies": ["@expo/*", "expo-*"]
+}

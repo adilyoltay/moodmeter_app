@@ -801,7 +801,11 @@ export class OfflineSyncService {
   };
 
   console.log(`🔄 Syncing mood entry with consistent timestamp: ${originalTimestamp}`);
-  await (svc as any).saveMoodEntry(entry);
+  const syncResult = await (svc as any).saveMoodEntry(entry);
+  if (syncResult && typeof syncResult === 'object' && syncResult.status === 'QUEUED_OFFLINE') {
+    console.warn('⚠️ Supabase returned QUEUED_OFFLINE while processing offline sync; will retry later.');
+    throw new Error('Mood entry re-queued for offline sync');
+  }
     
     // ✅ Mark as successfully synced in idempotency service
     if (raw.local_entry_id) {

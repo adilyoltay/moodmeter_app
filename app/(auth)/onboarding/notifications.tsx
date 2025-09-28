@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
-import { View, Text, Pressable, Switch, StyleSheet, Linking } from 'react-native';
+import { View, Text, Pressable, Switch, StyleSheet, Linking, Platform, ActivityIndicator } from 'react-native';
 import { useFocusEffect } from '@react-navigation/native';
 import { useThemeColors } from '@/contexts/ThemeContext';
 import { useRouter } from 'expo-router';
@@ -7,6 +7,8 @@ import { useMoodOnboardingStore } from '@/store/moodOnboardingStore';
 import ProgressDots from '@/components/onboarding/ProgressDots';
 import * as Notifications from 'expo-notifications';
 import { ObsessLessColors, Spacing } from '@/constants/DesignSystem';
+import { requestAppleHealthPermissions } from '@/services/heartpy/healthSignals';
+import type { HealthPermissionState } from '@/features/onboarding/types';
 
 type PermissionState = 'granted' | 'denied' | 'undetermined';
 
@@ -29,6 +31,7 @@ export default function NotificationsStep() {
     setReminders,
     payload,
     finalizeFlags,
+    setHealthPermissionStatus,
   } = useMoodOnboardingStore();
 
   const theme = useThemeColors();
@@ -45,8 +48,16 @@ export default function NotificationsStep() {
   const [permissionError, setPermissionError] = useState<string | null>(null);
   const [isRequestingPermission, setIsRequestingPermission] = useState(false);
   const [isContinuing, setIsContinuing] = useState(false);
+  const [isRequestingHealthPermission, setIsRequestingHealthPermission] = useState(false);
+  const healthStatus: HealthPermissionState = payload.health?.status ?? 'not_requested';
 
   useEffect(() => { setStep(4); }, [setStep]);
+
+  useEffect(() => {
+    if (Platform.OS !== 'ios' && healthStatus !== 'unavailable') {
+      setHealthPermissionStatus('unavailable');
+    }
+  }, [healthStatus, setHealthPermissionStatus]);
 
   const timezone = useMemo(
     () => remindersTimezone || Intl.DateTimeFormat().resolvedOptions().timeZone,
@@ -178,6 +189,21 @@ export default function NotificationsStep() {
     }
   }, [ensurePermissionBeforeContinue, finalizeFlags, isContinuing, next, router]);
 
+  const handleHealthPermission = useCallback(async () => {
+    if (Platform.OS !== 'ios' || isRequestingHealthPermission) return;
+    setIsRequestingHealthPermission(true);
+    try {
+      const status = await requestAppleHealthPermissions();
+      const normalized: HealthPermissionState = status ?? 'denied';
+      setHealthPermissionStatus(normalized, new Date().toISOString());
+    } catch (error) {
+      console.warn('⚠️ Apple Health permission request failed:', error);
+      setHealthPermissionStatus('denied', new Date().toISOString());
+    } finally {
+      setIsRequestingHealthPermission(false);
+    }
+  }, [isRequestingHealthPermission, setHealthPermissionStatus]);
+
   const handleSkip = useCallback(() => {
     persistReminderState(false, permissionStatus === 'granted' ? 'granted' : 'undetermined');
     finalizeFlags();
@@ -224,6 +250,45 @@ export default function NotificationsStep() {
               <Text style={styles.errorActionText}>Ayarları Aç</Text>
             </Pressable>
           )}
+        </View>
+      )}
+
+      {Platform.OS === 'ios' && (
+        <View style={styles.healthCard}>
+          <Text style={styles.healthTitle}>Apple Health Senkronizasyonu</Text>
+          <Text style={styles.healthDescription}>
+            Kalp ritmi, uyku ve aktivite verilerini eşleştirerek daha hassas içgörüler sunarız. Tüm süreç cihaz içinde gerçekleşir.
+          </Text>
+          <View style={styles.healthStatusRow}>
+            <Text style={styles.healthStatusLabel}>Durum:</Text>
+            <Text style={[styles.healthStatusValue, getHealthStatusColorStyle(healthStatus)]}>
+              {renderHealthStatusLabel(healthStatus)}
+            </Text>
+          </View>
+          <View style={styles.healthActions}>
+            <Pressable
+              accessibilityRole="button"
+              onPress={handleHealthPermission}
+              disabled={healthStatus === 'granted' || healthStatus === 'unavailable' || isRequestingHealthPermission}
+              style={[
+                styles.healthPrimaryButton,
+                (healthStatus === 'granted' || healthStatus === 'unavailable' || isRequestingHealthPermission) && styles.healthPrimaryButtonDisabled,
+              ]}
+            >
+              {isRequestingHealthPermission ? (
+                <ActivityIndicator size="small" color="#FFFFFF" />
+              ) : (
+                <Text style={styles.healthPrimaryText}>
+                  {healthStatus === 'granted' ? 'İzin verildi' : 'İzin iste'}
+                </Text>
+              )}
+            </Pressable>
+            {(healthStatus === 'blocked' || healthStatus === 'denied') && (
+              <Pressable accessibilityRole="button" onPress={openSettings} style={styles.healthSecondaryButton}>
+                <Text style={styles.healthSecondaryText}>Ayarları Aç</Text>
+              </Pressable>
+            )}
+          </View>
         </View>
       )}
 
@@ -328,6 +393,69 @@ const styles = StyleSheet.create({
     color: ObsessLessColors.white,
     fontWeight: '600',
   },
+  healthCard: {
+    marginTop: Spacing.lg,
+    padding: Spacing.lg,
+    borderRadius: 16,
+    backgroundColor: '#F3F4F6',
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+  },
+  healthTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#111827',
+  },
+  healthDescription: {
+    marginTop: Spacing.xs,
+    color: '#4B5563',
+    fontSize: 13,
+    lineHeight: 18,
+  },
+  healthStatusRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.sm,
+  },
+  healthStatusLabel: {
+    fontSize: 13,
+    color: '#374151',
+    marginRight: 6,
+  },
+  healthStatusValue: {
+    fontSize: 13,
+    fontWeight: '600',
+  },
+  healthActions: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: Spacing.md,
+    gap: 12,
+  },
+  healthPrimaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+    borderRadius: 12,
+    backgroundColor: '#111827',
+  },
+  healthPrimaryButtonDisabled: {
+    backgroundColor: '#9CA3AF',
+  },
+  healthPrimaryText: {
+    color: '#FFFFFF',
+    fontWeight: '600',
+  },
+  healthSecondaryButton: {
+    paddingVertical: Spacing.sm,
+    paddingHorizontal: Spacing.md,
+  },
+  healthSecondaryText: {
+    color: '#1F2937',
+    fontWeight: '600',
+  },
   footerButtons: {
     flexDirection: 'row',
     marginBottom: Spacing.md,
@@ -370,6 +498,38 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
 });
+
+const renderHealthStatusLabel = (status: HealthPermissionState): string => {
+  switch (status) {
+    case 'granted':
+      return 'İzin verildi';
+    case 'blocked':
+      return 'Ayarlar kapalı';
+    case 'denied':
+      return 'Reddedildi';
+    case 'unavailable':
+      return 'Desteklenmiyor';
+    case 'not_requested':
+    default:
+      return 'Henüz istekte bulunulmadı';
+  }
+};
+
+const getHealthStatusColorStyle = (status: HealthPermissionState) => {
+  switch (status) {
+    case 'granted':
+      return { color: '#047857' };
+    case 'blocked':
+    case 'denied':
+      return { color: '#DC2626' };
+    case 'unavailable':
+      return { color: '#6B7280' };
+    case 'not_requested':
+    default:
+      return { color: '#6B7280' };
+  }
+};
+
 const areDaysEqual = (next?: string[], base?: string[]) => {
   if (next === base) return true;
   if (!next || !base) return false;

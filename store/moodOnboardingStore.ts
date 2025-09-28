@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { deriveFeatureFlags, applyReminderRule } from '@/features/onboarding/lib/deriveFeatureFlags';
-import type { OnboardingPayload, MotivationKey } from '@/features/onboarding/types';
+import type { OnboardingPayload, MotivationKey, HealthPermissionState } from '@/features/onboarding/types';
 import moodTracker from '@/services/moodTrackingService';
 import { isUUID } from '@/utils/validators';
 import supabaseService from '@/services/supabase';
@@ -24,6 +24,7 @@ interface MoodOnboardingState {
   setFirstMood: (score?: 1|2|3|4|5, tags?: string[]) => void;
   setLifestyle: (data: OnboardingPayload['lifestyle']) => void;
   setReminders: (data: OnboardingPayload['reminders']) => void;
+  setHealthPermissionStatus: (status: HealthPermissionState, requestedAt?: string) => void;
   
   // Persistence methods
   hydrateFromStorage: (userId?: string) => Promise<void>;
@@ -79,6 +80,7 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
   totalSteps: 6,
   payload: {
     motivation: [],
+    health: { status: 'not_requested' },
     meta: { version: 1, created_at: new Date().toISOString() },
   },
   startedAt: Date.now(),
@@ -170,10 +172,27 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
     setTimeout(() => get().persistToStorage(), 100);
   },
 
+  setHealthPermissionStatus: (status, requestedAt) => {
+    set((st) => ({
+      payload: {
+        ...st.payload,
+        health: {
+          status,
+          lastRequestedAt: requestedAt || st.payload.health?.lastRequestedAt,
+        },
+      },
+    }));
+    setTimeout(() => get().persistToStorage(), 100);
+  },
+
   finalizeFlags: () => {
     set((st) => {
       const base = deriveFeatureFlags(st.payload.motivation || []);
       const withReminder = applyReminderRule(base, st.payload.reminders?.enabled);
+      if (st.payload.health?.status === 'granted') {
+        withReminder.healthkit_sync = true;
+        withReminder.sleep_energy_cards = true;
+      }
       return { payload: { ...st.payload, feature_flags: withReminder } };
     });
     // Auto-persist on change
@@ -226,6 +245,9 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
           first_mood: restoredPayload.first_mood || undefined,
           lifestyle: restoredPayload.lifestyle || undefined,
           reminders: restoredPayload.reminders || undefined,
+          health: restoredPayload.health && restoredPayload.health.status
+            ? { status: restoredPayload.health.status as HealthPermissionState, lastRequestedAt: restoredPayload.health.lastRequestedAt }
+            : { status: 'not_requested' },
           feature_flags: restoredPayload.feature_flags || undefined,
           profile: restoredPayload.profile || undefined,
           meta: restoredPayload.meta || { version: 1, created_at: new Date().toISOString() }
@@ -325,16 +347,39 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
   },
 
   reset: () => {
+    if (stepPersistTimer) {
+      clearTimeout(stepPersistTimer);
+      stepPersistTimer = null;
+    }
+
     set({
       step: 0,
+      totalSteps: 6,
       payload: {
         motivation: [],
+        health: { status: 'not_requested' },
         meta: { version: 1, created_at: new Date().toISOString() },
       },
       startedAt: Date.now(),
-      isHydrated: false,
+      isHydrated: true,
       isLoading: false,
     });
+
+    void (async () => {
+      try {
+        await AsyncStorage.multiRemove([
+          STORAGE_KEY_PAYLOAD,
+          STORAGE_KEY_STEP,
+          'profile_v2',
+          'onboarding_mood_insights',
+          'onboarding_motivation_insights',
+        ]);
+        console.log('🧹 Onboarding storage cleared');
+      } catch (error) {
+        console.warn('⚠️ Failed to clear onboarding storage during reset:', error);
+      }
+    })();
+
     console.log('🔄 Onboarding store reset');
   },
 
@@ -578,7 +623,7 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
     // ✅ STEP 4: CRITICAL - First Mood Entry (important baseline data)
     if (payload.first_mood?.score) {
       try {
-        await moodTracker.saveMoodEntry({
+        const saveResult = await moodTracker.saveMoodEntry({
           user_id: uidForKey,
           mood_score: Math.max(10, Math.min(100, payload.first_mood.score * 20)), // 1-5 → 20-100 consistent mapping
           energy_level: 5, // Default neutral energy (1-10 scale)
@@ -589,7 +634,11 @@ export const useMoodOnboardingStore = create<MoodOnboardingState>((set, get) => 
           // mark as onboarding to suppress micro-reward flicker
           source: 'onboarding' as any,
         } as any);
-        console.log('✅ First mood entry saved successfully');
+        if (saveResult.status === 'QUEUED_OFFLINE') {
+          console.log('ℹ️ First mood entry queued for offline sync');
+        } else {
+          console.log('✅ First mood entry saved successfully');
+        }
       } catch (error) {
         const errorMsg = 'First mood entry save failed';
         result.criticalErrors.push(errorMsg);

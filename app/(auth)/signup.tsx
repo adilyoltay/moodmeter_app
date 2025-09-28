@@ -8,7 +8,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton';
 import * as Haptics from 'expo-haptics';
 import Animated, { FadeInDown } from 'react-native-reanimated';
-import { isValidEmail } from '@/utils/validators';
+import { isValidEmail, isStrongPassword } from '@/utils/validators';
 
 export default function SignupScreen() {
   const [name, setName] = useState('');
@@ -17,7 +17,7 @@ export default function SignupScreen() {
   const [showPassword, setShowPassword] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const theme = useThemeColors();
-  const { signUpWithEmail, signInWithGoogle, isLoading, error, clearError, user } = useAuth() as any;
+  const { signUpWithEmail, isLoading, error, clearError, user } = useAuth() as any;
 
   const combinedError = formError || error;
 
@@ -54,14 +54,22 @@ export default function SignupScreen() {
           const supabaseService = (await import('@/services/supabase')).default;
           const { data: profile, error } = await supabaseService.supabaseClient
             .from('user_profiles')
-            .select('user_id')
+            .select('user_id, onboarding_completed, onboarding_completed_at')
             .eq('user_id', user.id)
-            .single();
-          if (!cancelled && profile && !error) {
+            .maybeSingle();
+
+          const serverCompleted = !error && profile && (
+            profile.onboarding_completed === true ||
+            Boolean(profile.onboarding_completed_at)
+          );
+
+          if (!cancelled && serverCompleted) {
             router.replace('/(tabs)');
             return;
           }
-        } catch {}
+        } catch (remoteError) {
+          console.warn('⚠️ Onboarding server check failed:', remoteError);
+        }
         if (!cancelled) router.replace('/(auth)/onboarding');
       } catch {
         if (!cancelled) router.replace('/(auth)/onboarding');
@@ -77,8 +85,12 @@ export default function SignupScreen() {
       return;
     }
 
-    if (password.length < 6) {
-      Alert.alert('Hata', 'Şifre en az 6 karakter olmalıdır');
+    if (!isStrongPassword(password)) {
+      Alert.alert(
+        'Hata',
+        'Şifreniz en az 8 karakter olmalı ve bir büyük harf, bir rakam ile özel karakter içermelidir.'
+      );
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
       return;
     }
 
@@ -120,20 +132,6 @@ export default function SignupScreen() {
       // Hata mesajını kullanıcıya göster
       const errorMessage = error?.message || 'Kayıt işlemi başarısız oldu. Lütfen tekrar deneyin.';
       Alert.alert('Kayıt Hatası', errorMessage);
-    }
-  };
-
-  const handleGoogleSignup = async () => {
-    try {
-      clearError();
-      await signInWithGoogle();
-    } catch (error: any) {
-      console.error('❌ Google signup error:', error);
-      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
-      
-      // Hata mesajını kullanıcıya göster
-      const errorMessage = error?.message || 'Google ile kayıt başarısız oldu. Lütfen tekrar deneyin.';
-      Alert.alert('Google Kayıt Hatası', errorMessage);
     }
   };
 
@@ -202,7 +200,7 @@ export default function SignupScreen() {
               <MaterialCommunityIcons name="lock" size={20} color="#6B7280" />
               <TextInput
                 style={styles.input}
-                placeholder="Şifreniz (en az 6 karakter)"
+                placeholder="Şifreniz (en az 8 karakter, bir büyük harf, rakam ve özel karakter)"
                 placeholderTextColor="#9CA3AF"
                 value={password}
                 onChangeText={makeFieldChangeHandler(setPassword)}
@@ -245,7 +243,7 @@ export default function SignupScreen() {
 
             {/* Google Signup */}
             <View style={{ height: 12 }} />
-            <GoogleSignInButton onPress={handleGoogleSignup} disabled={isLoading} loading={isLoading} mode="signup" />
+            <GoogleSignInButton disabled={isLoading} mode="signup" />
           </Animated.View>
         </View>
 

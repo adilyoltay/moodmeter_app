@@ -15,7 +15,7 @@ import ScreenLayout from '@/components/layout/ScreenLayout';
 import { AchievementBadge } from '@/components/gamification/AchievementBadge';
 import { useGamificationStore } from '@/store/gamificationStore';
 import { AchievementDefinition } from '@/types/gamification';
-import { Colors, Typography, Spacing, BorderRadius } from '@/constants/Colors';
+import { Colors, Typography, Spacing as SpacingTokens, BorderRadius } from '@/constants/Colors';
 
 export default function AchievementsScreen() {
   const { profile, achievements } = useGamificationStore();
@@ -175,13 +175,13 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: SpacingTokens.lg,
+    paddingVertical: SpacingTokens.md,
     borderBottomWidth: 1,
     borderBottomColor: Colors.ui.border,
   },
   backButton: {
-    padding: Spacing.xs,
+    padding: SpacingTokens.xs,
   },
   headerTitle: {
     fontSize: Typography.fontSize.headingM,
@@ -203,7 +203,7 @@ const styles = StyleSheet.create({
   statsContainer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    paddingVertical: Spacing.xl,
+    paddingVertical: SpacingTokens.xl,
     borderBottomWidth: 1,
     borderBottomColor: Colors.ui.border,
   },
@@ -218,24 +218,24 @@ const styles = StyleSheet.create({
   statLabel: {
     fontSize: Typography.fontSize.bodyS,
     color: Colors.text.secondary,
-    marginTop: Spacing.xs,
+    marginTop: SpacingTokens.xs,
   },
   categorySection: {
-    paddingHorizontal: Spacing.lg,
-    paddingVertical: Spacing.xl,
+    paddingHorizontal: SpacingTokens.lg,
+    paddingVertical: SpacingTokens.xl,
   },
   categoryTitle: {
     fontSize: Typography.fontSize.headingS,
     fontWeight: Typography.fontWeight.semiBold,
-    marginBottom: Spacing.lg,
+    marginBottom: SpacingTokens.lg,
   },
   achievementsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginHorizontal: -Spacing.sm,
+    marginHorizontal: -SpacingTokens.sm,
   },
   bottomSpacing: {
-    height: Spacing.xxl,
+    height: SpacingTokens.xxl,
   },
   
   // Modal styles
@@ -244,12 +244,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: Spacing.lg,
+    padding: SpacingTokens.lg,
   },
   modalContent: {
     backgroundColor: '#FFFFFF',
     borderRadius: BorderRadius.xl,
-    padding: Spacing.xl,
+    padding: SpacingTokens.xl,
     alignItems: 'center',
     width: '100%',
     maxWidth: 320,
@@ -260,13 +260,13 @@ const styles = StyleSheet.create({
     borderRadius: BorderRadius.xl,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: Spacing.lg,
+    marginBottom: SpacingTokens.lg,
   },
   modalTitle: {
     fontSize: Typography.fontSize.headingS,
     fontWeight: Typography.fontWeight.bold,
     color: Colors.text.primary,
-    marginBottom: Spacing.sm,
+    marginBottom: SpacingTokens.sm,
     textAlign: 'center',
   },
   modalDescription: {
@@ -274,17 +274,17 @@ const styles = StyleSheet.create({
     color: Colors.text.secondary,
     textAlign: 'center',
     lineHeight: 24,
-    marginBottom: Spacing.md,
+    marginBottom: SpacingTokens.md,
   },
   modalUnlockedDate: {
     fontSize: Typography.fontSize.bodyS,
     color: Colors.text.tertiary,
-    marginBottom: Spacing.lg,
+    marginBottom: SpacingTokens.lg,
   },
   modalButton: {
     backgroundColor: Colors.primary.green,
-    paddingHorizontal: Spacing.xl,
-    paddingVertical: Spacing.md,
+    paddingHorizontal: SpacingTokens.xl,
+    paddingVertical: SpacingTokens.md,
     borderRadius: BorderRadius.lg,
   },
   modalButtonText: {

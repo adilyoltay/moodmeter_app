@@ -1,4 +1,5 @@
 import { SupabaseClient, User, Session, AuthError } from '@supabase/supabase-js';
+import type { GoogleOAuthStartResult, GoogleOAuthCompleteResult } from '@/services/supabase/authService';
 import NetInfo from '@react-native-community/netinfo';
 import { trackAIInteraction, AIEventType } from '@/services/telemetry/noopTelemetry';
 import deadLetterQueue from '@/services/sync/deadLetterQueue';
@@ -169,9 +170,43 @@ class SupabaseNativeService {
     return this.authSvc.signInWithEmail(email, password);
   }
 
-  async signInWithGoogle(): Promise<any> {
+  async signInWithGoogle(): Promise<GoogleOAuthStartResult> {
     console.log('🔐 Google OAuth (delegated)');
     return this.authSvc.signInWithGoogle();
+  }
+
+  async completeGoogleOAuth(callbackUrl: string, expectedState?: string): Promise<GoogleOAuthCompleteResult> {
+    const result = await this.authSvc.completeGoogleOAuth(callbackUrl, expectedState);
+    this.currentUser = result.user;
+    try {
+      await this.ensureUserProfileExists(result.user.id);
+    } catch (error) {
+      console.warn('⚠️ ensureUserProfileExists failed after Google OAuth:', error);
+    }
+    return result;
+  }
+
+  async signInWithRefreshToken(refreshToken: string) {
+    const result = await this.authSvc.signInWithRefreshToken(refreshToken);
+    this.currentUser = result.user;
+    try {
+      await this.ensureUserProfileExists(result.user.id);
+    } catch (error) {
+      console.warn('⚠️ ensureUserProfileExists failed after refresh token login:', error);
+    }
+    return result;
+  }
+
+  async storeBiometricRefreshToken(userId: string, refreshToken: string) {
+    await this.authSvc.storeBiometricRefreshToken(userId, refreshToken);
+  }
+
+  async getBiometricRefreshToken(userId: string) {
+    return this.authSvc.getBiometricRefreshToken(userId);
+  }
+
+  async clearBiometricRefreshToken(userId: string) {
+    await this.authSvc.clearBiometricRefreshToken(userId);
   }
 
   async signOut(): Promise<void> {
