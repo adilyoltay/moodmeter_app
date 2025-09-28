@@ -293,12 +293,11 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       // Initialize gamification for this user (idempotent at store level)
       await initializeGamification(user.id);
       
-      let moodOnboardingStore: typeof import('@/store/moodOnboardingStore').useMoodOnboardingStore | null = null;
+      let onboardingStoreModule: typeof import('@/store/moodOnboardingStore') | null = null;
       // Hydrate onboarding store from storage
       try {
-        const module = await import('@/store/moodOnboardingStore');
-        moodOnboardingStore = module.useMoodOnboardingStore;
-        await moodOnboardingStore.getState().hydrateFromStorage(user.id);
+        onboardingStoreModule = await import('@/store/moodOnboardingStore');
+        await onboardingStoreModule.useMoodOnboardingStore.getState().hydrateFromStorage(user.id);
         console.log('🔄 Onboarding store hydrated for user:', user.id);
       } catch (error) {
         console.error('❌ Failed to hydrate onboarding store:', error);
@@ -349,7 +348,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
 
         // Ensure stale onboarding payloads are cleared for brand-new users
         try {
-          moodOnboardingStore?.getState().reset();
+          onboardingStoreModule?.resetMoodOnboardingStore?.();
         } catch (resetError) {
           console.warn('⚠️ Failed to reset onboarding store for new user:', resetError);
         }
@@ -409,6 +408,7 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
     } catch (error) {
       console.error('❌ Load user profile failed:', error);
       setProfile(null);
+      setError('Profil bilgileri yüklenemedi. Lütfen bağlantınızı kontrol edip tekrar deneyin.');
     } finally {
       isProfileLoadInFlightRef.current = false;
     }
@@ -627,8 +627,8 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       await clearLegacyOnboardingState(user?.id);
       console.log('🔄 Onboarding state reset on signout');
       try {
-        const { useMoodOnboardingStore } = await import('@/store/moodOnboardingStore');
-        useMoodOnboardingStore.getState().reset();
+        const { resetMoodOnboardingStore } = await import('@/store/moodOnboardingStore');
+        resetMoodOnboardingStore();
       } catch (error) {
         console.warn('⚠️ Failed to reset mood onboarding store on signout:', error);
       }
