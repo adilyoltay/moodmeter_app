@@ -285,35 +285,58 @@ export function SupabaseAuthProvider({ children }: { children: React.ReactNode }
       // Persist current user id for offline-first services (e.g., OfflineSync)
       try { await AsyncStorage.setItem('currentUserId', user.id); } catch {}
       
-      // Initialize user-specific data migration
-      await migrateToUserSpecificStorage(user.id);
-      // Migrate sensitive plain-text keys to encrypted storage
-      try { await SecureStorageMigration.migrate(user.id); } catch (e) { console.warn('Secure storage migration skipped:', e); }
-      
-      // Initialize gamification for this user (idempotent at store level)
-      await initializeGamification(user.id);
-      
-      let onboardingStoreModule: typeof import('@/store/moodOnboardingStore') | null = null;
-      // Hydrate onboarding store from storage
-      try {
-        onboardingStoreModule = await import('@/store/moodOnboardingStore');
-        await onboardingStoreModule.useMoodOnboardingStore.getState().hydrateFromStorage(user.id);
-        console.log('🔄 Onboarding store hydrated for user:', user.id);
-      } catch (error) {
-        console.error('❌ Failed to hydrate onboarding store:', error);
-      }
-
-      // ✅ NEW: Auto-recover unsynced mood entries on user login
-      try {
-        const { default: moodTrackingService } = await import('@/services/moodTrackingService');
-        const recoveryResult = await moodTrackingService.autoRecoverUnsyncedEntries(user.id);
-        if (recoveryResult.recovered > 0 || recoveryResult.failed > 0) {
-          console.log(`🔄 Mood auto-recovery completed: ${recoveryResult.recovered} queued, ${recoveryResult.failed} failed`);
+      // 🚀 PERFORMANCE: Defer heavy migrations to background for faster startup
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Starting deferred user data migration...');
+          // Initialize user-specific data migration
+          await migrateToUserSpecificStorage(user.id);
+          // Migrate sensitive plain-text keys to encrypted storage
+          await SecureStorageMigration.migrate(user.id);
+          console.log('✅ User data migration completed');
+        } catch (e) { 
+          console.warn('Secure storage migration skipped:', e); 
         }
-      } catch (error) {
-        console.error('❌ Failed to auto-recover mood entries:', error);
-        // Non-critical error - don't prevent user login
-      }
+      }, 2000);
+      
+      // 🚀 PERFORMANCE: Defer gamification initialization to background
+      setTimeout(async () => {
+        try {
+          console.log('🎮 Initializing gamification system...');
+          await initializeGamification(user.id);
+          console.log('✅ Gamification system initialized');
+        } catch (error) {
+          console.warn('Gamification initialization failed (non-critical):', error);
+        }
+      }, 1500);
+      
+      // 🚀 PERFORMANCE: Defer onboarding store hydration to background
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Loading onboarding store...');
+          const onboardingStoreModule = await import('@/store/moodOnboardingStore');
+          await onboardingStoreModule.useMoodOnboardingStore.getState().hydrateFromStorage(user.id);
+          console.log('✅ Onboarding store hydrated for user:', user.id);
+        } catch (error) {
+          console.error('❌ Failed to hydrate onboarding store:', error);
+        }
+      }, 1000);
+
+      // 🚀 PERFORMANCE: Defer mood entry recovery to background
+      setTimeout(async () => {
+        try {
+          console.log('🔄 Starting mood entry recovery...');
+          const { default: moodTrackingService } = await import('@/services/moodTrackingService');
+          const recoveryResult = await moodTrackingService.autoRecoverUnsyncedEntries(user.id);
+          if (recoveryResult.recovered > 0 || recoveryResult.failed > 0) {
+            console.log(`🔄 Mood auto-recovery completed: ${recoveryResult.recovered} queued, ${recoveryResult.failed} failed`);
+          }
+          console.log('✅ Mood entry recovery completed');
+        } catch (error) {
+          console.error('❌ Failed to auto-recover mood entries:', error);
+          // Non-critical error - don't prevent user login
+        }
+      }, 2500); // Defer mood recovery to background
       
       // Check if onboarding profile exists in user_profiles table
       let userProfile = await supabaseService.getUserProfile(user.id, { cacheMs: 120000 });

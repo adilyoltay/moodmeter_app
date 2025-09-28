@@ -15,19 +15,23 @@ import { AppErrorBoundary } from '@/components/error';
 // Performance monitoring
 import performanceMonitor from '@/services/performanceMonitor';
 
-// Import debug helpers in development
+// 🚀 PERFORMANCE: Debug helpers deferred to background in development
 if (__DEV__) {
-  try {
-    require('@/utils/debugHelper');
-  } catch (e) {
-    console.warn('Debug helper import failed:', e);
-  }
+  setTimeout(() => {
+    try {
+      require('@/utils/debugHelper');
+      console.log('✅ Debug helpers loaded (deferred)');
+    } catch (e) {
+      console.warn('Debug helper import failed:', e);
+    }
+  }, 1000); // Load debug tools after critical path
 }
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  // 🚀 PERFORMANCE: Optimize font loading - only load essential fonts initially
   const [loaded] = useFonts({
     SpaceMono: require('../assets/fonts/SpaceMono-Regular.ttf'),
   });
@@ -44,14 +48,16 @@ export default function RootLayout() {
     }
   }, [loaded]);
 
-  // One-time storage cleanup for legacy CBT/OCD/ERP keys
+  // One-time storage cleanup for legacy CBT/OCD/ERP keys - DEFERRED for startup performance
   useEffect(() => {
-    (async () => {
+    // 🚀 PERFORMANCE: Defer heavy AsyncStorage operations to background
+    const deferredCleanup = setTimeout(async () => {
       try {
         const FLAG = '__legacy_cleanup_v1_done__';
         const done = await AsyncStorage.getItem(FLAG);
         if (done === '1') return;
         
+        console.log('🧹 Starting deferred storage cleanup...');
         const allKeys = await AsyncStorage.getAllKeys();
         const shouldRemove = (key: string) => (
           key === 'compulsion_logs' ||
@@ -68,32 +74,44 @@ export default function RootLayout() {
         const keysToRemove = allKeys.filter(shouldRemove);
         if (keysToRemove.length > 0) {
           await AsyncStorage.multiRemove(keysToRemove);
+          console.log(`🧹 Cleaned ${keysToRemove.length} legacy storage keys`);
         }
         await AsyncStorage.setItem(FLAG, '1');
+        console.log('✅ Deferred storage cleanup completed');
       } catch (e) {
         console.warn('Storage cleanup failed (non-critical):', e);
       }
-    })();
+    }, 5000); // Defer 5 seconds after startup
+
+    return () => clearTimeout(deferredCleanup);
   }, []);
 
-  // 📊 Performance monitoring initialization - CRASH PREVENTION
+  // 📊 Performance monitoring initialization - DEFERRED for startup performance
   useEffect(() => {
-    try {
-      performanceMonitor.initialize().catch(error => {
-        console.warn('Performance monitor initialization failed (non-critical):', error);
-      });
-    } catch (error) {
-      console.warn('Performance monitor import failed (non-critical):', error);
-    }
+    // 🚀 PERFORMANCE: Defer performance monitoring to background
+    const deferredMonitoring = setTimeout(() => {
+      try {
+        performanceMonitor.initialize().catch(error => {
+          console.warn('Performance monitor initialization failed (non-critical):', error);
+        });
+        console.log('✅ Deferred performance monitoring initialized');
+      } catch (error) {
+        console.warn('Performance monitor import failed (non-critical):', error);
+      }
+    }, 2000); // Defer 2 seconds after startup
+
+    return () => clearTimeout(deferredMonitoring);
   }, []);
 
-  // Foreground DLQ scheduler: process periodically when app is active - CRASH PREVENTION
+  // Foreground DLQ scheduler: process periodically when app is active - DEFERRED for startup performance
   useEffect(() => {
     let interval: any = null;
     let appStateListener: any;
     
-    (async () => {
+    // 🚀 PERFORMANCE: Defer heavy service loading to background
+    const deferredSyncServices = setTimeout(async () => {
       try {
+        console.log('🔄 Loading deferred sync services...');
         // 🛡️ CRASH PREVENTION: Safe dynamic imports with error handling
         const { deadLetterQueue } = await import('@/services/sync/deadLetterQueue').catch(() => ({ deadLetterQueue: null }));
         const { offlineSyncService } = await import('@/services/offlineSync').catch(() => ({ offlineSyncService: null }));
@@ -103,11 +121,13 @@ export default function RootLayout() {
           return;
         }
         
-        // Run once shortly after startup with error handling
+        console.log('✅ Sync services loaded, starting background processing...');
+        
+        // Run once shortly after loading
         setTimeout(() => { 
           deadLetterQueue.processDeadLetterQueue().catch(() => {}); 
           offlineSyncService.processSyncQueue().catch(()=>{}); 
-        }, 3000);
+        }, 1000);
         
         // Then run periodically with error handling
         interval = setInterval(() => {
@@ -138,9 +158,10 @@ export default function RootLayout() {
       } catch (error) {
         console.warn('Sync service initialization failed (non-critical):', error);
       }
-    })();
+    }, 3000); // Defer 3 seconds after startup
     
     return () => {
+      clearTimeout(deferredSyncServices);
       if (interval) clearInterval(interval);
       try { appStateListener?.remove?.(); } catch {}
       
