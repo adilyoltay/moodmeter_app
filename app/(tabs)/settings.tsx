@@ -13,6 +13,7 @@ import {
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { router } from 'expo-router';
 
 // Custom UI Components
 import { Switch } from '@/components/ui/Switch';
@@ -105,6 +106,19 @@ export default function SettingsScreen() {
   // Log level & maintenance
   // Log level state removed along with advanced options
   // const aiStore = useAISettingsStore(); // REMOVED (AI disabled)
+  
+  // 🔧 Debug Console Access (hidden gesture)
+  const [debugTapCount, setDebugTapCount] = useState(0);
+  
+  const handleDebugTap = () => {
+    setDebugTapCount(prev => prev + 1);
+    if (debugTapCount >= 6) { // 7 taps to open debug console
+      setDebugTapCount(0);
+      router.push('/debug-console' as any);
+    }
+    // Reset counter after 3 seconds
+    setTimeout(() => setDebugTapCount(0), 3000);
+  };
 
   
 
@@ -673,7 +687,14 @@ export default function SettingsScreen() {
       <View style={styles.headerContainer}>
         <View style={styles.headerContent}>
           <View style={styles.headerLeft} />
-          <Text style={styles.headerTitle}>Ayarlar</Text>
+          <Pressable onPress={handleDebugTap}>
+            <Text style={styles.headerTitle}>Ayarlar</Text>
+            {debugTapCount > 0 && (
+              <Text style={{ fontSize: 10, color: '#6B7280', textAlign: 'center' }}>
+                {debugTapCount}/7
+              </Text>
+            )}
+          </Pressable>
           <View style={styles.headerRight} />
         </View>
       </View>
