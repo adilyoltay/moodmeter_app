@@ -1,0 +1,180 @@
+{
+  "navigation": {
+    "today": "Bugün",
+    "settings": "Ayarlar",
+    "back": "Geri",
+    "home": "Ana Sayfa",
+    "profile": "Profil",
+    "history": "Geçmiş"
+  },
+  "auth": {
+    "login": "Giriş Yap",
+    "signup": "Kayıt Ol",
+    "logout": "Çıkış Yap",
+    "email": "E-posta",
+    "password": "Şifre",
+    "confirmPassword": "Şifreyi Onaylayın",
+    "name": "Ad Soyad",
+    "fullName": "Tam Ad",
+    "forgotPassword": "Şifremi Unuttum",
+    "resetPassword": "Şifre Sıfırla",
+    "loginSuccess": "Başarıyla giriş yaptınız",
+    "signupSuccess": "Hesabınız oluşturuldu",
+    "logoutSuccess": "Çıkış yapıldı",
+    "invalidCredentials": "Geçersiz kullanıcı bilgileri",
+    "accountExists": "Bu e-posta ile hesap zaten mevcut",
+    "weakPassword": "Şifre çok zayıf",
+    "invalidEmail": "Geçersiz e-posta adresi"
+  },
+  "general": {
+    "save": "Kaydet",
+    "cancel": "İptal",
+    "delete": "Sil",
+    "edit": "Düzenle",
+    "loading": "Yükleniyor...",
+    "error": "Hata oluştu",
+    "success": "Başarılı",
+    "warning": "Uyarı",
+    "info": "Bilgi",
+    "confirm": "Onayla",
+    "yes": "Evet",
+    "no": "Hayır",
+    "ok": "Tamam",
+    "close": "Kapat",
+    "next": "İleri",
+    "previous": "Geri",
+    "finish": "Bitir",
+    "skip": "Geç",
+    "retry": "Tekrar Dene",
+    "refresh": "Yenile",
+    "search": "Ara",
+    "filter": "Filtrele",
+    "sort": "Sırala",
+    "clear": "Temizle",
+    "apply": "Uygula",
+    "reset": "Sıfırla"
+  },
+  "home": {
+    "welcome": "Hoş Geldiniz",
+    "greeting": {
+      "morning": "Günaydın",
+      "afternoon": "İyi öğleden sonra",
+      "evening": "İyi akşamlar"
+    },
+    "quickActions": "Hızlı İşlemler",
+    "todaysStats": "Bugünkü İstatistikler",
+    "recentActivity": "Son Aktiviteler",
+    "tipOfTheDay": "Günün İpucu",
+    
+    "viewHistory": "Geçmişi Görüntüle",
+    "motivation": {
+      "focus": "Odaklan",
+      "stayStrong": "Güçlü Kal", 
+      "progress": "İlerleme"
+    }
+  },
+  
+  "onb": {
+    "welcome_title": "ObsessLess'e Hoş Geldin",
+    "welcome_desc": "Daha sakin, daha farkında bir gün için küçük adımlarla başlayalım.",
+    "start": "Hadi Başlayalım",
+    "later": "Daha sonra",
+    "motivation_title": "Neden buradasın?",
+    "motivation_hint": "İstediğin kadar seçebilirsin.",
+    "first_mood_title": "Şu an nasıl hissediyorsun?",
+    "add_tag": "Ekle",
+    "lifestyle_title": "Yaşam tarzın (opsiyonel)",
+    "sleep_hours": "Günlük uyku (saat)",
+    "exercise": "Egzersiz",
+    "social": "Sosyal aktivite",
+    "notifications_title": "Günlük hatırlatma (opsiyonel)",
+    "reminders": "Hatırlatmalar",
+    "summary_title": "Senin için açılanlar",
+    "begin": "Başla",
+    "skip": "Atla",
+    "back": "Geri",
+    "next": "Devam"
+  },
+  
+  
+  
+  "settings": {
+    "title": "Ayarlar",
+    "account": "Hesap",
+    "notifications": "Bildirimler",
+    "privacy": "Gizlilik",
+    "language": "Dil",
+    "theme": "Tema",
+    "support": "Destek",
+    "about": "Hakkında",
+    "profileSettings": "Profil Ayarları",
+    "notificationSettings": "Bildirim Ayarları",
+    "dataAndPrivacy": "Veri ve Gizlilik",
+    "languageSelection": "Dil Seçimi",
+    "pushNotifications": "Push Bildirimleri",
+    "dailyReminders": "Günlük Hatırlatmalar",
+    "weeklyReports": "Haftalık Raporlar",
+    "dataExport": "Veri Dışa Aktarma",
+    "dataImport": "Veri İçe Aktarma",
+    "deleteAccount": "Hesabı Sil",
+    "version": "Versiyon",
+    "buildNumber": "Yapı Numarası"
+  },
+  "errors": {
+    "networkError": "Ağ bağlantısı hatası",
+    "serverError": "Sunucu hatası",
+    "unknownError": "Bilinmeyen hata",
+    "validationError": "Doğrulama hatası",
+    "permissionDenied": "İzin reddedildi",
+    "fileNotFound": "Dosya bulunamadı",
+    "sessionExpired": "Oturum süresi doldu",
+    "rateLimitExceeded": "Hız sınırı aşıldı"
+  },
+  
+  
+  "assessment": {
+      "title": "Y-BOCS Değerlendirme",
+      "subtitle": "OKB şiddetinizi değerlendirin",
+      "complete": "Tamamla",
+      "retake": "Yeniden Yap",
+      "yourScore": "Skorunuz"
+    },
+    "achievements": {
+      "title": "Başarılar",
+      "level": "Seviye",
+      "points": "Puan",
+      "all": "Tümü",
+      "unlocked": "Açılan",
+      "locked": "Kilitli",
+      "rarity": {
+        "common": "Yaygın",
+        "rare": "Nadir",
+        "epic": "Efsanevi",
+        "legendary": "Efsanevi+"
+      },
+      "firstTrack": {
+        "title": "İlk Adım",
+        "desc": "İlk kompulsiyon kaydını yap"
+      },
+      "track7Days": {
+        "title": "Haftalık Takipçi",
+        "desc": "7 gün boyunca takip yap"
+      },
+      "track30Days": {
+        "title": "Aylık Şampiyon",
+        "desc": "30 gün boyunca takip yap"
+      },
+      "streak3": {
+        "title": "Tutarlılık",
+        "desc": "3 gün üst üste aktivite yap"
+      },
+      "streak7": {
+        "title": "Haftalık Alev",
+        "desc": "7 gün üst üste aktivite yap"
+      },
+      "streak30": {
+        "title": "Aylık Ejder",
+        "desc": "30 gün üst üste aktivite yap"
+      }
+    }
+  }

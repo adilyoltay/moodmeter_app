@@ -1,0 +1,404 @@
+import React, { useMemo, useState } from 'react';
+import { View, Text, TextInput, Pressable, StyleSheet, KeyboardAvoidingView, Platform, Alert, ActivityIndicator } from 'react-native';
+import { useThemeColors } from '@/contexts/ThemeContext';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { router } from 'expo-router';
+import { useAuth } from '@/contexts/SupabaseAuthContext';
+import { GoogleSignInButton } from '@/components/ui/GoogleSignInButton';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
+import Animated, { FadeInDown } from 'react-native-reanimated';
+import { useLanguage } from '@/contexts/LanguageContext';
+import { useBiometric } from '@/hooks/useBiometric';
+
+export default function LoginScreen() {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const theme = useThemeColors();
+  const { signInWithEmail, isLoading, error, clearError, user } = useAuth() as any;
+  const { language } = useLanguage();
+
+  const biometric = useBiometric({
+    userId: user?.id ?? null,
+    email: user?.email ?? null,
+    language,
+  });
+
+  const primaryAccount = useMemo(() => {
+    if (!biometric.knownAccounts.length) return null;
+    return biometric.knownAccounts[biometric.knownAccounts.length - 1];
+  }, [biometric.knownAccounts]);
+
+  // After successful auth, route based on onboarding completion
+  React.useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const AsyncStorage = require('@react-native-async-storage/async-storage').default;
+        const aiKey = `ai_onboarding_completed_${user.id}`;
+        // Short window to allow auth profile loader to restore flags
+        for (let i = 0; i < 4; i++) {
+          const v = await AsyncStorage.getItem(aiKey);
+          if (cancelled) return;
+          if (v === 'true') {
+            router.replace('/(tabs)');
+            return;
+          }
+          await new Promise((r) => setTimeout(r, 250));
+        }
+        // Remote fallback: check server profile
+        try {
+          const supabaseService = (await import('@/services/supabase')).default;
+          const { data: profile, error } = await supabaseService.supabaseClient
+            .from('user_profiles')
+            .select('user_id, onboarding_completed, onboarding_completed_at')
+            .eq('user_id', user.id)
+            .maybeSingle();
+
+          const serverCompleted = !error && profile && (
+            profile.onboarding_completed === true ||
+            Boolean(profile.onboarding_completed_at)
+          );
+
+          if (!cancelled && serverCompleted) {
+            router.replace('/(tabs)');
+            return;
+          }
+        } catch (remoteError) {
+          console.warn('⚠️ Onboarding server check failed:', remoteError);
+        }
+        if (!cancelled) router.replace('/(auth)/onboarding');
+      } catch {
+        if (!cancelled) router.replace('/(auth)/onboarding');
+      }
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
+  const handleEmailLogin = async () => {
+    if (!email || !password) {
+      Alert.alert('Eksik Bilgi', 'Email ve şifre gerekli');
+      return;
+    }
+
+    try {
+      clearError();
+      Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Light);
+      await signInWithEmail(email, password);
+    } catch (error) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Error);
+    }
+  };
+
+  const handleBiometricLogin = async () => {
+    if (!primaryAccount) return;
+    const success = await biometric.loginWithBiometrics(primaryAccount.userId);
+    if (success) {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Success);
+    } else {
+      Haptics.notificationAsync(Haptics.NotificationFeedbackType.Warning);
+    }
+  };
+
+  React.useEffect(() => {
+    if (biometric.error) {
+      Alert.alert(language === 'tr' ? 'Biometrik Doğrulama' : 'Biometric Authentication', biometric.error);
+    }
+  }, [biometric.error, language]);
+
+  return (
+    <SafeAreaView style={styles.container}>
+      <KeyboardAvoidingView
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+        style={styles.keyboardAvoid}
+      >
+        <View style={styles.content}>
+          {/* Logo */}
+          <Animated.View entering={FadeInDown.delay(100)} style={styles.logoContainer}>
+            <View style={styles.logo}>
+              <MaterialCommunityIcons name="brain" size={48} color="#10B981" />
+            </View>
+            <Text style={styles.title}>ObsessLess</Text>
+            <Text style={styles.subtitle}>Dijital Sığınağınız</Text>
+          </Animated.View>
+
+          {/* Email Input */}
+          <Animated.View entering={FadeInDown.delay(200)} style={[styles.inputContainer, { backgroundColor: theme.card }]}>
+            <MaterialCommunityIcons name="email-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Email"
+              value={email}
+              onChangeText={(value) => {
+                clearError();
+                setEmail(value);
+              }}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoComplete="email"
+              placeholderTextColor="#9CA3AF"
+            />
+          </Animated.View>
+
+          {/* Password Input */}
+          <Animated.View entering={FadeInDown.delay(300)} style={[styles.inputContainer, { backgroundColor: theme.card }]}>
+            <MaterialCommunityIcons name="lock-outline" size={20} color="#6B7280" style={styles.inputIcon} />
+            <TextInput
+              style={styles.input}
+              placeholder="Şifre"
+              value={password}
+              onChangeText={(value) => {
+                clearError();
+                setPassword(value);
+              }}
+              secureTextEntry={!showPassword}
+              autoCapitalize="none"
+              autoComplete="password"
+              placeholderTextColor="#9CA3AF"
+            />
+            <Pressable
+              onPress={() => setShowPassword(!showPassword)}
+              style={styles.eyeIcon}
+            >
+              <MaterialCommunityIcons
+                name={showPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="#6B7280"
+              />
+            </Pressable>
+          </Animated.View>
+
+          {/* Error Message */}
+          {error && (
+            <Animated.View entering={FadeInDown} style={styles.errorContainer}>
+              <MaterialCommunityIcons name="alert-circle" size={16} color="#EF4444" />
+              <Text style={styles.errorText}>{error}</Text>
+            </Animated.View>
+          )}
+
+          {/* Login Button */}
+          <Animated.View entering={FadeInDown.delay(400)}>
+            <Pressable
+              style={[styles.loginButton, isLoading && styles.buttonDisabled]}
+              onPress={handleEmailLogin}
+              disabled={isLoading}
+            >
+              <Text style={styles.loginButtonText}>
+                {isLoading ? 'Giriş yapılıyor...' : 'Giriş Yap'}
+              </Text>
+            </Pressable>
+          </Animated.View>
+
+          {/* Google Login Button */}
+          <Animated.View entering={FadeInDown.delay(500)}>
+            <GoogleSignInButton disabled={isLoading} mode="signin" />
+          </Animated.View>
+
+          {/* Biometric Login CTA */}
+          {primaryAccount && (
+            <Animated.View entering={FadeInDown.delay(550)}>
+              <Pressable
+                style={[styles.biometricButton, (isLoading || biometric.processing) && styles.buttonDisabled]}
+                onPress={handleBiometricLogin}
+                disabled={isLoading || biometric.processing}
+              >
+                {biometric.processing ? (
+                  <ActivityIndicator color="#10B981" />
+                ) : (
+                  <MaterialCommunityIcons name="fingerprint" size={20} color="#10B981" />
+                )}
+                <Text style={styles.biometricButtonText}>
+                  {language === 'tr'
+                    ? `${primaryAccount.email} için biometrik giriş`
+                    : `Sign in as ${primaryAccount.email}`}
+                </Text>
+              </Pressable>
+            </Animated.View>
+          )}
+          {!primaryAccount && (
+            <Animated.View entering={FadeInDown.delay(550)} style={styles.biometricSettingsHintContainer}>
+              <MaterialCommunityIcons name="fingerprint" size={16} color="#10B981" style={{ marginRight: 6 }} />
+              <Text style={styles.biometricSettingsHint}>
+                {language === 'tr'
+                  ? 'Biometrik girişi etkinleştirmek için Profil > Ayarlar > Güvenlik bölümünü kullanın.'
+                  : 'Enable biometric login under Profile > Settings > Security.'}
+              </Text>
+            </Animated.View>
+          )}
+
+          {/* Signup Link */}
+          <Animated.View entering={FadeInDown.delay(600)} style={styles.footer}>
+            <Text style={styles.footerText}>
+              Hesabınız yok mu?{' '}
+              <Text style={styles.signupLink} onPress={() => router.push('/(auth)/signup')}>
+                Kayıt Olun
+              </Text>
+            </Text>
+          </Animated.View>
+        </View>
+      </KeyboardAvoidingView>
+    </SafeAreaView>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: '#F9FAFB',
+  },
+  keyboardAvoid: {
+    flex: 1,
+  },
+  content: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 32,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    marginBottom: 48,
+  },
+  logo: {
+    width: 80,
+    height: 80,
+    borderRadius: 40,
+    backgroundColor: '#F0FDF4',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  title: {
+    fontSize: 28,
+    fontWeight: '700',
+    color: '#374151',
+    marginBottom: 8,
+    fontFamily: 'Inter_700Bold',
+  },
+  subtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontFamily: 'Inter_400Regular',
+  },
+  inputContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 4,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#E5E7EB',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 3,
+    elevation: 1,
+  },
+  inputIcon: {
+    marginRight: 12,
+  },
+  input: {
+    flex: 1,
+    height: 50,
+    fontSize: 16,
+    color: '#374151',
+    fontFamily: 'Inter_400Regular',
+  },
+  eyeIcon: {
+    padding: 8,
+  },
+  errorContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#FEF2F2',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 12,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#FECACA',
+  },
+  errorText: {
+    flex: 1,
+    marginLeft: 8,
+    fontSize: 14,
+    color: '#DC2626',
+    fontFamily: 'Inter_400Regular',
+  },
+  loginButton: {
+    backgroundColor: '#10B981',
+    paddingHorizontal: 24,
+    paddingVertical: 16,
+    borderRadius: 16,
+    alignItems: 'center',
+    marginBottom: 16,
+    shadowColor: '#10B981',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  loginButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
+  },
+  buttonDisabled: {
+    opacity: 0.6,
+  },
+  biometricButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+    borderWidth: 1,
+    borderColor: '#D1FAE5',
+    backgroundColor: '#F0FFF4',
+    paddingVertical: 14,
+    borderRadius: 16,
+    marginTop: 16,
+  },
+  biometricButtonText: {
+    color: '#047857',
+    fontSize: 16,
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
+  },
+  biometricSettingsHintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 16,
+    paddingHorizontal: 12,
+  },
+  biometricSettingsHint: {
+    flex: 1,
+    textAlign: 'center',
+    color: '#6B7280',
+    fontSize: 13,
+    fontFamily: 'Inter_400Regular',
+  },
+  footer: {
+    alignItems: 'center',
+  },
+  footerText: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontFamily: 'Inter_400Regular',
+  },
+  signupLink: {
+    color: '#10B981',
+    fontWeight: '600',
+    fontFamily: 'Inter_600SemiBold',
+  },
+});

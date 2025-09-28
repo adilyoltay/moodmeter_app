@@ -1,0 +1,83 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": false,
+    "skipLibCheck": true,
+    "noImplicitAny": false,
+    "noImplicitReturns": false,
+    "jsx": "react-native",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "paths": {
+      "@/assets/*": [
+        "./assets/*"
+      ],
+      "@/components/*": [
+        "./components/*"
+      ],
+      "@/constants/*": [
+        "./constants/*"
+      ],
+      "@/hooks/*": [
+        "./hooks/*"
+      ],
+      "@/store/*": [
+        "./store/*"
+      ],
+      "@/types/*": [
+        "./types/*"
+      ],
+      "@/utils/*": [
+        "./utils/*"
+      ],
+      "@/services/*": [
+        "./services/*"
+      ],
+      "@/contexts/*": [
+        "./contexts/*"
+      ],
+      "@/lib/*": [
+        "./lib/*"
+      ],
+      "@/localization/*": [
+        "./localization/*"
+      ],
+      "@/features/*": [
+        "./features/*"
+      ]
+    }
+  },
+  "include": [
+    "**/*.ts",
+    "**/*.tsx"
+  ],
+  "exclude": [
+    "backup/**",
+    "archive/**",
+    "__tests__/**",
+    "**/*.test.ts",
+    "**/*.test.tsx",
+    "supabase/functions/**",
+    "features/ai-disabled-backup/**",
+    "features/ai/**",
+    "app/(dev)/**",
+    "components/dev/**",
+    "components/ai/**",
+    "hooks/useAIErrorHandler.ts",
+    "utils/debugInvalidEntries.ts",
+    "components/ui/AdaptiveSuggestionCard.tsx",
+    "components/ui/DailyMissionsCard.tsx",
+    "components/ui/DeadLetterQueueRecovery.tsx",
+    "components/ui/SyncErrorSummaryCard.tsx",
+    "services/autoRecordService.ts",
+    "services/crossDeviceSync.ts", 
+    "services/voiceCleanupService.ts",
+    "services/sync/maintenanceScheduler.ts",
+    "old_docs/**"
+  ],
+  "ts-node": {
+    "compilerOptions": {
+      "module": "CommonJS"
+    }
+  }
+}
