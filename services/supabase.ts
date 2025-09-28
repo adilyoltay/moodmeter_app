@@ -1,4 +1,4 @@
-import { SupabaseClient, User, Session, AuthError } from '@supabase/supabase-js';
+import { SupabaseClient, User, Session } from '@supabase/supabase-js';
 import type { GoogleOAuthStartResult, GoogleOAuthCompleteResult } from '@/services/supabase/authService';
 import NetInfo from '@react-native-community/netinfo';
 import { trackAIInteraction, AIEventType } from '@/services/telemetry/noopTelemetry';
@@ -7,13 +7,22 @@ import { mapToCanonicalCategory, mapToDatabaseCategory } from '@/utils/categoryM
 import { isUUID } from '@/utils/validators';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as Linking from 'expo-linking';
-import Constants from 'expo-constants';
 import { makeRedirectUri } from 'expo-auth-session';
 import { supabase as sharedClient } from '@/lib/supabase';
 import { sanitizePII } from '@/utils/privacy'; // ✅ F-06 FIX: Add PII sanitization
+import {
+  createSupabaseServiceFactory,
+  SupabaseServiceFactory,
+  SupabaseServiceSubset,
+  SUPABASE_SERVICE_TOKENS,
+} from '@/services/supabase/serviceFactory';
 import { mapOnboardingPayloadToUserProfileRow } from '@/utils/onboardingMapper';
 import { buildUsersUpsertRow } from '@/utils/userRowMapper';
 import { generatePrefixedId } from '@/utils/idGenerator';
+import { isOk } from '@/types/result';
+import type { CreateMoodEntryDto, MoodEntryRow, UpdateMoodEntryDto } from '@/types/dto/mood';
+import type { CreateUserProfileDto, UpsertOCDProfileDto } from '@/types/dto/profile';
+import { getAppConfig } from '../configuration/appConfig';
 // Re-export types for backward compatibility with existing imports
 export type {
   UserProfile,
@@ -30,8 +39,9 @@ export type {
 } from '@/types/supabase';
 
 // 🔐 SECURE CONFIGURATION - Environment variables are REQUIRED
-const SUPABASE_URL = process.env.EXPO_PUBLIC_SUPABASE_URL;
-const SUPABASE_ANON_KEY = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
+const { supabase: supabaseConfig } = getAppConfig();
+const SUPABASE_URL = supabaseConfig.url;
+const SUPABASE_ANON_KEY = supabaseConfig.anonKey;
 
 // 🚨 CRITICAL SECURITY CHECK: No fallback values for security
 if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
@@ -67,16 +77,8 @@ class SupabaseNativeService {
   private client: SupabaseClient;
   private currentUser: User | null = null;
   private userProfileCache: Map<string, { data: OCDProfile | null; fetchedAt: number }> = new Map();
-  // Segmented services
-  private authSvc: import('@/services/supabase/authService').AuthService;
-  private profileSvc: import('@/services/supabase/profileService').ProfileService;
-  private moodSvc: import('@/services/supabase/moodService').MoodService;
-  private voiceSvc: import('@/services/supabase/voiceService').VoiceService;
-  private thoughtSvc: import('@/services/supabase/thoughtService').ThoughtService;
-  private compulsionSvc: import('@/services/supabase/compulsionService').CompulsionService;
-  private breathSvc: import('@/services/supabase/breathService').BreathService;
-  private aiSvc: import('@/services/supabase/aiService').AIService;
-  private aiPredSvc: import('@/services/supabase/aiPredictionService').AIPredictionService;
+  private serviceFactory: SupabaseServiceFactory;
+  private services: SupabaseServiceSubset<typeof SUPABASE_SERVICE_TOKENS>;
 
   constructor(client?: SupabaseClient) {
     // Tek supabase client kullanımı (lib/supabase.ts)
@@ -84,25 +86,13 @@ class SupabaseNativeService {
     // Ortam değişkenleri lib içinde doğrulanır
     this.client = (client || (sharedClient as unknown as SupabaseClient));
     console.log('✅ Supabase Native Service initialized (shared client)');
-    // Initialize segmented services
-    const { AuthService } = require('@/services/supabase/authService');
-    const { ProfileService } = require('@/services/supabase/profileService');
-    const { MoodService } = require('@/services/supabase/moodService');
-    const { VoiceService } = require('@/services/supabase/voiceService');
-    const { ThoughtService } = require('@/services/supabase/thoughtService');
-    const { CompulsionService } = require('@/services/supabase/compulsionService');
-    const { BreathService } = require('@/services/supabase/breathService');
-    const { AIService } = require('@/services/supabase/aiService');
-    const { AIPredictionService } = require('@/services/supabase/aiPredictionService');
-    this.authSvc = new AuthService(this.client, (u: User | null) => { this.currentUser = u; });
-    this.profileSvc = new ProfileService(this.client);
-    this.moodSvc = new MoodService(this.client);
-    this.voiceSvc = new VoiceService(this.client);
-    this.thoughtSvc = new ThoughtService(this.client);
-    this.compulsionSvc = new CompulsionService(this.client);
-    this.breathSvc = new BreathService(this.client);
-    this.aiSvc = new AIService(this.client);
-    this.aiPredSvc = new AIPredictionService(this.client);
+    this.serviceFactory = createSupabaseServiceFactory({
+      client: this.client,
+      setCurrentUser: (u: User | null) => {
+        this.currentUser = u;
+      },
+    });
+    this.services = this.serviceFactory.create(SUPABASE_SERVICE_TOKENS);
   }
 
   // ===========================
@@ -162,21 +152,21 @@ class SupabaseNativeService {
 
   async signUpWithEmail(email: string, password: string, name: string): Promise<SignUpResult> {
     console.log('📧 Supabase signup (delegated):', email);
-    return this.authSvc.signUpWithEmail(email, password, name);
+    return this.services.auth.signUpWithEmail(email, password, name);
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthResult> {
     console.log('🔐 Supabase login (delegated):', email);
-    return this.authSvc.signInWithEmail(email, password);
+    return this.services.auth.signInWithEmail(email, password);
   }
 
   async signInWithGoogle(): Promise<GoogleOAuthStartResult> {
     console.log('🔐 Google OAuth (delegated)');
-    return this.authSvc.signInWithGoogle();
+    return this.services.auth.signInWithGoogle();
   }
 
   async completeGoogleOAuth(callbackUrl: string, expectedState?: string): Promise<GoogleOAuthCompleteResult> {
-    const result = await this.authSvc.completeGoogleOAuth(callbackUrl, expectedState);
+    const result = await this.services.auth.completeGoogleOAuth(callbackUrl, expectedState);
     this.currentUser = result.user;
     try {
       await this.ensureUserProfileExists(result.user.id);
@@ -187,7 +177,7 @@ class SupabaseNativeService {
   }
 
   async signInWithRefreshToken(refreshToken: string) {
-    const result = await this.authSvc.signInWithRefreshToken(refreshToken);
+    const result = await this.services.auth.signInWithRefreshToken(refreshToken);
     this.currentUser = result.user;
     try {
       await this.ensureUserProfileExists(result.user.id);
@@ -198,15 +188,15 @@ class SupabaseNativeService {
   }
 
   async storeBiometricRefreshToken(userId: string, refreshToken: string) {
-    await this.authSvc.storeBiometricRefreshToken(userId, refreshToken);
+    await this.services.auth.storeBiometricRefreshToken(userId, refreshToken);
   }
 
   async getBiometricRefreshToken(userId: string) {
-    return this.authSvc.getBiometricRefreshToken(userId);
+    return this.services.auth.getBiometricRefreshToken(userId);
   }
 
   async clearBiometricRefreshToken(userId: string) {
-    await this.authSvc.clearBiometricRefreshToken(userId);
+    await this.services.auth.clearBiometricRefreshToken(userId);
   }
 
   async signOut(): Promise<void> {
@@ -355,10 +345,14 @@ class SupabaseNativeService {
       } catch {}
 
       console.log('🔍 Fetching user profile from database...', userId);
-      const data = await this.profileSvc.getUserProfile(userId);
+      const profileResult = await this.services.profile.getUserProfile(userId);
+      if (!isOk(profileResult)) {
+        throw profileResult.error;
+      }
+      const data = profileResult.data ?? null;
       console.log('✅ User profile fetched from database');
-      this.userProfileCache.set(userId, { data: data ?? null, fetchedAt: Date.now() });
-      return data ?? null;
+      this.userProfileCache.set(userId, { data, fetchedAt: Date.now() });
+      return data;
     } catch (error) {
       // In dev, this can be noisy—log as warn and continue with fallback
       if (__DEV__) console.warn('❌ Get user profile failed (DEV fallback will be used):', error);
@@ -409,7 +403,17 @@ class SupabaseNativeService {
 
   async createUserProfile(userId: string, email: string, name: string, provider: 'email' | 'google'): Promise<UserProfile> {
     try {
-      const data = await this.profileSvc.createUserProfile(userId, email, name, provider);
+      const dto: CreateUserProfileDto = {
+        user_id: userId,
+        email,
+        name,
+        provider,
+      };
+      const result = await this.services.profile.createUserProfile(dto);
+      if (!isOk(result)) {
+        throw result.error;
+      }
+      const data = result.data;
       console.log('✅ User profile created:', email);
       return data;
     } catch (error) {
@@ -422,11 +426,15 @@ class SupabaseNativeService {
   // USER PROFILE METHODS
   // ===========================
 
-  async saveUserProfile(profile: Omit<OCDProfile, 'id' | 'created_at'>): Promise<OCDProfile> {
+  async saveUserProfile(profile: UpsertOCDProfileDto): Promise<OCDProfile> {
     try {
       console.log('🔄 Saving user profile to database...', profile);
       await this.ensureUserProfileExists(profile.user_id);
-      const data = await this.profileSvc.saveUserProfile(profile);
+      const result = await this.services.profile.saveUserProfile(profile);
+      if (!isOk(result)) {
+        throw result.error;
+      }
+      const data = result.data;
       console.log('✅ User profile saved to database:', data.user_id);
       return data;
     } catch (error) {
@@ -448,7 +456,7 @@ class SupabaseNativeService {
   ): Promise<void> {
     try {
       await this.ensureUserProfileExists(userId);
-      await this.aiSvc.upsertAIProfile(userId, profileData, onboardingCompleted);
+      await this.services.ai.upsertAIProfile(userId, profileData, onboardingCompleted);
       console.log('✅ AI profile upserted:', userId);
     } catch (error) {
       console.error('❌ upsertAIProfile failed:', error);
@@ -466,7 +474,7 @@ class SupabaseNativeService {
   ): Promise<void> {
     try {
       await this.ensureUserProfileExists(userId);
-      await this.aiSvc.upsertAITreatmentPlan(userId, planData, status);
+      await this.services.ai.upsertAITreatmentPlan(userId, planData, status);
       console.log('✅ AI treatment plan upserted:', userId);
     } catch (error) {
       console.error('❌ upsertAITreatmentPlan failed:', error);
@@ -489,7 +497,7 @@ class SupabaseNativeService {
     try {
       console.log('🔄 Saving compulsion to database...', compulsion);
       await this.ensureUserProfileExists(compulsion.user_id);
-      const result = await this.compulsionSvc.saveCompulsion(compulsion);
+      const result = await this.services.compulsion.saveCompulsion(compulsion);
       console.log('✅ Compulsion saved to database:', result.id);
       return result;
     } catch (error) {
@@ -501,7 +509,7 @@ class SupabaseNativeService {
   async getCompulsions(userId: string, startDate?: string, endDate?: string): Promise<CompulsionRecord[]> {
     try {
       console.log('🔍 Fetching compulsions from database...', { userId, startDate, endDate });
-      const list = await this.compulsionSvc.getCompulsions(userId, startDate, endDate);
+      const list = await this.services.compulsion.getCompulsions(userId, startDate, endDate);
       console.log(`✅ Fetched ${list?.length || 0} compulsions`);
       return list;
     } catch (error) {
@@ -730,7 +738,7 @@ class SupabaseNativeService {
   async saveVoiceCheckin(record: VoiceCheckinRecord): Promise<void> {
     try {
       await this.ensureUserProfileExists(record.user_id);
-      await this.voiceSvc.saveVoiceCheckin(record);
+      await this.services.voice.saveVoiceCheckin(record);
     } catch (error) {
       console.warn('⚠️ saveVoiceCheckin skipped:', (error as any)?.message);
     }
@@ -740,7 +748,7 @@ class SupabaseNativeService {
   async saveThoughtRecord(record: ThoughtRecordItem): Promise<void> {
     try {
       await this.ensureUserProfileExists(record.user_id);
-      await this.thoughtSvc.saveThoughtRecord(record);
+      await this.services.thought.saveThoughtRecord(record);
     } catch (error) {
       console.warn('⚠️ saveThoughtRecord skipped (table may not exist):', (error as any)?.message);
     }
@@ -820,7 +828,7 @@ class SupabaseNativeService {
 
   async getCBTRecords(userId: string, dateRange?: { start: Date; end: Date }): Promise<any[]> {
     try {
-      return await this.thoughtSvc.getCBTRecords(userId, dateRange);
+      return await this.services.thought.getCBTRecords(userId, dateRange);
     } catch (error) {
       console.error('❌ Failed to fetch CBT records:', error);
       return [];
@@ -852,7 +860,7 @@ class SupabaseNativeService {
   async saveVoiceSessionSummary(session: VoiceSessionDB): Promise<void> {
     try {
       await this.ensureUserProfileExists(session.user_id);
-      await this.voiceSvc.saveVoiceSessionSummary(session);
+      await this.services.voice.saveVoiceSessionSummary(session);
     } catch (error) {
       console.warn('⚠️ saveVoiceSessionSummary skipped (table may not exist):', (error as any)?.message);
     }
@@ -860,7 +868,7 @@ class SupabaseNativeService {
 
   async saveBreathSession(session: BreathSessionDB): Promise<void> {
     try {
-      await this.breathSvc.saveBreathSession(session);
+      await this.services.breath.saveBreathSession(session);
     } catch (error) {
       console.warn('⚠️ saveBreathSession skipped (table may not exist):', (error as any)?.message);
     }
@@ -882,21 +890,25 @@ class SupabaseNativeService {
   // MOOD METHODS
   // ===========================
 
-  async saveMoodEntry(entry: any): Promise<any> {
+  async saveMoodEntry(entry: CreateMoodEntryDto): Promise<MoodEntryRow | null> {
     if (!isUUID(entry.user_id)) {
       throw Object.assign(new Error('invalid user_id'), { code: 'CLIENT_INVALID_USER_ID' });
     }
     try {
       console.log('🔄 Saving mood entry...', entry);
       await this.ensureUserProfileExists(entry.user_id);
-      return await this.moodSvc.saveMoodEntry(entry);
+      const result = await this.services.mood.saveMoodEntry(entry);
+      if (!isOk(result)) {
+        throw result.error;
+      }
+      return result.data;
     } catch (error) {
       console.error('❌ Save mood entry failed:', error);
       throw error;
     }
   }
 
-  async getMoodEntries(userId: string, days: number = 7): Promise<any[]> {
+  async getMoodEntries(userId: string, days: number = 7): Promise<MoodEntryRow[]> {
     try {
       // Quick offline guard to avoid noisy network errors in RN when disconnected
       try {
@@ -908,7 +920,11 @@ class SupabaseNativeService {
       } catch {}
       const since = new Date();
       since.setDate(since.getDate() - days);
-      const list = await this.moodSvc.getMoodEntries(userId, since.toISOString());
+      const result = await this.services.mood.getMoodEntries(userId, since.toISOString());
+      if (!isOk(result)) {
+        throw result.error;
+      }
+      const list = result.data;
       console.log(`✅ Fetched ${list?.length || 0} mood entries`);
       return list;
     } catch (error) {
@@ -917,16 +933,13 @@ class SupabaseNativeService {
     }
   }
   
-  async updateMoodEntry(entryId: string, updates: Partial<{
-    mood_score: number;
-    energy_level: number;
-    anxiety_level: number;
-    notes: string;
-    triggers: string[];
-    activities: string[];
-  }>): Promise<any> {
+  async updateMoodEntry(entryId: string, updates: UpdateMoodEntryDto): Promise<MoodEntryRow> {
     try {
-      return await this.moodSvc.updateMoodEntry(entryId, updates);
+      const result = await this.services.mood.updateMoodEntry(entryId, updates);
+      if (!isOk(result)) {
+        throw result.error;
+      }
+      return result.data;
     } catch (error) {
       console.error('❌ Update mood entry failed:', error);
       throw error;
@@ -965,7 +978,7 @@ class SupabaseNativeService {
   async deleteVoiceCheckin(checkinId: string): Promise<void> {
     try {
       console.log('🗑️ Attempting to delete voice checkin:', checkinId);
-      await this.voiceSvc.deleteVoiceCheckin(checkinId);
+      await this.services.voice.deleteVoiceCheckin(checkinId);
       console.log('✅ Voice checkin deleted successfully from server:', checkinId);
     } catch (error) {
       console.error('❌ Failed to delete voice checkin:', error);
@@ -978,7 +991,7 @@ class SupabaseNativeService {
   async deleteThoughtRecord(recordId: string): Promise<void> {
     try {
       console.log('🗑️ Attempting to delete thought record:', recordId);
-      await this.thoughtSvc.deleteThoughtRecord(recordId);
+      await this.services.thought.deleteThoughtRecord(recordId);
       console.log('✅ Thought record deleted successfully from server:', recordId);
     } catch (error) {
       console.error('❌ Failed to delete thought record:', error);
@@ -1012,11 +1025,11 @@ class SupabaseNativeService {
   // ===========================
 
   async upsertAIPrediction(pred: import('@/types/ai').AIPrediction): Promise<{ id?: string; created_at?: string } | null> {
-    return this.aiPredSvc.upsertPrediction(pred);
+    return this.services.aiPrediction.upsertPrediction(pred);
   }
 
   async getAIPredictions(userId: string, sinceYmdInclusive: string, granularity: import('@/types/ai').AIPredGranularity = 'day', limit: number = 400) {
-    return this.aiPredSvc.getPredictions(userId, sinceYmdInclusive, granularity, limit);
+    return this.services.aiPrediction.getPredictions(userId, sinceYmdInclusive, granularity, limit);
   }
 }
 

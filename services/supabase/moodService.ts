@@ -2,6 +2,13 @@ import type { SupabaseClient } from '@supabase/supabase-js';
 import { TableClient } from '@/services/supabase/tableClient';
 import { sanitizePII } from '@/utils/privacy';
 import { computeMoodContentHash } from '@/services/idempotency/moodContentHash';
+import { err, ok, type Result } from '@/types/result';
+import type {
+  CreateMoodEntryDto,
+  MoodEntryRow,
+  MoodServiceError,
+  UpdateMoodEntryDto,
+} from '@/types/dto/mood';
 
 /**
  * MoodService: mood_entries CRUD (scaffold)
@@ -9,7 +16,11 @@ import { computeMoodContentHash } from '@/services/idempotency/moodContentHash';
 export class MoodService {
   constructor(private client: SupabaseClient) {}
 
-  async getMoodEntries(userId: string, sinceIso: string, limit: number = 200): Promise<any[]> {
+  async getMoodEntries(
+    userId: string,
+    sinceIso: string,
+    limit: number = 200,
+  ): Promise<Result<MoodEntryRow[], MoodServiceError>> {
     const moods = new TableClient<any>(this.client, 'mood_entries');
     const { data, error } = await moods
       .select('id, user_id, content_hash, created_at, mood_score, energy_level, anxiety_level, notes, triggers, activities')
@@ -17,12 +28,16 @@ export class MoodService {
       .gte('created_at', sinceIso)
       .order('created_at', { ascending: false })
       .limit(limit);
-    if (error) throw error;
-    return data || [];
+    if (error) return err(error);
+    const rows = (data ?? []) as unknown as MoodEntryRow[];
+    return ok(rows);
   }
 
-  async saveMoodEntry(entry: any): Promise<any> {
-    if (!entry?.user_id) throw new Error('invalid user_id');
+  async saveMoodEntry(entry: CreateMoodEntryDto): Promise<Result<MoodEntryRow | null, MoodServiceError>> {
+    if (!entry?.user_id) {
+      const error = Object.assign(new Error('invalid user_id'), { code: 'CLIENT_INVALID_USER_ID' });
+      return err(error);
+    }
     // Sanitize PII
     const sanitizedEntry = {
       ...entry,
@@ -64,31 +79,39 @@ export class MoodService {
     const { data, error } = await this.client
       .from('mood_entries')
       .upsert(payload, { onConflict: 'user_id,content_hash', ignoreDuplicates: true })
-      .select('id, user_id, content_hash, created_at')
+      .select('id, user_id, content_hash, created_at, mood_score, energy_level, anxiety_level, notes, triggers, activities')
       .maybeSingle();
 
     if (error) {
-      if (error.code === '23505' || error.message?.includes('duplicate') || error.code === 'PGRST116' || /multiple \(or no\) rows returned/i.test(error.message || '')) {
-        return null;
+      if (
+        error.code === '23505' ||
+        error.message?.includes('duplicate') ||
+        error.code === 'PGRST116' ||
+        /multiple \(or no\) rows returned/i.test(error.message || '')
+      ) {
+        return ok(null);
       }
-      throw error;
+      return err(error);
     }
     if (!data) {
       try {
         const { data: existing } = await this.client
           .from('mood_entries')
-          .select('id, user_id, content_hash, created_at')
+          .select('id, user_id, content_hash, created_at, mood_score, energy_level, anxiety_level, notes, triggers, activities')
           .eq('user_id', sanitizedEntry.user_id)
           .eq('content_hash', content_hash)
           .maybeSingle();
-        if (existing) return existing;
+        if (existing) return ok(existing as unknown as MoodEntryRow);
       } catch {}
     }
-    return data;
+    return ok((data as unknown as MoodEntryRow | null) ?? null);
   }
 
-  async updateMoodEntry(entryId: string, updates: Partial<{ mood_score: number; energy_level: number; anxiety_level: number; notes: string; triggers: string[]; activities: string[]; }>): Promise<any> {
-    const payload: any = { ...updates };
+  async updateMoodEntry(
+    entryId: string,
+    updates: UpdateMoodEntryDto,
+  ): Promise<Result<MoodEntryRow, MoodServiceError>> {
+    const payload: Record<string, unknown> = { ...updates };
     if (typeof payload.notes === 'string') payload.notes = sanitizePII(payload.notes);
     if (Array.isArray(payload.triggers)) payload.triggers = payload.triggers.map((t: string) => sanitizePII(t));
     if (Array.isArray(payload.activities)) payload.activities = payload.activities.map((a: string) => sanitizePII(a));
@@ -98,7 +121,7 @@ export class MoodService {
       .eq('id', entryId)
       .select()
       .single();
-    if (error) throw error;
-    return data;
+    if (error) return err(error);
+    return ok(data as unknown as MoodEntryRow);
   }
 }

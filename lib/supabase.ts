@@ -1,10 +1,11 @@
 import 'react-native-url-polyfill/auto'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { createClient } from '@supabase/supabase-js'
+import { getAppConfig } from '../configuration/appConfig'
 
-// Environment variables
-const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL || ''
-const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY || ''
+const { supabase: supabaseConfig } = getAppConfig()
+const supabaseUrl = supabaseConfig.url || ''
+const supabaseAnonKey = supabaseConfig.anonKey || ''
 
 // Validate environment variables
 if (!supabaseUrl || !supabaseAnonKey) {

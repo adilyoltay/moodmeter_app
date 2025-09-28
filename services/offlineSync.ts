@@ -15,6 +15,9 @@ import offlineSyncUserFeedbackService from '@/services/offlineSyncUserFeedbackSe
 import { networkMonitor } from '@/services/sync/networkMonitor';
 import { queueRepository } from '@/services/sync/queueRepository';
 import { syncMaintenance } from '@/services/sync/syncMaintenance';
+import { getAppConfig } from '../configuration/appConfig';
+
+const offlineFeatures = getAppConfig().features.offline;
 
 export interface SyncQueueItem {
   id: string;
@@ -38,7 +41,9 @@ export class OfflineSyncService {
   private isSyncing: boolean = false;
   
   // 🚨 CRITICAL FIX: Queue size limit to prevent unbounded growth
-  private static readonly MAX_QUEUE_SIZE = 1000;
+  private static readonly MAX_QUEUE_SIZE = offlineFeatures.maxQueueSize;
+  private static readonly SYNC_ENABLED = offlineFeatures.syncEnabled;
+  private static syncDisabledLogged = false;
   
   // ✅ NEW: Performance metrics tracking
   private syncMetrics = {
@@ -301,6 +306,14 @@ export class OfflineSyncService {
       });
     }
 
+    if (!OfflineSyncService.SYNC_ENABLED) {
+      if (!OfflineSyncService.syncDisabledLogged) {
+        OfflineSyncService.syncDisabledLogged = true;
+        console.log('ℹ️ Offline sync disabled by configuration; skipping queueing.');
+      }
+      return;
+    }
+
     // Sanitize the item to fix common issues
     const sanitizedTempItem = queueValidator.sanitizeItem(tempItem);
 
@@ -382,6 +395,14 @@ export class OfflineSyncService {
       }
     } catch (error) {
       console.error('❌ Failed to check encryption status for queue processing:', error);
+    }
+
+    if (!OfflineSyncService.SYNC_ENABLED) {
+      if (!OfflineSyncService.syncDisabledLogged) {
+        OfflineSyncService.syncDisabledLogged = true;
+        console.log('ℹ️ Offline sync disabled by configuration; skipping queue processing.');
+      }
+      return;
     }
 
     if (this.isSyncing || !this.isOnline || this.syncQueue.length === 0) {

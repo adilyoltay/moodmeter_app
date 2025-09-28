@@ -7,57 +7,23 @@
  * KRİTİK: Bu dosyadaki değişiklikler prodüksiyonu etkileyebilir!
  */
 
-import Constants from 'expo-constants';
+import { getAppConfig } from '../configuration/appConfig';
 
-// 🎯 MASTER AI SWITCH - Tek bir toggle ile tüm AI özellikleri kontrol edilir
-const getAIMasterEnabled = () => {
-  // Expo config ve process env üzerinden kontrol (prod dahil)
-  const enableAI = (Constants.expoConfig?.extra?.EXPO_PUBLIC_ENABLE_AI === 'true') ||
-                   (process.env.EXPO_PUBLIC_ENABLE_AI === 'true');
-  return enableAI;
-};
+const appConfig = getAppConfig();
+const { features, misc, environment, ai } = appConfig;
+const aiFeatures = features.ai;
 
-const AI_MASTER_ENABLED = false; // DISABLED - AI removal Phase 2
+const AI_MASTER_ENABLED = aiFeatures.masterEnabled;
+const AI_CHAT_ENABLED = aiFeatures.chatEnabled;
+const AI_PROMPT_LOGGING_ENV = aiFeatures.promptLogging;
 
-// Geçici: Prompt logging toggle (varsayılan kapalı, env ile açılabilir)
-const AI_PROMPT_LOGGING_ENV = (Constants.expoConfig?.extra?.EXPO_PUBLIC_AI_PROMPT_LOGGING === 'true') ||
-                              (process.env.EXPO_PUBLIC_AI_PROMPT_LOGGING === 'true');
-
-// 💬 AI_CHAT için bağımsız override desteği
-const resolveChatEnabled = (): boolean => {
-  const chatEnv = (Constants.expoConfig?.extra?.EXPO_PUBLIC_ENABLE_AI_CHAT ?? process.env.EXPO_PUBLIC_ENABLE_AI_CHAT);
-  if (typeof chatEnv === 'string') {
-    return chatEnv === 'true';
-  }
-  // Varsayılan: master switch ile aynı
-  return AI_MASTER_ENABLED;
-};
-const AI_CHAT_ENABLED = resolveChatEnabled();
-
-// Debug logging (development only) ve telemetry
 if (__DEV__) {
   console.log('🔧 Feature Flags Debug:', {
-    __DEV__,
-    expoConfigExtra: Constants.expoConfig?.extra?.EXPO_PUBLIC_ENABLE_AI,
-    processEnv: process.env.EXPO_PUBLIC_ENABLE_AI,
-    AI_MASTER_ENABLED
+    environment,
+    aiFeatures,
+    telemetryEnabled: aiFeatures.telemetryEnabled,
+    mockApiResponses: misc.mockApiResponses,
   });
-}
-
-// AI Master Switch durumunu telemetriye gönder
-if (typeof window !== 'undefined') {
-  // Browser/mobile environment
-  setTimeout(() => {
-    import('@/services/telemetry/noopTelemetry').then(({ trackAIInteraction, AIEventType }) => {
-      trackAIInteraction(AIEventType.SYSTEM_STATUS, {
-        aiMasterEnabled: AI_MASTER_ENABLED,
-        environment: __DEV__ ? 'development' : 'production',
-        enabledFeatureCount: Object.values(featureFlagState).filter(Boolean).length
-      });
-    }).catch(() => {
-      // Telemetry yüklenemezse sessizce devam et
-    });
-  }, 1000);
 }
 
 // Feature flag değerlerini runtime'da değiştirmek için mutable obje
@@ -153,10 +119,10 @@ const featureFlagState: Record<string, boolean | number> = {
   
   // 🔧 Development Features
   DEBUG_MODE: __DEV__,
-  MOCK_API_RESPONSES: __DEV__ && process.env.EXPO_PUBLIC_MOCK_API === 'true',
+  MOCK_API_RESPONSES: misc.mockApiResponses,
   
   // 📊 Telemetry Features
-  AI_TELEMETRY: AI_MASTER_ENABLED, // Master switch ile kontrol edilir
+  AI_TELEMETRY: AI_MASTER_ENABLED && aiFeatures.telemetryEnabled,
   PERFORMANCE_MONITORING: true,
   ERROR_REPORTING: true,
   
@@ -168,6 +134,23 @@ const featureFlagState: Record<string, boolean | number> = {
   // 🛡️ (Removed) ERP Module Feature Flag
   // ERP_MODULE_ENABLED: false, // Removed ERP module
 };
+
+// AI Master Switch durumunu telemetriye gönder
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    import('@/services/telemetry/noopTelemetry')
+      .then(({ trackAIInteraction, AIEventType }) => {
+        trackAIInteraction(AIEventType.SYSTEM_STATUS, {
+          aiMasterEnabled: AI_MASTER_ENABLED,
+          environment,
+          enabledFeatureCount: Object.values(featureFlagState).filter(Boolean).length,
+        });
+      })
+      .catch(() => {
+        // Telemetry yüklenemezse sessizce devam et
+      });
+  }, 1000);
+}
 
 // Feature flag logging için
 const featureUsageLog: Record<string, number> = {};
@@ -294,8 +277,7 @@ export const FEATURE_FLAGS = {
     delete (global as any).__MOODMETER_KILL_SWITCH;
     
     // Master switch'i aktifleştir
-    const masterEnabled = (Constants.expoConfig?.extra?.EXPO_PUBLIC_ENABLE_AI === 'true') ||
-                          (process.env.EXPO_PUBLIC_ENABLE_AI === 'true');
+    const masterEnabled = getAppConfig().features.ai.masterEnabled;
     Object.keys(featureFlagState).forEach(key => {
       if (key.startsWith('AI_')) {
         featureFlagState[key] = masterEnabled;
@@ -306,30 +288,11 @@ export const FEATURE_FLAGS = {
 
 // AI Configuration - Yol Haritası Uyumlu
 export const AI_CONFIG = {
-  // Default provider - environment'tan override edilebilir
-  DEFAULT_PROVIDER: (() => {
-    const raw = (Constants.expoConfig?.extra?.EXPO_PUBLIC_AI_PROVIDER as string) ||
-                (process.env.EXPO_PUBLIC_AI_PROVIDER as string) ||
-                'gemini';
-    const lower = String(raw).toLowerCase();
-    // Gemini-only: başka değer gelirse gemini'ye düş
-    return (lower === 'gemini' ? 'gemini' : 'gemini') as 'gemini';
-  })(),
-  
-  // Provider priorities (single provider)
-  PROVIDER_PRIORITY: ['gemini'] as const,
-  
-  // Feature-specific AI requirements
-  CHAT_REQUIRES_EXTERNAL_AI: true,
-  INSIGHTS_USES_LOCAL_AI: true,
-  VOICE_USES_HYBRID_AI: true,
-  
-  // Safety configurations
-  MAX_TOKENS: 4000,
-  TEMPERATURE_LIMIT: 0.8,
-  SAFETY_THRESHOLD: 0.9,
-  
-  // Rate limiting
-  MAX_REQUESTS_PER_MINUTE: 60,
-  MAX_REQUESTS_PER_HOUR: 1000,
+  DEFAULT_PROVIDER: ai.provider,
+  MODEL: ai.geminiModel,
+  CONFIDENCE_THRESHOLDS: ai.confidenceThresholds,
+  TEXT_LENGTH_THRESHOLD: ai.textLengthThreshold,
+  LLM_RATE_LIMIT_PER_10MIN: ai.llmRateLimitPer10Min,
+  LLM_DAILY_TOKEN_SOFT_LIMIT: ai.llmDailyTokenSoftLimit,
+  TELEMETRY_ENABLED: aiFeatures.telemetryEnabled,
 } as const;

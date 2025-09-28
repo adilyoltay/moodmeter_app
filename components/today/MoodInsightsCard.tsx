@@ -10,6 +10,7 @@ import {
   DominantTriggerInsight,
   MoodInsightEntry,
 } from '@/utils/moodInsights';
+import { getAppConfig } from '../../configuration/appConfig';
 
 type Props = {
   entries: MoodInsightEntry[];
@@ -21,6 +22,9 @@ type Props = {
 const MoodInsightsCard: React.FC<Props> = ({ entries, accentColor = Colors.primary.green, isLoading = false, range = 'week' }) => {
   const theme = useThemeColors();
   const { scheme } = useTheme();
+
+  const { features } = getAppConfig();
+  const insightsEnabled = features.ai.masterEnabled;
 
   const summary = useMemo(() => buildMoodInsights(entries ?? []), [entries]);
   const subtitleText = useMemo(() => {
@@ -116,6 +120,10 @@ const MoodInsightsCard: React.FC<Props> = ({ entries, accentColor = Colors.prima
       </View>
     );
   };
+
+  if (!insightsEnabled) {
+    return null;
+  }
 
   return (
     <View

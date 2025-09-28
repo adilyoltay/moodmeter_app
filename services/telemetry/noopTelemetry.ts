@@ -88,8 +88,25 @@ export const safeTrackAIInteraction = (
 /**
  * Default export for easier imports
  */
+export const trackErrorEvent = (
+  scope: string,
+  error: Error,
+  context: Record<string, any> = {}
+): Promise<void> => {
+  if (__DEV__) {
+    console.log(`[NOOP-TELEMETRY] error:${scope}`, {
+      message: error.message,
+      stack: error.stack,
+      ...context,
+    });
+  }
+
+  return Promise.resolve();
+};
+
 export default {
   trackAIInteraction,
   safeTrackAIInteraction,
-  AIEventType
+  trackErrorEvent,
+  AIEventType,
 };

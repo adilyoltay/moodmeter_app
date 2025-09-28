@@ -1,8 +1,5 @@
-import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { useFonts } from 'expo-font';
-import { Slot } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
-import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 import { LogBox } from 'react-native';
 import { AppState } from 'react-native';
@@ -10,26 +7,10 @@ import 'react-native-reanimated';
 import 'react-native-gesture-handler';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
-
-import { useColorScheme } from '@/hooks/useColorScheme';
-import { AuthProvider } from '@/contexts/SupabaseAuthContext';
-import { LoadingProvider } from '@/contexts/LoadingContext';
-import { NotificationProvider } from '@/contexts/NotificationContext';
-import { LanguageProvider } from '@/contexts/LanguageContext';
-import { AccentColorProvider } from '@/contexts/AccentColorContext';
-// 🚫 AI Context - DISABLED (Hard Stop AI Cleanup)
-// import { AIProvider } from '@/contexts/AIContext';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { queryClient } from '@/lib/queryClient';
 import { NavigationGuard } from '@/components/navigation/NavigationGuard';
-import { GlobalLoading } from '@/components/ui/GlobalLoading';
-import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import Toast from 'react-native-toast-message';
-import ErrorBoundary from '@/components/ErrorBoundary';
-import ConflictNotificationBanner from '@/components/ui/ConflictNotificationBanner';
-import { SyncStatusNotification } from '@/components/ui/SyncStatusNotification';
-import { ThemeProvider as AppThemeProvider } from '@/contexts/ThemeContext';
 import AppSplashScreen from '@/components/layout/AppSplashScreen';
+import AppProviders from '@/components/providers/AppProviders';
+import { AppErrorBoundary } from '@/components/error';
 
 // Performance monitoring
 import performanceMonitor from '@/services/performanceMonitor';
@@ -186,34 +167,14 @@ export default function RootLayout() {
   }
 
   return (
-    <ErrorBoundary>
-      <QueryClientProvider client={queryClient}>
-        <LanguageProvider>
-          <LoadingProvider>
-            <NotificationProvider>
-              <AuthProvider>
-                <AccentColorProvider>
-                <AppThemeProvider>
-                {/* 🚫 AIProvider - DISABLED (Hard Stop AI Cleanup) */}
-                <AppSplashScreen>
-                <NavigationGuard>
-                    <GestureHandlerRootView style={{ flex: 1 }}>
-                      <Slot />
-                      <ConflictNotificationBanner />
-                      <SyncStatusNotification />
-                      <GlobalLoading />
-                      <Toast />
-                    </GestureHandlerRootView>
-                </NavigationGuard>
-                </AppSplashScreen>
-                {/* 🚫 AIProvider closing tag removed */}
-                </AppThemeProvider>
-                </AccentColorProvider>
-              </AuthProvider>
-            </NotificationProvider>
-          </LoadingProvider>
-        </LanguageProvider>
-      </QueryClientProvider>
-    </ErrorBoundary>
+    <AppErrorBoundary>
+      <AppProviders>
+        {(appContent) => (
+          <AppSplashScreen>
+            <NavigationGuard>{appContent}</NavigationGuard>
+          </AppSplashScreen>
+        )}
+      </AppProviders>
+    </AppErrorBoundary>
   );
 }
